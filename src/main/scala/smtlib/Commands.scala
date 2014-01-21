@@ -6,7 +6,7 @@ object Commands {
 
   sealed abstract class Command
   case class SetLogic(logic: Logic) extends Command
-  case class SetOption(attribute: SMTOption) extends Command
+  case class SetOption(option: SMTOption) extends Command
   case class SetInfo(attribute: Attribute) extends Command
   case class DeclareSort(name: SSymbol, arity: Int) extends Command
   //case class DefineSort
