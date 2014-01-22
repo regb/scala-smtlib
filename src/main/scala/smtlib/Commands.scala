@@ -11,18 +11,18 @@ object Commands {
   case class SetLogic(logic: Logic) extends Command
   case class SetOption(option: SMTOption) extends Command
   case class SetInfo(attribute: Attribute) extends Command
-  case class DeclareSort(name: SSymbol, arity: Int) extends Command
+  case class DeclareSort(name: String, arity: Int) extends Command
   //case class DefineSort
-  case class DeclareFun(name: SSymbol, paramSorts: Seq[SExpr], returnSort: SExpr) extends Command
+  case class DeclareFun(name: String, paramSorts: Seq[SExpr], returnSort: SExpr) extends Command
   //case class DefineFun
-  case class Assert(term: SExpr) extends Command
   case class Push(n: Int) extends Command
   case class Pop(n: Int) extends Command
+  case class Assert(term: SExpr) extends Command
   case object CheckSat extends Command
-  //case object GetValue extends Command
+  case object GetAssertions extends Command
   case object GetProof extends Command
   case object GetUnsatCore extends Command
-  case object GetAssertions extends Command
+  case class GetValue(term: SExpr, terms: Seq[SExpr]) extends Command
   case object GetAssignment extends Command
   case class GetOption(key: String) extends Command
   case class GetInfo(flag: InfoFlag) extends Command

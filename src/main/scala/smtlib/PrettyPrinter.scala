@@ -12,23 +12,23 @@ object PrettyPrinter {
     case SetLogic(logic) => SList(SSymbol("set-logic"), logicToSExpr(logic))
     case SetOption(option) => SList(SSymbol("set-option"), optionToSExpr(option))
     case SetInfo(attribute) => SList(SSymbol("set-info"), attributeToSExpr(attribute))
-    //case class DeclareSort(name: SSymbol, arity: Int) extends Command
-    ////case class DefineSort
-    //case class DeclareFun(name: SSymbol, paramSorts: Seq[SExpr], returnSort: SExpr) extends Command
-    ////case class DefineFun
-    //case class Assert(term: SExpr) extends Command
-    //case class Push(n: Int) extends Command
-    //case class Pop(n: Int) extends Command
-    //case object CheckSat extends Command
-    ////case object GetValue extends Command
-    //case object GetProof extends Command
-    //case object GetUnsatCore extends Command
-    //case object GetAssertions extends Command
-    //case object GetAssignment extends Command
-    //case class GetOption(key: String) extends Command
+    case DeclareSort(name, arity) => SList(SSymbol("declare-sort"), SSymbol(name), SInt(arity))
+    //case class DefineSort
+    case DeclareFun(name, paramSorts, returnSort) => 
+      SList(SSymbol("declare-fun"), SList(paramSorts.toList), returnSort)
+    //case class DefineFun
+    case Push(n: Int) => SList(SSymbol("push"), SInt(n))
+    case Pop(n: Int) => SList(SSymbol("pop"), SInt(n))
+    case Assert(term) => SList(SSymbol("assert"), term)
+    case CheckSat => SList(SSymbol("check-sat"))
+    case GetAssertions => SList(SSymbol("get-assertions"))
+    case GetProof => SList(SSymbol("get-proof"))
+    case GetUnsatCore => SList(SSymbol("get-unsat-core"))
+    case GetValue(t, ts) => SList(SSymbol("get-value"), SList((t +: ts).toList))
+    case GetAssignment => SList(SSymbol("get-assignment"))
+    case GetOption(key) => SList(SSymbol("get-option"), SQualifiedSymbol(None, SSymbol(key)))
     case GetInfo(flag) => SList(SSymbol("get-info"), infoFlagToSExpr(flag))
     case Exit => SList(SSymbol("exit"))
-    case _ => ???
   }
 
   def logicToSExpr(logic: Logic): SExpr = ???
@@ -63,7 +63,7 @@ object PrettyPrinter {
   }
 
   def infoFlagToSExpr(flag: InfoFlag): SExpr = flag match {
-    case NameInfoFlag => SQualifiedSymbol(None, SSymbol("error-behavious"))
+    case ErrorBehaviourInfoFlag => SQualifiedSymbol(None, SSymbol("error-behavious"))
     case NameInfoFlag => SQualifiedSymbol(None, SSymbol("name"))
     case AuthorsInfoFlag => SQualifiedSymbol(None, SSymbol("author"))
     case VersionInfoFlag => SQualifiedSymbol(None, SSymbol("version"))
