@@ -4,6 +4,9 @@ import sexpr.SExprs._
 
 object Commands {
 
+  //TODO: TraversableOnce vs LinearSeq ?
+  case class Script(cmds: TraversableOnce[Command])
+
   sealed abstract class Command
   case class SetLogic(logic: Logic) extends Command
   case class SetOption(option: SMTOption) extends Command
@@ -21,11 +24,20 @@ object Commands {
   case object GetUnsatCore extends Command
   case object GetAssertions extends Command
   case object GetAssignment extends Command
-  case class GetInfo(flag: InfoFlag) extends Command
   case class GetOption(key: String) extends Command
+  case class GetInfo(flag: InfoFlag) extends Command
   case object Exit extends Command
 
+  case class Attribute(name: String, v: Option[SExpr])
+
+  /* 
+   * Info flags can be queried with get-info command and
+   * the SMT solver should support the following set of standard
+   * flags. Additional solver-specific flags are supported via the general
+   * KeywordInfoFlag
+   */
   sealed trait InfoFlag
+  case object ErrorBehaviourInfoFlag extends InfoFlag
   case object NameInfoFlag extends InfoFlag
   case object AuthorsInfoFlag extends InfoFlag
   case object VersionInfoFlag extends InfoFlag
@@ -34,12 +46,10 @@ object Commands {
   case object AllStatisticsInfoFlag extends InfoFlag
   case class KeywordInfoFlag(keyword: String) extends InfoFlag
 
-  case class Attribute(name: String, v: Option[SExpr])
-
   /*
    * Options that can be passed to the underlying SMT solver.
    * A bunch of standard option (defined by the SMT-LIB standard) and
-   * a generic syntax via attribute allows for solver specific options
+   * a generic syntax via attribute allows for solver-specific options
    */
   sealed trait SMTOption
   case class PrintSuccess(value: Boolean) extends SMTOption

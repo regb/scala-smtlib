@@ -11,7 +11,7 @@ object PrettyPrinter {
   def cmdToSExpr(cmd: Command): SExpr = cmd match {
     case SetLogic(logic) => SList(SSymbol("set-logic"), logicToSExpr(logic))
     case SetOption(option) => SList(SSymbol("set-option"), optionToSExpr(option))
-    //case class SetInfo(attribute: Attribute) extends Command
+    case SetInfo(attribute) => SList(SSymbol("set-info"), attributeToSExpr(attribute))
     //case class DeclareSort(name: SSymbol, arity: Int) extends Command
     ////case class DefineSort
     //case class DeclareFun(name: SSymbol, paramSorts: Seq[SExpr], returnSort: SExpr) extends Command
@@ -25,8 +25,8 @@ object PrettyPrinter {
     //case object GetUnsatCore extends Command
     //case object GetAssertions extends Command
     //case object GetAssignment extends Command
-    //case class GetInfo(flag: InfoFlag) extends Command
     //case class GetOption(key: String) extends Command
+    case GetInfo(flag) => SList(SSymbol("get-info"), infoFlagToSExpr(flag))
     case Exit => SList(SSymbol("exit"))
     case _ => ???
   }
@@ -62,13 +62,15 @@ object PrettyPrinter {
     case AttributeOption(attribute) => attributeToSExpr(attribute)
   }
 
-  //sealed trait InfoFlag
-  //case object NameInfoFlag extends InfoFlag
-  //case object AuthorsInfoFlag extends InfoFlag
-  //case object VersionInfoFlag extends InfoFlag
-  //case object StatusInfoFlag extends InfoFlag
-  //case object ReasonUnknownInfoFlag extends InfoFlag
-  //case object AllStatisticsInfoFlag extends InfoFlag
-  //case class KeywordInfoFlag(keyword: String) extends InfoFlag
+  def infoFlagToSExpr(flag: InfoFlag): SExpr = flag match {
+    case NameInfoFlag => SQualifiedSymbol(None, SSymbol("error-behavious"))
+    case NameInfoFlag => SQualifiedSymbol(None, SSymbol("name"))
+    case AuthorsInfoFlag => SQualifiedSymbol(None, SSymbol("author"))
+    case VersionInfoFlag => SQualifiedSymbol(None, SSymbol("version"))
+    case StatusInfoFlag => SQualifiedSymbol(None, SSymbol("status"))
+    case ReasonUnknownInfoFlag => SQualifiedSymbol(None, SSymbol("reason-unknown"))
+    case AllStatisticsInfoFlag => SQualifiedSymbol(None, SSymbol("all-statistics"))
+    case KeywordInfoFlag(keyword) => SQualifiedSymbol(None, SSymbol(keyword))
+  }
 
 }
