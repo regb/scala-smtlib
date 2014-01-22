@@ -9,7 +9,7 @@ import java.io.StringWriter
 
 object PrettyPrinter {
 
-  def apply(command: Command, writer: Writer): Unit = ???
+  def apply(command: Command, writer: Writer): Unit = sexpr.PrettyPrinter(cmdToSExpr(command), writer)
 
   def apply(command: Command): String = {
     val sWriter = new StringWriter
