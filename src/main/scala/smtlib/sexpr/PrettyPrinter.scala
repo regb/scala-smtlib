@@ -6,12 +6,14 @@ import java.io.Writer
 import java.io.StringWriter
 
 /*
- * Symbols are printed with quotations (|SYMBOL|) because this is the way you
- * are supposed to escape lower cases in Common Lisp. However, existing solvers (at the time of
- * commenting --- January 22 2014) are not respecting such things as they are invalidly parsing the
+ * Symbols are printed with quotations (|SYMBOL|) because this is the way you are supposed to escape 
+ * lower cases in Common Lisp. However, existing solvers (at the time of commenting --- January 22 
+ * 2014 --- Z3 and CVC4 at least) are not respecting such things as they are invalidly parsing the
  * input: <a> and <A> as different symbols while they should be both internally represented as <A>
  * Printing with the quotation seem to make the printer useable by other SMT solvers while still
  * respecting the standard.
+ *
+ * TODO: Double vs BigDecimals ?
  */
 
 object PrettyPrinter {
