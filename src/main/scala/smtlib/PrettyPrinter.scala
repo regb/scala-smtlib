@@ -4,9 +4,18 @@ import Commands._
 
 import sexpr.SExprs._
 
+import java.io.Writer
+import java.io.StringWriter
+
 object PrettyPrinter {
 
-  def apply(command: Command): String = ???
+  def apply(command: Command, writer: Writer): Unit = ???
+
+  def apply(command: Command): String = {
+    val sWriter = new StringWriter
+    apply(command, sWriter)
+    sWriter.toString
+  }
   
   def cmdToSExpr(cmd: Command): SExpr = cmd match {
     case SetLogic(logic) => SList(SSymbol("set-logic"), logicToSExpr(logic))
