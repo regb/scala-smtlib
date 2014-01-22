@@ -14,11 +14,15 @@ object PrettyPrinter {
       writer.write(s)
       writer.append('"')
     }
-    case SSymbol(s) => writer.write(s)
+    case SSymbol(s) => { //quoting the symbol since some SMT solver do not accept captical cases for symbols
+      writer.append('|')
+      writer.write(s)
+      writer.append('|')
+    }
     case SQualifiedSymbol(os, s) => {
       os.foreach(apply(_, writer))
       writer.append(':')
-      writer.write(apply(s))
+      apply(s, writer)
     }
     case SInt(i) => writer.write(i.toString)
     case SDouble(d) => writer.write(d.toString)
@@ -29,7 +33,7 @@ object PrettyPrinter {
     }
   }
 
-  def apply(sexpr: SExpr): String = {
+  def toString(sexpr: SExpr): String = {
     val sWriter = new StringWriter
     apply(sexpr, sWriter)
     sWriter.toString

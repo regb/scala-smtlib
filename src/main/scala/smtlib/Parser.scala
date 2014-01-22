@@ -7,6 +7,8 @@ import scala.collection.Iterator
 
 object Parser {
   class UnknownCommand(msg: String) extends Exception(msg)
+
+  //def fromString(str: String): S
 }
 
 /*

@@ -70,3 +70,16 @@ class Parser(lexer: Lexer) {
 
 
 }
+
+object Parser {
+
+  /*
+   * Parse a string and return the next SExpr in the string, ignore the rest
+   */
+  def fromString(str: String): SExpr = {
+    val lexer = new Lexer(new java.io.StringReader(str))
+    val parser = new Parser(lexer)
+    parser.parse
+  }
+
+}
