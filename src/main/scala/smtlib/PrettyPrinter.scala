@@ -36,21 +36,31 @@ object PrettyPrinter {
   def attributeToSExpr(attribute: Attribute): SExpr = ???
   //final case class Attribute(name: String, v: Option[SExpr])
 
-  def optionToSExpr(option: SMTOption): SExpr = ???
-  //sealed trait SMTOption
-  //case class PrintSuccess(value: Boolean) extends SMTOption
-  //case class ExpandDefinitions(value: Boolean) extends SMTOption
-  //case class InteractiveMode(value: Boolean) extends SMTOption
-  //case class ProduceProofs(value: Boolean) extends SMTOption
-  //case class ProduceUnsatCores(value: Boolean) extends SMTOption
-  //case class ProduceModels(value: Boolean) extends SMTOption
-  //case class ProduceAssignments(value: Boolean) extends SMTOption
-  //case class RegularOutputChannel(value: String) extends SMTOption
-  //case class DiagnosticOutputChannel(value: String) extends SMTOption
-  //case class RandomSeed(value: Int) extends SMTOption
-  //case class Verbosity(value: Int) extends SMTOption
-  //case class AttributeOption(name: String, v: Option[SExpr]) extends SMTOption
-
+  def optionToSExpr(option: SMTOption): SExpr = option match {
+    case PrintSuccess(value) => 
+      SList(SQualifiedSymbol(None, SSymbol("print-success")), SSymbol(value.toString))
+    case ExpandDefinitions(value) =>
+      SList(SQualifiedSymbol(None, SSymbol("expand-definitions")), SSymbol(value.toString))
+    case InteractiveMode(value) =>
+      SList(SQualifiedSymbol(None, SSymbol("interactive-mode")), SSymbol(value.toString))
+    case ProduceProofs(value) =>
+      SList(SQualifiedSymbol(None, SSymbol("produce-proofs")), SSymbol(value.toString))
+    case ProduceUnsatCores(value) =>
+      SList(SQualifiedSymbol(None, SSymbol("produce-unsat-cores")), SSymbol(value.toString))
+    case ProduceModels(value) =>
+      SList(SQualifiedSymbol(None, SSymbol("produce-models")), SSymbol(value.toString))
+    case ProduceAssignments(value) =>
+      SList(SQualifiedSymbol(None, SSymbol("produce-assignments")), SSymbol(value.toString))
+    case RegularOutputChannel(value) =>
+      SList(SQualifiedSymbol(None, SSymbol("regular-output-channel")), SString(value))
+    case DiagnosticOutputChannel(value) =>
+      SList(SQualifiedSymbol(None, SSymbol("diagnostic-output-channel")), SString(value))
+    case RandomSeed(numeral) =>
+      SList(SQualifiedSymbol(None, SSymbol("random-seed")), SInt(numeral))
+    case Verbosity(numeral) =>
+      SList(SQualifiedSymbol(None, SSymbol("verbosity")), SInt(numeral))
+    case AttributeOption(attribute) => attributeToSExpr(attribute)
+  }
 
   //sealed trait InfoFlag
   //case object NameInfoFlag extends InfoFlag

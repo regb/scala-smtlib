@@ -14,4 +14,6 @@ object SExprs {
   case class SQualifiedSymbol(q: Option[SSymbol], s: SSymbol) extends SExpr
   case class SComment(s: String) extends SExpr /* Never parsed, only used for pretty printing */
 
+
+  //TODO: SBoolean ???
 }

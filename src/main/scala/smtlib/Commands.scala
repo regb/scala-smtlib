@@ -25,7 +25,6 @@ object Commands {
   case class GetOption(key: String) extends Command
   case object Exit extends Command
 
-
   sealed trait InfoFlag
   case object NameInfoFlag extends InfoFlag
   case object AuthorsInfoFlag extends InfoFlag
@@ -35,8 +34,13 @@ object Commands {
   case object AllStatisticsInfoFlag extends InfoFlag
   case class KeywordInfoFlag(keyword: String) extends InfoFlag
 
-  final case class Attribute(name: String, v: Option[SExpr])
+  case class Attribute(name: String, v: Option[SExpr])
 
+  /*
+   * Options that can be passed to the underlying SMT solver.
+   * A bunch of standard option (defined by the SMT-LIB standard) and
+   * a generic syntax via attribute allows for solver specific options
+   */
   sealed trait SMTOption
   case class PrintSuccess(value: Boolean) extends SMTOption
   case class ExpandDefinitions(value: Boolean) extends SMTOption
@@ -49,7 +53,7 @@ object Commands {
   case class DiagnosticOutputChannel(value: String) extends SMTOption
   case class RandomSeed(value: Int) extends SMTOption
   case class Verbosity(value: Int) extends SMTOption
-  case class AttributeOption(name: String, v: Option[SExpr]) extends SMTOption
+  case class AttributeOption(attribute: Attribute) extends SMTOption
 
   case class Identifier(symbol: SSymbol, ns: Seq[Int])
   //case class SymbolId(symbol: SSymbol) extends Identifier
