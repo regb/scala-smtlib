@@ -1,9 +1,16 @@
 Scala SMT-LIB
 =============
 
-SMT-LIB library for Scala. It provides support for parsing and printing SMT-LIB2 syntax.
+Scala SMT-LIB is a generic abstraction over the [SMT-LIB](http://www.smtlib.org/) textual standard.
+It enables you to use a typesafe API to build SMT-LIB 2.0 scripts and execute them via any solver
+that respects the SMT-LIB standard.
 
-The library is still in development and evolve along with the needs of the projects that use it.
+Scala SMT-LIB provides tool support for parsing and printing SMT-LIB syntax. It can help you if you need
+to communicate with a native SMT process via its text interface. You can also write Scala wrapper around
+SMT solvers and use them from the programmable API. Or you could even get crazier and use a [pure Scala
+SMT solver](https://github.com/regb/scabolic) that happens to implement the SMT-LIB api.
+
+The library is still in development and is evolving along with the needs of the projects that use it.
 
 Setup
 -----
