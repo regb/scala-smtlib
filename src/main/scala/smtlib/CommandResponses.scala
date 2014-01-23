@@ -17,20 +17,17 @@ object CommandResponses {
     override def toString = """(error "%s")""".format(msg)
   }
 
-  sealed trait CheckSatResponse extends CommandResponse
-  case object SatStatus extends CommandResponse {
+  sealed trait Status
+  case object SatStatus extends Status {
     override def toString = "sat"
   }
-  case object UnsatStatus extends CommandResponse {
+  case object UnsatStatus extends Status {
     override def toString = "unsat"
   }
-  case object UnknownStatus extends CommandResponse {
+  case object UnknownStatus extends Status {
     override def toString = "unknown"
   }
 
-  /*
-   * Info Response stuff
-   */
   sealed trait ErrorBehaviour
   case object ImmediateExitErrorBehaviour extends ErrorBehaviour {
     override def toString = "immediate-exit"
@@ -45,6 +42,11 @@ object CommandResponses {
   }
   case object IncompleteReasonUnknown extends ErrorBehaviour {
     override def toString = "incomplete"
+  }
+
+
+  case class CheckSatResponse(status: Status) extends CommandResponse {
+    override def toString = status.toString
   }
 
   case class GetInfoResponse(info: InfoResponse, infos: Seq[InfoResponse]) extends CommandResponse {
@@ -64,7 +66,10 @@ object CommandResponses {
     override def toString = ":version \"%s\"".format(version)
   }
   case class ReasonUnkownionInfoResponse(reason: ReasonUnknown) extends InfoResponse {
-    override def toString = ":reason-unknown " + reason
+    override def toString = ":reason-unknown " + reason.toString
+  }
+  case class StatusInfoResponse(status: Status) extends InfoResponse {
+    override def toString = ":status " + status.toString
   }
   case class AttributeInfoResponse(attribute: Attribute) extends InfoResponse {
     override def toString = attribute.toString

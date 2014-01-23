@@ -56,20 +56,34 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
         DeclareSort(sort, arity.toInt)
       case SList(List(SSymbol("DECLARE-FUN"), s@SSymbol(fun), SList(sorts), sort)) =>
         DeclareFun(fun, sorts, sort)
-      case SList(List(SSymbol("ASSERT"), term)) =>
-        Assert(term)
-      case SList(List(SSymbol("CHECK-SAT"))) =>
-        CheckSat
-      case SList(List(SSymbol("EXIT"))) =>
-        Exit
       case SList(List(SSymbol("PUSH"), SInt(n))) => 
         Push(n.toInt)
       case SList(List(SSymbol("POP"), SInt(n))) => 
         Pop(n.toInt)
+      case SList(List(SSymbol("ASSERT"), term)) =>
+        Assert(term)
+      case SList(List(SSymbol("CHECK-SAT"))) =>
+        CheckSat
+      case SList(List(SSymbol("GET-OPTION"), SQualifiedSymbol(None, SSymbol(keyword)))) => GetOption(keyword)
+      case SList(List(SSymbol("GET-INFO"), flag)) => GetInfo(parseInfoFlag(flag))
+      case SList(List(SSymbol("EXIT"))) =>
+        Exit
       case _ =>
         throw new UnknownCommand("Unknown command: " + cmd)
     }
     res
+  }
+
+  private def parseInfoFlag(flag: SExpr): InfoFlag = flag match {
+    case SQualifiedSymbol(None, SSymbol("ERROR-BEHAVIOUR")) => ErrorBehaviourInfoFlag
+    case SQualifiedSymbol(None, SSymbol("NAME")) => NameInfoFlag
+    case SQualifiedSymbol(None, SSymbol("AUTHORS")) => AuthorsInfoFlag
+    case SQualifiedSymbol(None, SSymbol("VERSION")) => VersionInfoFlag
+    case SQualifiedSymbol(None, SSymbol("STATUS")) => StatusInfoFlag
+    case SQualifiedSymbol(None, SSymbol("REASON-UNKNOWN")) => ReasonUnknownInfoFlag
+    case SQualifiedSymbol(None, SSymbol("ALL-STATISTICS")) => AllStatisticsInfoFlag
+    case SQualifiedSymbol(None, SSymbol(keyword)) => KeywordInfoFlag(keyword)
+    case _ => sys.error("unexpected: " + flag + " when expecting info flag")
   }
 
   private def parseOption(option: List[SExpr]): SMTOption = option match {
