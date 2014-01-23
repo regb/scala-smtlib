@@ -7,7 +7,7 @@ package smtlib
  * That choice is also influenced by the somewhat unclear treatment of upper/lower case symbols in SMT-LIB.
  */
 
-import Commands.{Identifier, Sort} //to remove when id and sort will be moved to here
+import Commands._
 
 object Terms {
 
@@ -25,12 +25,12 @@ object Terms {
   case class Decimal(value: BigDecimal) extends Literal[BigDecimal]
   case class SMTLIBString(value: String) extends Literal[String]
 
-  case class Let(binding: VarBinding, term: Term, terms: Seq[Term]) extends Term
+  case class Let(binding: VarBinding, bindings: Seq[VarBinding], term: Term) extends Term
   case class ForAll(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
   case class Exists(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
   case class QualifiedIdentifier(id: Identifier, sort: Option[Sort]) extends Term
-  //(QualIdentifier Term+)
-  //(! Term Attribute+)
+  case class AnnotatedTerm(term: Term, attribute: Attribute, attributes: Seq[Attribute]) extends Term
+  case class FunctionApplication(fun: QualifiedIdentifier, terms: Seq[Term]) extends Term //TODO: should terms be at leat of length 1 ?
 
 
   case class SortedVar(symbol: String, sort: Sort)

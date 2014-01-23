@@ -5,7 +5,7 @@ import sexpr.SExprs._
 object Commands {
 
   //TODO: TraversableOnce vs LinearSeq ?
-  case class Script(cmds: TraversableOnce[Command])
+  case class Script(commands: TraversableOnce[Command])
 
   sealed abstract class Command
   case class SetLogic(logic: Logic) extends Command
