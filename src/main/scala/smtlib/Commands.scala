@@ -65,9 +65,8 @@ object Commands {
   case class Verbosity(value: Int) extends SMTOption
   case class AttributeOption(attribute: Attribute) extends SMTOption
 
-  case class Identifier(symbol: SSymbol, ns: Seq[Int])
-  //case class SymbolId(symbol: SSymbol) extends Identifier
-  //case class IndexedId(symbol: SSymbol, n1: Int, ns: Seq[Int]) extends Identifier
+  //an identifier is either a symbol or an indexed symbol: (_ symbol <numeral>+)
+  case class Identifier(symbol: SSymbol, ns: Seq[Int]) //should be moved to the Terms
 
   case class Sort(id: Identifier, subSorts: Seq[Sort])
   //case class SymbolSort(symbol: SSymbol) extends Sort
