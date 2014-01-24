@@ -12,9 +12,9 @@ object Commands {
   case class SetOption(option: SMTOption) extends Command
   case class SetInfo(attribute: Attribute) extends Command
   case class DeclareSort(name: String, arity: Int) extends Command
-  //case class DefineSort
+  //case class DefineSort(name: String, params: Seq[String], sort: Sort) extends Command
   case class DeclareFun(name: String, paramSorts: Seq[SExpr], returnSort: SExpr) extends Command
-  //case class DefineFun
+  //case class DefineFun(name: String, params: Seq[
   case class Push(n: Int) extends Command
   case class Pop(n: Int) extends Command
   case class Assert(term: SExpr) extends Command

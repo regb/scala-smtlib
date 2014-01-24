@@ -88,16 +88,31 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
 
   private def parseOption(option: List[SExpr]): SMTOption = option match {
     case List(SQualifiedSymbol(None, SSymbol("PRINT-SUCCESS")), SBool(bv)) => PrintSuccess(bv)
-    case List(SQualifiedSymbol(None, SSymbol("VERBOSITY")), SInt(i)) => Verbosity(i.toInt)
+    case List(SQualifiedSymbol(None, SSymbol("EXPAND-DEFINITIONS")), SBool(bv)) => ExpandDefinitions(bv)
+    case List(SQualifiedSymbol(None, SSymbol("INTERACTIVE-MODE")), SBool(bv)) => InteractiveMode(bv)
+    case List(SQualifiedSymbol(None, SSymbol("PRODUCE-PROOFS")), SBool(bv)) => ProduceProofs(bv)
+    case List(SQualifiedSymbol(None, SSymbol("PRODUCE-UNSAT-CORES")), SBool(bv)) => ProduceUnsatCores(bv)
+    case List(SQualifiedSymbol(None, SSymbol("PRODUCE-MODELS")), SBool(bv)) => ProduceModels(bv)
+    case List(SQualifiedSymbol(None, SSymbol("PRODUCE-ASSIGNMENTS")), SBool(bv)) => ProduceAssignments(bv)
     case List(SQualifiedSymbol(None, SSymbol("REGULAR-OUTPUT-CHANNEL")), SString(channel)) => RegularOutputChannel(channel)
     case List(SQualifiedSymbol(None, SSymbol("DIAGNOSTIC-OUTPUT-CHANNEL")), SString(channel)) => DiagnosticOutputChannel(channel)
-    case _ => sys.error("unexpected: " + option + " when expecting option")
+    case List(SQualifiedSymbol(None, SSymbol("RANDOM-SEED")), SInt(num)) => RandomSeed(num.toInt)
+    case List(SQualifiedSymbol(None, SSymbol("VERBOSITY")), SInt(i)) => Verbosity(i.toInt)
+    case _ => AttributeOption(parseAttribute(option))
+    //case _ => sys.error("unexpected: " + option + " when expecting option")
   }
 
   object SBool {
     def unapply(expr: SExpr): Option[Boolean] = expr match {
       case SSymbol("TRUE") => Some(true)
       case SSymbol("FALSE") => Some(false)
+      case _ => None
+    }
+  }
+
+  object keyword {
+    def unapply(expr: SExpr): Option[String] = expr match {
+      case SQualifiedSymbol(None, SSymbol(sym)) => Some(sym)
       case _ => None
     }
   }
