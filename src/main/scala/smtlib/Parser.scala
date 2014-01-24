@@ -102,21 +102,6 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
     //case _ => sys.error("unexpected: " + option + " when expecting option")
   }
 
-  object SBool {
-    def unapply(expr: SExpr): Option[Boolean] = expr match {
-      case SSymbol("TRUE") => Some(true)
-      case SSymbol("FALSE") => Some(false)
-      case _ => None
-    }
-  }
-
-  object keyword {
-    def unapply(expr: SExpr): Option[String] = expr match {
-      case SQualifiedSymbol(None, SSymbol(sym)) => Some(sym)
-      case _ => None
-    }
-  }
-
   //todo: make sure no nested keyword in value
   private def parseAttribute(ss: List[SExpr]): Attribute = ss match {
     case List(SQualifiedSymbol(None, SSymbol(key))) => Attribute(key, None)

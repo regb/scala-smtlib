@@ -1,6 +1,7 @@
 package smtlib
 
 import Commands.Attribute
+import sexpr.SExprs.SExpr
 
 object CommandResponses {
 
@@ -74,5 +75,8 @@ object CommandResponses {
   case class AttributeInfoResponse(attribute: Attribute) extends InfoResponse {
     override def toString = attribute.toString
   }
+
+  //TODO: attributeValue trait more precise than SExpr
+  case class GetOptionResponse(attributeValue: SExpr) extends CommandResponse
 
 }
