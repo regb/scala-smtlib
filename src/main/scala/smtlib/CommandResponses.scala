@@ -33,8 +33,8 @@ object CommandResponses {
   case object ImmediateExitErrorBehaviour extends ErrorBehaviour {
     override def toString = "immediate-exit"
   }
-  case object ContinuedExecutionErrorBehaviour extends ErrorBehaviour {
-    override def toString = "continued-execution"
+  case object ContinueExecutionErrorBehaviour extends ErrorBehaviour {
+    override def toString = "continue-execution"
   }
 
   sealed trait ReasonUnknown
