@@ -7,7 +7,7 @@ object Commands {
   //TODO: TraversableOnce vs LinearSeq ?
   case class Script(commands: TraversableOnce[Command])
 
-  sealed abstract class Command
+  sealed trait Command
   case class SetLogic(logic: Logic) extends Command
   case class SetOption(option: SMTOption) extends Command
   case class SetInfo(attribute: Attribute) extends Command
