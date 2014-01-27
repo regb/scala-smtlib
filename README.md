@@ -10,7 +10,7 @@ to communicate with a native SMT process via its text interface. You can also wr
 SMT solvers and use them from the programmable API. Or you could even get crazier and use a [pure Scala
 SMT solver](https://github.com/regb/scabolic) that happens to implement the SMT-LIB api.
 
-The library is still in development and is evolving along with the needs of the projects that use it.
+The library is still in development and is evolving along with the needs of the projects using it.
 
 Setup
 -----
@@ -23,6 +23,18 @@ It will produce a jar that you can add to the classpath of your own project.
 
 Examples
 --------
+
+The parser can be constructed with a java.io.Reader, you could for example do the following:
+
+    val is = new java.io.FileReader(inputFile)
+    val parser = new smtlib.Parser(is)
+
+The parser implements the `Iterator[Command]` and can thus be used in any
+interface that expects a `TraversableOnce` element. In particular, assuming an implicit solver
+that implements the Interpreter interface is in scope, you can do the following:
+
+    import smtlib.Commands.Script
+    smtlib.Interpreter(Script(parser))
 
 API
 ---
