@@ -6,6 +6,11 @@ import CommandResponses.CommandResponse
 /*
  * An interpreter is a stateful object that can eval Commands and returns
  * CommandResponse.
+ *
+ * Note that despite returning the command response, the interpreter should handle the printing
+ * of those responses itself. That is because it needs to handle the verbosity and *-output-channel
+ * options commands, and will do the correct printing depending on the internal state.
+ * The responses are returned as a way to progamatically communicate with a solver.
  */
 trait Interpreter {
 
