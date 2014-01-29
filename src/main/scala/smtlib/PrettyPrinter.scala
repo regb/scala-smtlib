@@ -24,7 +24,7 @@ object PrettyPrinter {
     case DeclareSort(name, arity) => SList(SSymbol("declare-sort"), SSymbol(name), SInt(arity))
     //case class DefineSort
     case DeclareFun(name, paramSorts, returnSort) => 
-      SList(SSymbol("declare-fun"), SList(paramSorts.toList), returnSort)
+      SList(SSymbol("declare-fun"), SSymbol(name), SList(paramSorts.toList), returnSort)
     //case class DefineFun
     case Push(n: Int) => SList(SSymbol("push"), SInt(n))
     case Pop(n: Int) => SList(SSymbol("pop"), SInt(n))
