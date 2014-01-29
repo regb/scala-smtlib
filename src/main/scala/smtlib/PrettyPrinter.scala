@@ -38,6 +38,7 @@ object PrettyPrinter {
     case GetOption(key) => SList(SSymbol("get-option"), SQualifiedSymbol(None, SSymbol(key)))
     case GetInfo(flag) => SList(SSymbol("get-info"), infoFlagToSExpr(flag))
     case Exit => SList(SSymbol("exit"))
+    case NonStandardCommand(expr) => expr
   }
 
   def logicToSExpr(logic: Logic): SExpr = ???

@@ -27,6 +27,9 @@ object Commands {
   case class GetOption(key: String) extends Command
   case class GetInfo(flag: InfoFlag) extends Command
   case object Exit extends Command
+  //this command can be used to create and print arbitrary commands using the s-expression
+  //It can be used to send commands not supported in this library, such as non-standard commands like declare-datatypes
+  case class NonStandardCommand(sexpr: SExpr) extends Command
 
   case class Attribute(name: String, v: Option[SExpr])
 
