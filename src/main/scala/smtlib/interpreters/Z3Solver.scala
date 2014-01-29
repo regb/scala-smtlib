@@ -13,29 +13,23 @@ class Z3Interpreter extends Interpreter {
   var z3Out: Reader = null
 
   private val pio = new ProcessIO(
-    in => z3In = new PrintWriter(in),
-    out => {
-      z3Out = new InputStreamReader(out)
-      //new Thread {
-      //  override def run() {
-      //    while(true)
-      //      println(z3Out.read.toChar)
-      //  }
-      //}.start
-    },
+    in => z3In = new BufferedWriter(new OutputStreamWriter(in)),
+    out => z3Out = new BufferedReader(new InputStreamReader(out)),
     err => ()
   )
 
-  //val z3 = "z3 -in -smt".run(pio)
-  val cvc = "cvc4 -lang=smtlib".run(pio)
+  val z3 = "z3 -in -smt2".run(pio)
 
-  //PrettyPrinter(SetOption(PrintSuccess(true)), z3In)
-  //z3In.write("\n")
-  //PrettyPrinter(SetOption(PrintSuccess(true)), z3In)
-  //z3In.write("\n")
-  //println("Z3 output: " + readFromZ3)
 
-  private def readFromZ3: String = {
+  PrettyPrinter(SetOption(PrintSuccess(true)), z3In)
+  z3In.write("\n")
+  z3In.flush
+
+  val parser = new ResponseParser(z3Out)
+  parser.next
+
+  def readFromZ3: String = {
+    z3In.flush
     var res: String = ""
     while(z3Out.ready) {
       val c = z3Out.read
@@ -44,6 +38,11 @@ class Z3Interpreter extends Interpreter {
     res
   }
 
-  def eval(cmd: Command) = ???
+  def eval(cmd: Command): CommandResponse = {
+    PrettyPrinter(cmd, z3In)
+    z3In.write("\n")
+    z3In.flush
+    parser.next
+  }
 
 }

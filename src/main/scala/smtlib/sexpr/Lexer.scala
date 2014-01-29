@@ -19,6 +19,7 @@ class Lexer(reader: java.io.Reader) {
   private def isBlank(c: Char) = c == '\n' || c == '\r' || c == ' '
   private def isSeparator(c: Char) = isBlank(c) || c == ')' || c == '('
 
+  //TODO: no lookahead unless asked for read
   private var _currentChar: Int = -1
   private var _futureChar: Int = reader.read
 

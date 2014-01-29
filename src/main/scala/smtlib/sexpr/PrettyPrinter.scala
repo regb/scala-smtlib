@@ -25,10 +25,8 @@ object PrettyPrinter {
       writer.write(s)
       writer.append('"')
     }
-    case SSymbol(s) => { //quoting the symbol since some SMT solver do not accept captical cases for symbols
-      writer.append('|')
+    case SSymbol(s) => {
       writer.write(s)
-      writer.append('|')
     }
     case SQualifiedSymbol(os, s) => {
       os.foreach(apply(_, writer))
