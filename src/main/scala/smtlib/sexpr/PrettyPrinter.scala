@@ -55,6 +55,7 @@ object PrettyPrinter {
 
     exprs.foreach(e => {
       apply(e, writer)
+      c += 1
       if(c < sz) writer.write(op)
     })
     writer.write(post)
