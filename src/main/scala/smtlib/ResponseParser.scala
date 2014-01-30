@@ -47,8 +47,8 @@ class ResponseParser(input: java.io.Reader) extends Iterator[CommandResponse] {
       case SSymbol("SAT") => CheckSatResponse(SatStatus)
       case SSymbol("UNSAT") => CheckSatResponse(UnsatStatus)
       case SSymbol("UNKNOWN") => CheckSatResponse(UnknownStatus)
-      case _ =>
-        throw new UnknownCommandResponse("Unknown command response: " + response)
+      case SList(List(SSymbol(""), SString(msg))) => Error(msg)
+      case sexpr => SExprResponse(sexpr)
     }
     res
   }

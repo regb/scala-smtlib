@@ -1,7 +1,7 @@
 package smtlib
 
 import Commands.Attribute
-import sexpr.SExprs.SExpr
+import sexpr.SExprs._
 
 object CommandResponses {
 
@@ -79,6 +79,19 @@ object CommandResponses {
   //TODO: attributeValue trait more precise than SExpr
   case class GetOptionResponse(attributeValue: SExpr) extends CommandResponse
 
+  case class SExprResponse(sexpr: SExpr) extends CommandResponse
 
-  case class GetValueResponse(values: Seq[(SExpr, SExpr)]) extends CommandResponse
+  object GetValueResponse {
+    def apply(values: Seq[(SExpr, SExpr)]): CommandResponse = SExprResponse(SList(values.map(p => SList(p._1, p._2)).toList))
+    def unapply(cmdRes: CommandResponse): Option[Seq[(SExpr, SExpr)]] = cmdRes match {
+      case SExprResponse(SList(values)) => {
+        scala.util.Try(values.map{
+          case SList(List(s, v)) => (s, v)
+          case _ => throw new Exception
+        }).toOption
+      }
+      case _ => None
+    }
+  }
+
 }
