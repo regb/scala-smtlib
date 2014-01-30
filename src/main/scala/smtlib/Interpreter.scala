@@ -16,6 +16,10 @@ trait Interpreter {
 
   def eval(cmd: Command): CommandResponse
 
+  //A free method is kind of justified by the need for the IO streams to be closed, and
+  //there seems to be a decent case in general to have such a method for things like solvers
+  def free(): Unit
+
 }
 
 object Interpreter {

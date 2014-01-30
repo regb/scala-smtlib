@@ -38,11 +38,17 @@ class Z3Interpreter extends Interpreter {
     res
   }
 
-  def eval(cmd: Command): CommandResponse = {
+  override def eval(cmd: Command): CommandResponse = {
     PrettyPrinter(cmd, z3In)
     z3In.write("\n")
     z3In.flush
     parser.next
+  }
+
+
+  override def free(): Unit = {
+    z3In.close
+    //TODO: should make sure z3 has stopped running, potentially killing it
   }
 
 }
