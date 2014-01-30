@@ -79,4 +79,6 @@ object CommandResponses {
   //TODO: attributeValue trait more precise than SExpr
   case class GetOptionResponse(attributeValue: SExpr) extends CommandResponse
 
+
+  case class GetValueResponse(values: Seq[(SExpr, SExpr)]) extends CommandResponse
 }
