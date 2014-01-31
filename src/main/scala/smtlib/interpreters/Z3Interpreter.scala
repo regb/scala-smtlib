@@ -17,7 +17,7 @@ class Z3Interpreter extends Interpreter {
   //)
 
   //val z3 = "z3 -in -smt2".run(pio)
-  private val z3 = new ProcessBuilder("z3", "-in", "-smt2").start
+  private val z3 = new ProcessBuilder("z3", "-in", "-smt2").redirectErrorStream(true).start
 
   //var z3In: Writer = null
   //var z3Out: Reader = null
