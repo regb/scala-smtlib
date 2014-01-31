@@ -1,5 +1,7 @@
 package smtlib.sexpr
 
+import smtlib.SynchronousPipedReader
+
 import Tokens._
 
 import java.io.{StringReader, PipedInputStream, PipedOutputStream, InputStreamReader, OutputStreamWriter}
@@ -143,16 +145,16 @@ deF"""))
   }
 
   test("interactive lexer") {
-    val pos = new PipedOutputStream()
-    val writer = new OutputStreamWriter(pos)
-    val pis = new PipedInputStream(pos)
-    val reader = new InputStreamReader(pis)
-    val lexer = failAfter(3 seconds) { new Lexer(reader) }
-    failAfter(3 seconds) { writer.write("12 ") } //this is impossible for lexer to determine whether the token is terminated or simply the next char takes time to arrive, so we need some syntactic separation
-    failAfter(3 seconds) { assert(lexer.next === IntLit(12)) }
-    failAfter(3 seconds) { writer.write("(") }
-    failAfter(3 seconds) { assert(lexer.next === OParen) }
-
+    val pis = new SynchronousPipedReader
+    val lexer = failAfter(3 seconds) { new Lexer(pis) }
+    pis.write("12 ")//this is impossible for lexer to determine whether the token is terminated or simply the next char takes time to arrive, so we need some syntactic separation
+    assert(lexer.next === IntLit(12))
+    pis.write("(")
+    assert(lexer.next === OParen)
+    pis.write(")")
+    assert(lexer.next === CParen)
+    pis.write("\"abcd\"")
+    assert(lexer.next === StringLit("abcd"))
   }
 
 }

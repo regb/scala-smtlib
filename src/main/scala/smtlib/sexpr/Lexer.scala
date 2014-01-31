@@ -114,7 +114,6 @@ class Lexer(reader: java.io.Reader, smtLibCompatibility: Boolean = false) {
       }
       case d if d.isDigit => { //TODO: a symbol can start with a digit !
         val intPart = readInt(d, 10)
-            println(intPart)
         if(peek != '.')
           IntLit(intPart)
         else {
