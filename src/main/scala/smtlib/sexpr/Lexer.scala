@@ -13,7 +13,11 @@ import Tokens._
  * So we will just use it as the S-Expression as used in SMTLIB
  */
 
-class Lexer(reader: java.io.Reader) {
+/*
+ * Here is my best shot at fixing the upper case mess, an smtLibCompatibility flag that will
+ * parse the symbols as such (on upper casing).
+ */
+class Lexer(reader: java.io.Reader, smtLibCompatibility: Boolean = false) {
 
   private def isNewLine(c: Char) = c == '\n' || c == '\r'
   private def isBlank(c: Char) = c == '\n' || c == '\r' || c == ' '
@@ -119,12 +123,15 @@ class Lexer(reader: java.io.Reader) {
         c = nextChar
       }
     } else {
-      buffer.append(currentChar.toUpper)
+      buffer.append(if(smtLibCompatibility) currentChar else currentChar.toUpper)
       while(isSymbolChar(peek.toChar) || peek == '\\') {
         if(peek == '\\') {
           nextChar
           buffer.append(nextChar) //escaped char is not stored in upper case
         } else
+        if(smtLibCompatibility)
+          buffer.append(nextChar.toUpper)
+        else
           buffer.append(nextChar.toUpper)
       }
     }

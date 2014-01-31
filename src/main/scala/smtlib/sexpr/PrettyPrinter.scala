@@ -18,15 +18,20 @@ import java.io.StringWriter
 
 object PrettyPrinter {
 
-  def apply(sexpr: SExpr, writer: Writer): Unit = sexpr match {
+  def apply(sexpr: SExpr, writer: Writer, smtLibCompatibility: Boolean = false): Unit = sexpr match {
     case SList(sexprs) => ppNary(writer, sexprs, "(", " ", ")")
     case SString(s) => {
       writer.append('"')
       writer.write(s)
       writer.append('"')
     }
-    case SSymbol(s) => {
+    case SSymbol(s) if(smtLibCompatibility) => {
       writer.write(s)
+    }
+    case SSymbol(s) => {
+      writer.write("|")
+      writer.write(s)
+      writer.write("|")
     }
     case SQualifiedSymbol(os, s) => {
       os.foreach(apply(_, writer))

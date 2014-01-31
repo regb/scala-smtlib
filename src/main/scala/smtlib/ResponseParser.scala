@@ -41,12 +41,12 @@ class ResponseParser(input: java.io.Reader) extends Iterator[CommandResponse] {
     if(response == null)
       throw new NoSuchElementException
     val res = response match {
-      case SSymbol("SUCCESS") => Success
-      case SSymbol("UNSUPORTED") => Unsupported
-      case SList(List(SSymbol("ERROR"), SString(msg))) => Error(msg)
-      case SSymbol("SAT") => CheckSatResponse(SatStatus)
-      case SSymbol("UNSAT") => CheckSatResponse(UnsatStatus)
-      case SSymbol("UNKNOWN") => CheckSatResponse(UnknownStatus)
+      case SSymbol("success") => Success
+      case SSymbol("unsuported") => Unsupported
+      case SList(List(SSymbol("error"), SString(msg))) => Error(msg)
+      case SSymbol("sat") => CheckSatResponse(SatStatus)
+      case SSymbol("unsat") => CheckSatResponse(UnsatStatus)
+      case SSymbol("unknown") => CheckSatResponse(UnknownStatus)
       case SList(List(SSymbol(""), SString(msg))) => Error(msg)
       case sexpr => SExprResponse(sexpr)
     }
