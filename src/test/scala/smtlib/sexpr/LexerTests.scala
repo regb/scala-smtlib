@@ -1,11 +1,14 @@
 package smtlib.sexpr
 
 import Tokens._
-import java.io.StringReader
+
+import java.io.{StringReader, PipedInputStream, PipedOutputStream, InputStreamReader, OutputStreamWriter}
 
 import org.scalatest.FunSuite
+import org.scalatest.concurrent.Timeouts
+import org.scalatest.time.SpanSugar._
 
-class LexerTests extends FunSuite {
+class LexerTests extends FunSuite with Timeouts {
 
   test("eof read") {
     val reader1 = new StringReader("12")
@@ -137,6 +140,19 @@ deF"""))
     assert(lexer3.next === CParen)
     assert(lexer3.next === IntLit(12))
     assert(lexer3.next === StringLit("salut"))
+  }
+
+  test("interactive lexer") {
+    val pos = new PipedOutputStream()
+    val writer = new OutputStreamWriter(pos)
+    val pis = new PipedInputStream(pos)
+    val reader = new InputStreamReader(pis)
+    val lexer = failAfter(3 seconds) { new Lexer(reader) }
+    failAfter(3 seconds) { writer.write("12 ") } //this is impossible for lexer to determine whether the token is terminated or simply the next char takes time to arrive, so we need some syntactic separation
+    failAfter(3 seconds) { assert(lexer.next === IntLit(12)) }
+    failAfter(3 seconds) { writer.write("(") }
+    failAfter(3 seconds) { assert(lexer.next === OParen) }
+
   }
 
 }

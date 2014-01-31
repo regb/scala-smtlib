@@ -31,16 +31,6 @@ class Z3Interpreter extends Interpreter {
   val parser = new ResponseParser(z3Out)
   parser.next
 
-  def readFromZ3: String = {
-    z3In.flush
-    var res: String = ""
-    while(z3Out.ready) {
-      val c = z3Out.read
-      res += c.toChar
-    }
-    res
-  }
-
   override def eval(cmd: Command): CommandResponse = {
     PrettyPrinter(cmd, z3In)
     z3In.write("\n")
@@ -48,10 +38,9 @@ class Z3Interpreter extends Interpreter {
     parser.next
   }
 
-
   override def free(): Unit = {
+    z3.destroy
     z3In.close
-    //TODO: should make sure z3 has stopped running, potentially killing it
   }
 
 }

@@ -25,16 +25,42 @@ class Lexer(reader: java.io.Reader, smtLibCompatibility: Boolean = false) {
 
   //TODO: no lookahead unless asked for read
   private var _currentChar: Int = -1
-  private var _futureChar: Int = reader.read
+  private var _futureChar: Option[Int] = None//reader.read
 
   private def nextChar: Char = {
-    if(_futureChar == -1)
-      throw new java.io.EOFException
-    _currentChar = _futureChar
-    _futureChar = reader.read
+    _futureChar match {
+      case Some(i) => {
+        if(_futureChar == -1)
+          throw new java.io.EOFException
+        _currentChar = i
+        _futureChar = None
+      }
+      case None => {
+        try {
+          _currentChar = reader.read
+        } catch {
+          case e: java.io.IOException => throw new java.io.EOFException
+        }
+        if(_currentChar == -1)
+          throw new java.io.EOFException
+      }
+    }
     _currentChar.toChar
   }
-  private def peek: Int = _futureChar
+  //peek assumes that there should be something to read, encountering eof
+  //should return -1, but at least the call should not be blocked
+  private def peek: Int = _futureChar match {
+    case Some(i) => i
+    case None => {
+      try {
+        val tmp = reader.read
+        _futureChar = Some(tmp)
+        tmp
+      } catch {
+        case e: java.io.IOException => -1
+      }
+    }
+  }
 
   /* 
      Return the next token if there is one, or null if EOF.
@@ -88,6 +114,7 @@ class Lexer(reader: java.io.Reader, smtLibCompatibility: Boolean = false) {
       }
       case d if d.isDigit => { //TODO: a symbol can start with a digit !
         val intPart = readInt(d, 10)
+            println(intPart)
         if(peek != '.')
           IntLit(intPart)
         else {

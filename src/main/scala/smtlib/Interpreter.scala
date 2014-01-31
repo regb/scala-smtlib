@@ -18,6 +18,7 @@ trait Interpreter {
 
   //A free method is kind of justified by the need for the IO streams to be closed, and
   //there seems to be a decent case in general to have such a method for things like solvers
+  //note that free can be used even if the solver is currently solving, and act as a sort of interrupt
   def free(): Unit
 
 }
