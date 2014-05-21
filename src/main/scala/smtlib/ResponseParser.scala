@@ -44,9 +44,9 @@ class ResponseParser(input: java.io.Reader) extends Iterator[CommandResponse] {
       case SSymbol("success") => Success
       case SSymbol("unsuported") => Unsupported
       case SList(List(SSymbol("error"), SString(msg))) => Error(msg)
-      case SSymbol("sat") => CheckSatResponse(SatStatus)
-      case SSymbol("unsat") => CheckSatResponse(UnsatStatus)
-      case SSymbol("unknown") => CheckSatResponse(UnknownStatus)
+      case SSymbol("sat") | SSymbol("SAT") => CheckSatResponse(SatStatus)
+      case SSymbol("unsat") | SSymbol("UNSAT") => CheckSatResponse(UnsatStatus)
+      case SSymbol("unknown") | SSymbol("UNKNOWN") => CheckSatResponse(UnknownStatus)
       case SList(List(SSymbol(""), SString(msg))) => Error(msg)
       case sexpr => SExprResponse(sexpr)
     }
