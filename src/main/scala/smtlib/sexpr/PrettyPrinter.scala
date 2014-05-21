@@ -34,9 +34,9 @@ object PrettyPrinter {
       writer.write("|")
     }
     case SQualifiedSymbol(os, s) => {
-      os.foreach(apply(_, writer))
+      os.foreach(apply(_, writer, smtLibCompatibility))
       writer.append(':')
-      apply(s, writer)
+      apply(s, writer, smtLibCompatibility)
     }
     case SInt(i) => writer.write(i.toString)
     case SDouble(d) => writer.write(d.toString)
@@ -49,7 +49,7 @@ object PrettyPrinter {
 
   def toString(sexpr: SExpr): String = {
     val sWriter = new StringWriter
-    apply(sexpr, sWriter)
+    apply(sexpr, sWriter, smtLibCompatibility)
     sWriter.toString
   }
 
@@ -59,7 +59,7 @@ object PrettyPrinter {
     var sz = exprs.size
 
     exprs.foreach(e => {
-      apply(e, writer)
+      apply(e, writer, smtLibCompatibility)
       c += 1
       if(c < sz) writer.write(op)
     })
