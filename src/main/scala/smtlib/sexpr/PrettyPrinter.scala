@@ -19,7 +19,7 @@ import java.io.StringWriter
 object PrettyPrinter {
 
   def apply(sexpr: SExpr, writer: Writer, smtLibCompatibility: Boolean = false): Unit = sexpr match {
-    case SList(sexprs) => ppNary(writer, sexprs, "(", " ", ")")
+    case SList(sexprs) => ppNary(writer, sexprs, "(", " ", ")", smtLibCompatibility)
     case SString(s) => {
       writer.append('"')
       writer.write(s)
@@ -49,11 +49,11 @@ object PrettyPrinter {
 
   def toString(sexpr: SExpr): String = {
     val sWriter = new StringWriter
-    apply(sexpr, sWriter, smtLibCompatibility)
+    apply(sexpr, sWriter)
     sWriter.toString
   }
 
-  private def ppNary(writer: Writer, exprs: Seq[SExpr], pre: String, op: String, post: String): Unit = {
+  private def ppNary(writer: Writer, exprs: Seq[SExpr], pre: String, op: String, post: String, smtLibCompatibility: Boolean = false): Unit = {
     writer.write(pre)
     var c = 0
     var sz = exprs.size
