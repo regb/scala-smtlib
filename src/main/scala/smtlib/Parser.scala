@@ -19,7 +19,7 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
 
   import Parser._
 
-  private val l = new sexpr.Lexer(input, true)
+  private val l = new sexpr.Lexer(input)
   private val p = new sexpr.Parser(l)
 
   private var lookAhead: Option[SExpr] = None

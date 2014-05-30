@@ -92,10 +92,9 @@ object Commands {
   }
 
   object SBool {
-    def apply(b: Boolean): SExpr = SSymbol(b.toString.toUpperCase)
     def unapply(expr: SExpr): Option[Boolean] = expr match {
-      case SSymbol("TRUE") => Some(true)
-      case SSymbol("FALSE") => Some(false)
+      case SSymbol("true") => Some(true)
+      case SSymbol("false") => Some(false)
       case _ => None
     }
   }
