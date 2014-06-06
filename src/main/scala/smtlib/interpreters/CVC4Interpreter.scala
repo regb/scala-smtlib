@@ -12,7 +12,8 @@ class CVC4Interpreter extends Interpreter {
   private val cvc4 = new ProcessBuilder("cvc4",
                                                 "-q",
                                                 "--produce-models",
-                                                "--incremental",
+                                                "--no-incremental",
+                                                "--tear-down-incremental",
                                                 "--print-success",
                                                 "--lang", "smt").redirectErrorStream(true).start
 
