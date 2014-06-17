@@ -14,7 +14,7 @@ class CVC4Interpreter extends Interpreter {
                                                 "--produce-models",
                                                 "--no-incremental",
                                                 "--tear-down-incremental",
-                                                "--dt-rewrite-error-sel",
+                                                //"--dt-rewrite-error-sel",
                                                 "--print-success",
                                                 "--lang", "smt").redirectErrorStream(true).start
 
