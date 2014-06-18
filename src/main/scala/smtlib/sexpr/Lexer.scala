@@ -6,11 +6,9 @@ import Tokens._
  * Note that in theory this should be a complete s-expression parser/lexer, following
  * standard of common lisp. In practice, it is not complete but should supports
  * s-expression as used in SMT-lib (which is a subset of legal s-expression).
- * Hopefully, at some point in the future (in fact, when needed) 
- * it will be fully compliant with s-expression.
  *
  * However, S-expression lacking an actual standard, it is very difficult tu make it a standalone package.
- * So we will just use it as the S-Expression as used in SMTLIB
+ * So we will just make it work for SMT-LIB.
  */
 
 class Lexer(reader: java.io.Reader) {
