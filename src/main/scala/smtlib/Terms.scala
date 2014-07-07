@@ -1,6 +1,10 @@
 package smtlib
 
 /*
+ * =========== IMPORTANT ================
+ * This file is still work in progress, the hierarchy is not yet used in the library,
+ * but is expected to replace the s-expr based interface at some point.
+ *
  * Even though it is a bit annoying to have a layer on top of the S-expression syntax;
  * it seems reasonable to have a well typed SMT-LIB tree to interact with the parser/printer.
  *
@@ -10,8 +14,6 @@ package smtlib
 import Commands._
 
 object Terms {
-
-  //TODO
 
   sealed trait Term
 

@@ -14,19 +14,19 @@ import org.scalatest.time.SpanSugar._
 class ParserTests extends FunSuite with Timeouts {
 
   test("parser basic commands") {
-    val reader1 = new StringReader("""(set-logic QF_UF)""")
+    val reader1 = new StringReader("(set-logic QF_UF)")
     val parser1 = new Parser(reader1)
     assert(parser1.hasNext)
     assert(parser1.next === SetLogic(QF_UF))
     assert(!parser1.hasNext)
 
-    val reader2 = new StringReader("""(exit)""")
+    val reader2 = new StringReader("(exit)")
     val parser2 = new Parser(reader2)
     assert(parser2.hasNext)
     assert(parser2.next === Exit)
     assert(!parser2.hasNext)
 
-    val reader3 = new StringReader("""(check-sat)""")
+    val reader3 = new StringReader("(check-sat)")
     val parser3 = new Parser(reader3)
     assert(parser3.hasNext)
     assert(parser3.next === CheckSat)
@@ -34,7 +34,7 @@ class ParserTests extends FunSuite with Timeouts {
   }
 
   test("Unknown command") {
-    val reader1 = new StringReader("""(alpha beta)""")
+    val reader1 = new StringReader("(alpha beta)")
     val parser1 = new Parser(reader1)
     assert(parser1.hasNext)
     intercept[UnknownCommandException] {

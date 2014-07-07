@@ -21,11 +21,13 @@ class ResponseParser(input: java.io.Reader) extends Iterator[CommandResponse] {
 
   override def hasNext: Boolean = {
     lookAhead match {
-      case Some(expr) => expr != null
+      case Some(expr) => true
       case None => {
-        val c = p.next
-        lookAhead = Some(c)
-        c != null
+        if(p.hasNext) {
+          val c = p.next
+          lookAhead = Some(c)
+          true
+        } else false
       }
     }
   }
@@ -42,7 +44,7 @@ class ResponseParser(input: java.io.Reader) extends Iterator[CommandResponse] {
       throw new NoSuchElementException
     val res = response match {
       case SSymbol("success") => Success
-      case SSymbol("unsuported") => Unsupported
+      case SSymbol("unsupported") => Unsupported
       case SList(List(SSymbol("error"), SString(msg))) => Error(msg)
       case SSymbol("sat") | SSymbol("SAT") => CheckSatResponse(SatStatus)
       case SSymbol("unsat") | SSymbol("UNSAT") => CheckSatResponse(UnsatStatus)
