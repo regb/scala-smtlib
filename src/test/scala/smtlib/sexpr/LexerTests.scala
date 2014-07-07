@@ -66,18 +66,19 @@ class LexerTests extends FunSuite with Timeouts {
     assert(lexer4.next === StringLit("\"abc\""))
   }
 
+
   test("symbol literals") {
     val reader1 = new StringReader(""" d12 """)
     val lexer1 = new Lexer(reader1)
-    assert(lexer1.next === SymbolLit("D12"))
+    assert(lexer1.next === SymbolLit("d12"))
 
     val reader2 = new StringReader(""" abc\ def """)
     val lexer2 = new Lexer(reader2)
-    assert(lexer2.next === SymbolLit("ABC DEF"))
+    assert(lexer2.next === SymbolLit("abc def"))
 
     val reader3 = new StringReader("""  ab\c\ d\ef" """)
     val lexer3 = new Lexer(reader3)
-    assert(lexer3.next === SymbolLit("ABc DeF"))
+    assert(lexer3.next === SymbolLit("abc def"))
 
     val reader4 = new StringReader(""" |abc deF| """)
     val lexer4 = new Lexer(reader4)
@@ -96,15 +97,15 @@ deF"""))
   test("qualified symbols") {
     val reader1 = new StringReader(""" :d12 """)
     val lexer1 = new Lexer(reader1)
-    assert(lexer1.next === QualifiedSymbol(None, "D12"))
+    assert(lexer1.next === QualifiedSymbol(None, "d12"))
 
     val reader2 = new StringReader(""" abc:def """)
     val lexer2 = new Lexer(reader2)
-    assert(lexer2.next === QualifiedSymbol(Some("ABC"), "DEF"))
+    assert(lexer2.next === QualifiedSymbol(Some("abc"), "def"))
 
     val reader3 = new StringReader("""  ab\c:d\ef" """)
     val lexer3 = new Lexer(reader3)
-    assert(lexer3.next === QualifiedSymbol(Some("ABc"), "DeF"))
+    assert(lexer3.next === QualifiedSymbol(Some("abc"), "def"))
 
     val reader4 = new StringReader(""" |abc : deF| """)
     val lexer4 = new Lexer(reader4)
@@ -121,7 +122,7 @@ deF"""))
     """)
     val lexer1 = new Lexer(reader1)
     assert(lexer1.next === OParen)
-    assert(lexer1.next === SymbolLit("TEST"))
+    assert(lexer1.next === SymbolLit("test"))
     assert(lexer1.next === StringLit("test"))
     assert(lexer1.next === CParen)
 
@@ -157,4 +158,35 @@ deF"""))
     assert(lexer.next === StringLit("abcd"))
   }
 
+  /* 
+   * Those tests are outaded but were supporting a strict
+   * application of the rules of S-Expression symbols in common lisp
+   * where the symbol would be converted to upper cases
+  test("symbol literals") {
+    val reader1 = new StringReader(""" d12 """)
+    val lexer1 = new Lexer(reader1)
+    assert(lexer1.next === SymbolLit("D12"))
+
+    val reader2 = new StringReader(""" abc\ def """)
+    val lexer2 = new Lexer(reader2)
+    assert(lexer2.next === SymbolLit("ABC DEF"))
+
+    val reader3 = new StringReader("""  ab\c\ d\ef" """)
+    val lexer3 = new Lexer(reader3)
+    assert(lexer3.next === SymbolLit("ABc DeF"))
+
+    val reader4 = new StringReader(""" |abc deF| """)
+    val lexer4 = new Lexer(reader4)
+    assert(lexer4.next === SymbolLit("abc deF"))
+
+    val reader5 = new StringReader(""" 
+|abc
+deF| 
+""")
+    val lexer5 = new Lexer(reader5)
+    assert(lexer5.next === SymbolLit(
+"""abc
+deF"""))
+  }
+  */
 }

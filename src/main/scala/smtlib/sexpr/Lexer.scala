@@ -132,9 +132,14 @@ class Lexer(reader: java.io.Reader) {
     }
   }
 
+  /*
+   * There is a confusion with the 'official' S-Expression standard that
+   * suggest that symbols should be converted to upper case. We do not ignore
+   * case in order to be compatible with smtlib common implementations.
+   */
   private def readSymbol(currentChar: Char): String = {
     val buffer = new scala.collection.mutable.ArrayBuffer[Char]
-    if(currentChar == '|') {
+    if(currentChar == '|') { //a symbol can be within quotes: |symb|
       var c = nextChar
       while(c != '|') {
         if(c == '\\')
@@ -145,12 +150,15 @@ class Lexer(reader: java.io.Reader) {
     } else {
       buffer.append(currentChar)
       while(isSymbolChar(peek.toChar) || peek == '\\') {
-        if(peek == '\\') {
+        if(peek == '\\') { 
+          /*
+	   * Escaped char was intended to be interpreted in its actual case.
+	   * Probably not making a lot of sense in the SMT-LIB standard, but we
+	   * are ignoring the backslash and recording the escaped char.
+	   */
           nextChar
-          buffer.append(nextChar) //escaped char is not stored in upper case
-        } else {
-          buffer.append(nextChar)
-        }
+	}
+        buffer.append(nextChar)
       }
     }
     new String(buffer.toArray)
