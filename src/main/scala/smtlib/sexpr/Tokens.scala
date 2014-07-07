@@ -17,4 +17,9 @@ object Tokens {
   case class IntLit(n: BigInt)     extends Token /* 42, #b101, #xFF1D */
   case class DoubleLit(d: Double)  extends Token /* 42.24 */
 
+/*
+ * TODO: Double vs BigDecimals ?
+ */
+
+
 }
