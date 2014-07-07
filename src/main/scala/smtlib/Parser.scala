@@ -58,6 +58,8 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
         SetOption(parseOption(option))
       case SList(List(SSymbol("declare-sort"), s@SSymbol(sort), SInt(arity))) => 
         DeclareSort(sort, arity.toInt)
+      case SList(List(SSymbol("define-sort"), s@SSymbol(sort), SList(params), ds)) =>
+        DefineSort(sort, params.map(_.asInstanceOf[SSymbol].s), ds)
       case SList(List(SSymbol("declare-fun"), s@SSymbol(fun), SList(sorts), sort)) =>
         DeclareFun(fun, sorts, sort)
       case SList(List(SSymbol("push"), SInt(n))) => 

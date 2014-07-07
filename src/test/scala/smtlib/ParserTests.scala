@@ -33,6 +33,20 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parser3.hasNext)
     assert(parser3.next === CheckSat)
     assert(!parser3.hasNext)
+
+    val reader4 = new StringReader("(declare-sort A 0)")
+    val parser4 = new Parser(reader4)
+    assert(parser4.hasNext)
+    assert(parser4.next === DeclareSort("A", 0))
+    assert(!parser4.hasNext)
+
+    val reader5 = new StringReader("(define-sort A (B C) (Array B C))")
+    val parser5 = new Parser(reader5)
+    assert(parser5.hasNext)
+    assert(parser5.next === DefineSort("A", Seq("B", "C"), 
+                                            SList(SSymbol("Array"), SSymbol("B"), SSymbol("C"))
+                                      ))
+    assert(!parser5.hasNext)
   }
 
   test("Unknown command") {

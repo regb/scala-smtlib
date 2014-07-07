@@ -8,28 +8,36 @@ object Commands {
   case class Script(commands: TraversableOnce[Command])
 
   sealed trait Command
+
   case class SetLogic(logic: Logic) extends Command
   case class SetOption(option: SMTOption) extends Command
   case class SetInfo(attribute: Attribute) extends Command
+
   case class DeclareSort(name: String, arity: Int) extends Command
-  //case class DefineSort(name: String, params: Seq[String], sort: Sort) extends Command
+  case class DefineSort(name: String, params: Seq[String], sort: SExpr) extends Command
   case class DeclareFun(name: String, paramSorts: Seq[SExpr], returnSort: SExpr) extends Command
   //case class DefineFun(name: String, params: Seq[
+
   case class Push(n: Int) extends Command
   case class Pop(n: Int) extends Command
   case class Assert(term: SExpr) extends Command
+
   case object CheckSat extends Command
   case object GetAssertions extends Command
   case object GetProof extends Command
   case object GetUnsatCore extends Command
   case class GetValue(term: SExpr, terms: Seq[SExpr]) extends Command
   case object GetAssignment extends Command
+
   case class GetOption(key: String) extends Command
   case class GetInfo(flag: InfoFlag) extends Command
+
   case object Exit extends Command
+
   //this command can be used to create and print arbitrary commands using the s-expression
   //It can be used to send commands not supported in this library, such as non-standard commands like declare-datatypes
   case class NonStandardCommand(sexpr: SExpr) extends Command
+
 
   case class Attribute(name: String, v: Option[SExpr])
 

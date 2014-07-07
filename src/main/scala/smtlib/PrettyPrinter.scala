@@ -22,7 +22,8 @@ object PrettyPrinter {
     case SetOption(option) => SList(SSymbol("set-option") :: optionToSExpr(option))
     case SetInfo(attribute) => SList(SSymbol("set-info"), attributeToSExpr(attribute))
     case DeclareSort(name, arity) => SList(SSymbol("declare-sort"), SSymbol(name), SInt(arity))
-    //case class DefineSort
+    case DefineSort(name, params, sort) =>
+      SList(SSymbol("define-sort"), SSymbol(name), SList(params.map(SSymbol(_)).toList), sort)
     case DeclareFun(name, paramSorts, returnSort) => 
       SList(SSymbol("declare-fun"), SSymbol(name), SList(paramSorts.toList), returnSort)
     //case class DefineFun
