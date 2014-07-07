@@ -19,7 +19,7 @@ import common._
  *
  * The tokens are positioned: the line/column numerotation starts at 1-1.
  */
-class Lexer(reader: java.io.Reader) {
+class Lexer(reader: java.io.Reader) extends Iterator[Token] {
 
   import Lexer._
 
