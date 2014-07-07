@@ -11,6 +11,9 @@ import CommandResponses.CommandResponse
  * of those responses itself. That is because it needs to handle the verbosity and *-output-channel
  * options commands, and will do the correct printing depending on the internal state.
  * The responses are returned as a way to progamatically communicate with a solver.
+
+ * TODO: The interaction of the set-option for the channels with the eval interface
+         seems just wrong. Need to clarify that.
  */
 trait Interpreter {
 
