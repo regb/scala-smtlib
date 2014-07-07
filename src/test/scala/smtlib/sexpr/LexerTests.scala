@@ -16,17 +16,19 @@ class LexerTests extends FunSuite with Timeouts {
     val reader1 = new StringReader("12")
     val lexer1 = new Lexer(reader1)
     assert(lexer1.next === IntLit(12))
-    assert(lexer1.next === null)
-    assert(lexer1.next === null)
+    assert(!lexer1.hasNext)
   }
 
   test("integer literals") {
     val reader1 = new StringReader("12")
     val lexer1 = new Lexer(reader1)
+    assert(lexer1.hasNext)
     assert(lexer1.next === IntLit(12))
+    assert(!lexer1.hasNext)
 
     val reader2 = new StringReader("#xF")
     val lexer2 = new Lexer(reader2)
+    assert(lexer2.hasNext)
     assert(lexer2.next === IntLit(15))
 
     val reader3 = new StringReader("#o55")
@@ -39,9 +41,13 @@ class LexerTests extends FunSuite with Timeouts {
 
     val reader5 = new StringReader("123 #x11 #o12")
     val lexer5 = new Lexer(reader5)
+    assert(lexer5.hasNext)
     assert(lexer5.next === IntLit(123))
+    assert(lexer5.hasNext)
     assert(lexer5.next === IntLit(17))
+    assert(lexer5.hasNext)
     assert(lexer5.next === IntLit(10))
+    assert(!lexer5.hasNext)
 
     val reader6 = new StringReader("#16r21")
     val lexer6 = new Lexer(reader6)

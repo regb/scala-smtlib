@@ -12,14 +12,16 @@ import common._
  * However, S-expression lacking an actual standard, it is very difficult to make 
  * it a standalone package. So we will just make it work for SMT-LIB.
  *
- * The Lexer provides an interface with a next function, that returns the
- * next available token or the value null if the EOF is reached. It throws an
- * EOFException in case the end of file is encountered at an unexpected position
- * (in the middle of a token).
+ * The Lexer provides an interface with a next and hasNext.
+ * The next function returns the * next available token or throw a runtime exception if
+ * the EOF is reached (should call hasNext before invoking next).
+ * It throws some self explicit exceptions to indicate an issue with the syntax of the input.
  *
  * The tokens are positioned: the line/column numerotation starts at 1-1.
  */
 class Lexer(reader: java.io.Reader) {
+
+  import Lexer._
 
   private def isNewLine(c: Char) = c == '\n' || c == '\r'
   private def isBlank(c: Char) = c == '\n' || c == '\r' || c == ' '
@@ -37,11 +39,15 @@ class Lexer(reader: java.io.Reader) {
   private var _currentLine: Int = 1
   private var _currentCol: Int = 0
 
+  /*
+   * nextChar reads the next char in the reader and convert it into a char.
+   * It raises an unexceptedEOFException if EOF is reached in the reader
+   */
   private def nextChar: Char = {
     _futureChar match {
       case Some(i) => {
         if(_futureChar == -1)
-          throw new java.io.EOFException
+          throw new UnexpectedEOFException(Position(_currentLine, _currentCol))
         _currentChar = i
         _futureChar = None
       }
@@ -49,10 +55,11 @@ class Lexer(reader: java.io.Reader) {
         try {
           _currentChar = reader.read
         } catch {
-          case e: java.io.IOException => throw new java.io.EOFException
+          case e: java.io.EOFException => 
+            throw new UnexpectedEOFException(Position(_currentLine, _currentCol))
         }
         if(_currentChar == -1)
-          throw new java.io.EOFException
+          throw new UnexpectedEOFException(Position(_currentLine, _currentCol))
       }
     }
 
@@ -76,7 +83,7 @@ class Lexer(reader: java.io.Reader) {
         _futureChar = Some(tmp)
         tmp
       } catch {
-        case e: java.io.IOException => -1
+        case e: java.io.EOFException => -1
       }
     }
   }
@@ -84,10 +91,11 @@ class Lexer(reader: java.io.Reader) {
   def hasNext: Boolean = peek != -1
 
   /* 
-   * Return the next token if there is one, or null if EOF.
-   * Throw an EOFException if EOF is reached at an unexpected moment (incomplete token).
+   * Return the next token if there is one, or throw NoSuchElementException.
    */
-  def next: Token = if(peek == -1) null else {
+  def next: Token = if(peek == -1) {
+    throw new NoSuchElementException
+  } else {
 
     var c: Char = nextChar
     while(isBlank(c)) {
@@ -127,11 +135,18 @@ class Lexer(reader: java.io.Reader) {
           case d if d.isDigit => {
             val r = readInt(d, 10).toInt
             val ending = nextChar
-            if(ending != 'r' && ending != 'R')
-              sys.error("expected 'r' termination mark for radix")
+            if(ending != 'r' && ending != 'R') {
+              throw new UnexpectedCharException(ending, 
+                Position(_currentLine, _currentCol), 
+                "expected 'r' termination mark for radix")
+            }
             r
           }
-          case _ => sys.error("unexpected char: " + radix)
+          case _ => {
+            throw new UnexpectedCharException(radix,
+              Position(_currentLine, _currentCol), 
+              "'#' should be followed by a radix")
+          }
         }
         IntLit(readInt(nextChar, base))
       }
@@ -188,7 +203,7 @@ class Lexer(reader: java.io.Reader) {
 	         * are ignoring the backslash and recording the escaped char.
 	         */
           nextChar
-	}
+	      }
         buffer.append(nextChar)
       }
     }
@@ -210,5 +225,14 @@ class Lexer(reader: java.io.Reader) {
   private def isSymbolChar(c: Char): Boolean =
     c.isDigit || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || extraSymbolChars.contains(c)
 
+
+}
+
+object Lexer {
+
+  class UnexpectedCharException(char: Char, position: Position, msg: String) extends
+    Exception("Encountered unexpected character: '" + char + "' at " + position + ": " + msg)
+
+  class UnexpectedEOFException(position: Position) extends Exception
 
 }
