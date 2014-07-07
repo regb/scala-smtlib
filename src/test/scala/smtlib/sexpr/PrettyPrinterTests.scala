@@ -10,7 +10,7 @@ class PrettyPrinterTests extends FunSuite {
   import PrettyPrinter.{toString => pp}
 
   private def checkExpr(expr: SExpr): Unit = {
-    assert(pp(expr) === pp(Parser.fromString(pp(expr))))
+    assert(pp(expr) === pp(Parser.exprFromString(pp(expr))))
   }
 
   /* Seems legit to assume a literal should be printed without extra white space,

@@ -88,12 +88,12 @@ class Lexer(reader: java.io.Reader) extends Iterator[Token] {
     }
   }
 
-  def hasNext: Boolean = peek != -1
+  override def hasNext: Boolean = peek != -1
 
   /* 
    * Return the next token if there is one, or throw NoSuchElementException.
    */
-  def next: Token = if(peek == -1) {
+  override def next: Token = if(peek == -1) {
     throw new NoSuchElementException
   } else {
 

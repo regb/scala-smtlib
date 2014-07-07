@@ -217,6 +217,8 @@ deF"""))
     assert(token43.getPos === Position(3,2))
   }
 
+  //TODO: testing exceptions and error handling
+
   /* 
    * Those tests are outaded but were supporting a strict
    * application of the rules of S-Expression symbols in common lisp

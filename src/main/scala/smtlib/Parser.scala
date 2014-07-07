@@ -28,7 +28,7 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
     lookAhead match {
       case Some(expr) => expr != null
       case None => {
-        val c = p.parse
+        val c = p.next
         lookAhead = Some(c)
         c != null
       }
@@ -37,7 +37,7 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
 
   override def next: Command = {
     val cmd = lookAhead match {
-      case None => p.parse
+      case None => p.next
       case Some(c) => {
         lookAhead = None
         c
