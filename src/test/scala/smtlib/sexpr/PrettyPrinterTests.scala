@@ -28,4 +28,11 @@ class PrettyPrinterTests extends FunSuite {
     checkExpr(SList(SSymbol("ADD"), SList(SSymbol("min"), SInt(12), SInt(42)), SDouble(22.11)))
   }
 
+  test("composed exprs") {
+    checkExpr(SList(
+      SList(SSymbol("add"), SInt(23), SSymbol("xyz")),
+      SList(SInt(42), SDouble(12.2))
+    ))
+  }
+
 }
