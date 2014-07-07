@@ -12,6 +12,8 @@ import org.scalatest.time.SpanSugar._
 
 class ParserTests extends FunSuite with Timeouts {
 
+  override def suiteName = "S-expression Parser suite"
+
   test("parser basic") {
     val reader1 = new StringReader("""
       (test "test")

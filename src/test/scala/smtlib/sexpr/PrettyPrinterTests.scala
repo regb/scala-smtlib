@@ -7,6 +7,8 @@ import org.scalatest.FunSuite
 
 class PrettyPrinterTests extends FunSuite {
 
+  override def suiteName = "S-expression PrettyPrinter suite"
+
   import PrettyPrinter.{toString => pp}
 
   private def checkExpr(expr: SExpr): Unit = {

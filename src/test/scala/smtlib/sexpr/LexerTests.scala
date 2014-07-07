@@ -12,6 +12,8 @@ import org.scalatest.time.SpanSugar._
 
 class LexerTests extends FunSuite with Timeouts {
 
+  override def suiteName = "S-expression Lexer suite"
+
   test("eof read") {
     val reader1 = new StringReader("12")
     val lexer1 = new Lexer(reader1)
@@ -127,18 +129,18 @@ deF"""))
       (test "test")
     """)
     val lexer1 = new Lexer(reader1)
-    assert(lexer1.next === OParen)
+    assert(lexer1.next === OParen())
     assert(lexer1.next === SymbolLit("test"))
     assert(lexer1.next === StringLit("test"))
-    assert(lexer1.next === CParen)
+    assert(lexer1.next === CParen())
 
 
     val reader2 = new StringReader("""
       ) (  42  42.173
     """)
     val lexer2 = new Lexer(reader2)
-    assert(lexer2.next === CParen)
-    assert(lexer2.next === OParen)
+    assert(lexer2.next === CParen())
+    assert(lexer2.next === OParen())
     assert(lexer2.next === IntLit(42))
     assert(lexer2.next === DoubleLit(42.173))
 
@@ -146,7 +148,7 @@ deF"""))
       ) ;(  42  42.173
       12 "salut" ; """)
     val lexer3 = new Lexer(reader3)
-    assert(lexer3.next === CParen)
+    assert(lexer3.next === CParen())
     assert(lexer3.next === IntLit(12))
     assert(lexer3.next === StringLit("salut"))
   }
@@ -166,9 +168,9 @@ deF"""))
     pis.write("12 ")
     assert(lexer.next === IntLit(12))
     pis.write("(")
-    assert(lexer.next === OParen)
+    assert(lexer.next === OParen())
     pis.write(")")
-    assert(lexer.next === CParen)
+    assert(lexer.next === CParen())
     pis.write("\"abcd\"")
     assert(lexer.next === StringLit("abcd"))
   }
@@ -192,13 +194,13 @@ deF"""))
     val token32 = lexer3.next
     val token33 = lexer3.next
     val token34 = lexer3.next
-    assert(token31 === OParen)
+    assert(token31 === OParen())
     assert(token31.getPos === Position(1,1))
     assert(token32 === SymbolLit("test"))
     assert(token32.getPos === Position(1,2))
     assert(token33 === StringLit("test"))
     assert(token33.getPos === Position(1,7))
-    assert(token34 === CParen)
+    assert(token34 === CParen())
     assert(token34.getPos === Position(1,13))
 
     val reader4 = new StringReader(
@@ -213,8 +215,31 @@ deF"""))
     assert(token41.getPos === Position(1,1))
     assert(token42 === IntLit(12))
     assert(token42.getPos === Position(2,3))
-    assert(token43 === CParen)
+    assert(token43 === CParen())
     assert(token43.getPos === Position(3,2))
+  }
+
+  test("Positions of parenthesis") {
+    val reader = new StringReader("()()()")
+    val lexer = new Lexer(reader)
+    val token1 = lexer.next
+    val token2 = lexer.next
+    val token3 = lexer.next
+    val token4 = lexer.next
+    val token5 = lexer.next
+    val token6 = lexer.next
+    assert(token1 === OParen())
+    assert(token1.getPos == Position(1, 1))
+    assert(token2 === CParen())
+    assert(token2.getPos == Position(1, 2))
+    assert(token3 === OParen())
+    assert(token3.getPos == Position(1, 3))
+    assert(token4 === CParen())
+    assert(token4.getPos == Position(1, 4))
+    assert(token5 === OParen())
+    assert(token5.getPos == Position(1, 5))
+    assert(token6 === CParen())
+    assert(token6.getPos == Position(1, 6))
   }
 
   //TODO: testing exceptions and error handling

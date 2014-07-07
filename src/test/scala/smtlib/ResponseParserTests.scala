@@ -14,6 +14,8 @@ import org.scalatest.time.SpanSugar._
 
 class ResponseParserTests extends FunSuite with Timeouts {
 
+  override def suiteName = "SMT-LIB Commands Repsones Parser suite"
+
   test("basic responses") {
     val reader1 = new StringReader("success")
     val parser1 = new ResponseParser(reader1)

@@ -13,6 +13,8 @@ import org.scalatest.time.SpanSugar._
 
 class ParserTests extends FunSuite with Timeouts {
 
+  override def suiteName = "SMT-LIB Commands Parser suite"
+
   test("parser basic commands") {
     val reader1 = new StringReader("(set-logic QF_UF)")
     val parser1 = new Parser(reader1)

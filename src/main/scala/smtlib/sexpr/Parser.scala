@@ -79,14 +79,14 @@ class Parser(lexer: Lexer) extends Iterator[SExpr] {
   override def next: SExpr = {
     val tok = nextToken
     val expr = tok match {
-      case OParen => {
+      case OParen() => {
         val buffer = new scala.collection.mutable.ListBuffer[SExpr]
-        while(peekToken != CParen) {
+        while(peekToken != CParen()) {
           if(!this.hasNext)
             throw new EOFBeforeMatchingParenthesisException(tok.getPos)
           buffer.append(this.next)
         }
-        eat(CParen)
+        eat(CParen())
         SList(buffer.toList)
       }
       case IntLit(d) => SInt(d)
@@ -98,7 +98,7 @@ class Parser(lexer: Lexer) extends Iterator[SExpr] {
       }
       case QualifiedSymbol(o, s) => SQualifiedSymbol(o.map(SSymbol), SSymbol(s))
       case DoubleLit(d) => SDouble(d)
-      case CParen => throw new UnexpectedTokenException(CParen, tok.getPos)
+      case CParen() => throw new UnexpectedTokenException(CParen(), tok.getPos)
     }
     expr.setPos(tok)
   }

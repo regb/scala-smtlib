@@ -7,8 +7,11 @@ object Tokens {
 
   sealed trait Token extends Positioned
 
-  case object OParen               extends Token /* ( */
-  case object CParen               extends Token /* ) */
+  /*
+   * Need to be case class since each instance is different because of their positions
+   */
+  case class OParen()              extends Token /* ( */
+  case class CParen()              extends Token /* ) */
 
   case class StringLit(s: String)  extends Token /* "hello" */
   case class SymbolLit(s: String)  extends Token /* hello */

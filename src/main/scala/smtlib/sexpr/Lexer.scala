@@ -112,8 +112,8 @@ class Lexer(reader: java.io.Reader) extends Iterator[Token] {
           ()
         next
       }
-      case '(' => OParen
-      case ')' => CParen
+      case '(' => OParen()
+      case ')' => CParen()
       case ':' => QualifiedSymbol(None, readSymbol(nextChar))
       case '"' => {
         val buffer = new scala.collection.mutable.ArrayBuffer[Char]
