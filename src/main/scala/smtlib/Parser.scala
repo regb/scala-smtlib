@@ -6,15 +6,18 @@ import Commands._
 import scala.collection.Iterator
 
 object Parser {
-  class UnknownCommand(msg: String) extends Exception(msg)
 
-  //def fromString(str: String): S
+  class UnknownCommandException(msg: String) extends Exception(msg)
+
 }
 
 /*
- * TODO: specify what is the behaviour with CAPS from Symbol S-Expr parser
+ * A parser for SMT-LIB is an implementation of an iterator of SMT-LIB commands.
+ * The hasNext semantics is to return true when the end of file is not reached
+ * and more commands are coming. It is, however, no guarantee that the coming
+ * commands are well formed and a call to next following a successful hasNext
+ * might throw exceptions due to the syntax of the command.
  */
-
 class Parser(input: java.io.Reader) extends Iterator[Command] {
 
   import Parser._
@@ -26,11 +29,13 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
 
   override def hasNext: Boolean = {
     lookAhead match {
-      case Some(expr) => expr != null
+      case Some(expr) => true
       case None => {
-        val c = p.next
-        lookAhead = Some(c)
-        c != null
+        if(p.hasNext) {
+          val c = p.next
+          lookAhead = Some(c)
+          true
+        } else false
       }
     }
   }
@@ -43,8 +48,7 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
         c
       }
     }
-    if(cmd == null)
-      throw new NoSuchElementException
+    assert(cmd != null)
     val res = cmd match {
       case SList(List(SSymbol("set-logic"), SSymbol(logic))) => 
         SetLogic(Logic.fromString(logic))
@@ -69,7 +73,7 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
       case SList(List(SSymbol("exit"))) =>
         Exit
       case _ =>
-        throw new UnknownCommand("Unknown command: " + cmd)
+        throw new UnknownCommandException("Unknown command: " + cmd)
     }
     res
   }
