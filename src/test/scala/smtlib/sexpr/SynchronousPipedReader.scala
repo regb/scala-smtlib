@@ -1,4 +1,5 @@
 package smtlib
+package sexpr
 
 import java.io.Reader
 import scala.collection.mutable.ArrayBuffer
@@ -12,7 +13,7 @@ import scala.collection.mutable.Queue
  *
  * It provides method for directly writing to the pipe.
  */
-class SynchronousPipedReader extends Reader {
+private[sexpr] class SynchronousPipedReader extends Reader {
 
   private val buffy = new Queue[Int]()
 

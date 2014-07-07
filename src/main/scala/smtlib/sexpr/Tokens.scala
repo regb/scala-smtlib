@@ -1,8 +1,11 @@
-package smtlib.sexpr
+package smtlib
+package sexpr
+
+import common._
 
 object Tokens {
 
-  sealed trait Token
+  sealed trait Token extends Positioned
 
   case object OParen               extends Token /* ( */
   case object CParen               extends Token /* ) */

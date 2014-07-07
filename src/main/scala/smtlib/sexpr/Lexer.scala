@@ -1,25 +1,41 @@
-package smtlib.sexpr
+package smtlib
+package sexpr
 
 import Tokens._
+import common._
 
 /*
  * Note that in theory this should be a complete s-expression parser/lexer, following
  * standard of common lisp. In practice, it is not complete but should supports
  * s-expression as used in SMT-lib (which is a subset of legal s-expression).
  *
- * However, S-expression lacking an actual standard, it is very difficult tu make it a standalone package.
- * So we will just make it work for SMT-LIB.
+ * However, S-expression lacking an actual standard, it is very difficult to make 
+ * it a standalone package. So we will just make it work for SMT-LIB.
+ *
+ * The Lexer provides an interface with a next function, that returns the
+ * next available token or the value null if the EOF is reached. It throws an
+ * EOFException in case the end of file is encountered at an unexpected position
+ * (in the middle of a token).
+ *
+ * The tokens are positioned: the line/column numerotation starts at 1-1.
  */
-
 class Lexer(reader: java.io.Reader) {
 
   private def isNewLine(c: Char) = c == '\n' || c == '\r'
   private def isBlank(c: Char) = c == '\n' || c == '\r' || c == ' '
   private def isSeparator(c: Char) = isBlank(c) || c == ')' || c == '('
 
-  //TODO: no lookahead unless asked for read
+  /*
+   * Note that we do not start reading the input until the next function is called.
+   */
   private var _currentChar: Int = -1
-  private var _futureChar: Option[Int] = None//reader.read
+  private var _futureChar: Option[Int] = None
+
+  /*
+   * Current line and column numbers of the current char value
+   */
+  private var _currentLine: Int = 1
+  private var _currentCol: Int = 0
 
   private def nextChar: Char = {
     _futureChar match {
@@ -39,8 +55,17 @@ class Lexer(reader: java.io.Reader) {
           throw new java.io.EOFException
       }
     }
-    _currentChar.toChar
+
+    val res = _currentChar.toChar
+    if(isNewLine(res)) {
+      _currentLine += 1
+      _currentCol = 0
+    } else {
+      _currentCol += 1
+    }
+    res
   }
+
   //peek assumes that there should be something to read, encountering eof
   //should return -1, but at least the call should not be blocked
   private def peek: Int = _futureChar match {
@@ -56,10 +81,12 @@ class Lexer(reader: java.io.Reader) {
     }
   }
 
+  def hasNext: Boolean = peek != -1
+
   /* 
-     Return the next token if there is one, or null if EOF.
-     Throw an EOFException if EOF is reached at an unexpected moment (incomplete token).
-  */
+   * Return the next token if there is one, or null if EOF.
+   * Throw an EOFException if EOF is reached at an unexpected moment (incomplete token).
+   */
   def next: Token = if(peek == -1) null else {
 
     var c: Char = nextChar
@@ -69,7 +96,9 @@ class Lexer(reader: java.io.Reader) {
       c = nextChar
     }
 
-    c match {
+    val currentPosition = Position(_currentLine, _currentCol)
+
+    val res = c match {
       case ';' => {
         while(!isNewLine(nextChar))
           ()
@@ -130,6 +159,8 @@ class Lexer(reader: java.io.Reader) {
         } else SymbolLit(sym)
       }
     }
+
+    res.setPos(currentPosition)
   }
 
   /*
@@ -152,10 +183,10 @@ class Lexer(reader: java.io.Reader) {
       while(isSymbolChar(peek.toChar) || peek == '\\') {
         if(peek == '\\') { 
           /*
-	   * Escaped char was intended to be interpreted in its actual case.
-	   * Probably not making a lot of sense in the SMT-LIB standard, but we
-	   * are ignoring the backslash and recording the escaped char.
-	   */
+	         * Escaped char was intended to be interpreted in its actual case.
+	         * Probably not making a lot of sense in the SMT-LIB standard, but we
+	         * are ignoring the backslash and recording the escaped char.
+	         */
           nextChar
 	}
         buffer.append(nextChar)

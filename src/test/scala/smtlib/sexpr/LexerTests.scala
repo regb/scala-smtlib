@@ -1,10 +1,10 @@
-package smtlib.sexpr
-
-import smtlib.SynchronousPipedReader
+package smtlib
+package sexpr
 
 import Tokens._
+import common._
 
-import java.io.{StringReader, PipedInputStream, PipedOutputStream, InputStreamReader, OutputStreamWriter}
+import java.io.StringReader
 
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.Timeouts
@@ -147,8 +147,17 @@ deF"""))
 
   test("interactive lexer") {
     val pis = new SynchronousPipedReader
+    /*
+     * Since the pipe is empty, the lexer should not even start to read
+     * in the reader. It should only start reading when asked for the next token.
+     */
     val lexer = failAfter(3 seconds) { new Lexer(pis) }
-    pis.write("12 ")//this is impossible for lexer to determine whether the token is terminated or simply the next char takes time to arrive, so we need some syntactic separation
+    /* 
+     * this is impossible for the lexer to determine whether the token is terminated 
+     * or if the next char takes time to arrive, so we need some syntactic separation
+     * hence the space after 12
+     */
+    pis.write("12 ")
     assert(lexer.next === IntLit(12))
     pis.write("(")
     assert(lexer.next === OParen)
@@ -156,6 +165,50 @@ deF"""))
     assert(lexer.next === CParen)
     pis.write("\"abcd\"")
     assert(lexer.next === StringLit("abcd"))
+  }
+
+  test("Positions of tokens") {
+    val reader1 = new StringReader("12")
+    val lexer1 = new Lexer(reader1)
+    val token1 = lexer1.next
+    assert(token1 === IntLit(12))
+    assert(token1.getPos == Position(1, 1))
+
+    val reader2 = new StringReader("  12 ")
+    val lexer2 = new Lexer(reader2)
+    val token2 = lexer2.next
+    assert(token2 === IntLit(12))
+    assert(token2.getPos == Position(1, 3))
+
+    val reader3 = new StringReader("""(test "test")""")
+    val lexer3 = new Lexer(reader3)
+    val token31 = lexer3.next
+    val token32 = lexer3.next
+    val token33 = lexer3.next
+    val token34 = lexer3.next
+    assert(token31 === OParen)
+    assert(token31.getPos === Position(1,1))
+    assert(token32 === SymbolLit("test"))
+    assert(token32.getPos === Position(1,2))
+    assert(token33 === StringLit("test"))
+    assert(token33.getPos === Position(1,7))
+    assert(token34 === CParen)
+    assert(token34.getPos === Position(1,13))
+
+    val reader4 = new StringReader(
+"""test
+  12
+ )""")
+    val lexer4 = new Lexer(reader4)
+    val token41 = lexer4.next
+    val token42 = lexer4.next
+    val token43 = lexer4.next
+    assert(token41 === SymbolLit("test"))
+    assert(token41.getPos === Position(1,1))
+    assert(token42 === IntLit(12))
+    assert(token42.getPos === Position(2,3))
+    assert(token43 === CParen)
+    assert(token43.getPos === Position(3,2))
   }
 
   /* 
