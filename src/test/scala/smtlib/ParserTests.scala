@@ -37,7 +37,21 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(declare-fun xyz (A B) C)") ===
            DeclareFun("xyz", Seq(SSymbol("A"), SSymbol("B")), SSymbol("C")))
 
+    assert(parseUniqueCmd("(push 1)") === Push(1))
+    assert(parseUniqueCmd("(push 4)") === Push(4))
+    assert(parseUniqueCmd("(pop 1)") === Pop(1))
+    assert(parseUniqueCmd("(pop 2)") === Pop(2))
+    assert(parseUniqueCmd("(assert true)") === Assert(SBoolean(true)))
     assert(parseUniqueCmd("(check-sat)") === CheckSat)
+
+    assert(parseUniqueCmd("(get-assertions)") === GetAssertions)
+    assert(parseUniqueCmd("(get-proof)") === GetProof)
+    assert(parseUniqueCmd("(get-unsat-core)") === GetUnsatCore)
+    assert(parseUniqueCmd("(get-value (x y z))") === GetValue(SSymbol("x"), Seq(SSymbol("y"), SSymbol("z"))))
+    assert(parseUniqueCmd("(get-assignment)") === GetAssignment)
+
+    assert(parseUniqueCmd("(get-option :keyword)") === GetOption("keyword"))
+    assert(parseUniqueCmd("(get-info :authors)") === GetInfo(AuthorsInfoFlag))
 
     assert(parseUniqueCmd("(exit)") === Exit)
   }
@@ -56,6 +70,11 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(set-option :random-seed 42)") === SetOption(RandomSeed(42)))
     assert(parseUniqueCmd("(set-option :verbosity 4)") === SetOption(Verbosity(4)))
 
+  }
+
+  test("Parsing set-info command") {
+    assert(parseUniqueCmd("""(set-info :author "Reg")""") === SetInfo(Attribute("author", Some(SString("Reg")))))
+    assert(parseUniqueCmd("""(set-info :test)""") === SetInfo(Attribute("test", None)))
   }
 
   test("Unknown command") {

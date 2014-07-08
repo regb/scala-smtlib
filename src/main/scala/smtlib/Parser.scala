@@ -70,8 +70,20 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
         Assert(term)
       case SList(List(SSymbol("check-sat"))) =>
         CheckSat
-      case SList(List(SSymbol("get-option"), SQualifiedSymbol(None, SSymbol(keyword)))) => GetOption(keyword)
-      case SList(List(SSymbol("get-info"), flag)) => GetInfo(parseInfoFlag(flag))
+      case SList(List(SSymbol("get-assertions"))) =>
+        GetAssertions
+      case SList(List(SSymbol("get-proof"))) =>
+        GetProof
+      case SList(List(SSymbol("get-unsat-core"))) =>
+        GetUnsatCore
+      case SList(List(SSymbol("get-value"), SList(head :: tail))) =>
+        GetValue(head, tail)
+      case SList(List(SSymbol("get-assignment"))) =>
+        GetAssignment
+      case SList(List(SSymbol("get-option"), SQualifiedSymbol(None, SSymbol(keyword)))) => 
+        GetOption(keyword)
+      case SList(List(SSymbol("get-info"), flag)) => 
+        GetInfo(parseInfoFlag(flag))
       case SList(List(SSymbol("exit"))) =>
         Exit
       case _ =>
