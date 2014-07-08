@@ -86,9 +86,13 @@ and has been made standalone in order for the
 [Leon](https://github.com/epfl-lara/leon) project to rely on it as well.
 Hopefully, it can be useful to other people as well.
 
-TODO
-----
+Road Map
+--------
 
+A list of potential features to be added.
+
+* Type checking of the input script: Make sure the logic declaration corresponds to the syntax of the formulas,
+  check correct syntax of terms and proper declaration of all uninterpreted symbols used.
 * Expore asynchrous IO: Doesn't seem to make sense with a tree sturcture, and script are short in practice.
 * Modularize the background theory definitions as an abstract component that could be extended by third party
   code. Should only provide the Core theory and the basic theories defined by SMT-LIB standard.
