@@ -15,38 +15,47 @@ class ParserTests extends FunSuite with Timeouts {
 
   override def suiteName = "SMT-LIB Commands Parser suite"
 
-  test("parser basic commands") {
-    val reader1 = new StringReader("(set-logic QF_UF)")
-    val parser1 = new Parser(reader1)
-    assert(parser1.hasNext)
-    assert(parser1.next === SetLogic(QF_UF))
-    assert(!parser1.hasNext)
+  //parse the string for a single command and asserts no more commands
+  private def parseUniqueCmd(str: String): Command = {
+    val reader = new StringReader(str)
+    val parser = new Parser(reader)
+    assert(parser.hasNext)
+    val cmd = parser.next
+    assert(!parser.hasNext)
+    cmd
+  }
 
-    val reader2 = new StringReader("(exit)")
-    val parser2 = new Parser(reader2)
-    assert(parser2.hasNext)
-    assert(parser2.next === Exit)
-    assert(!parser2.hasNext)
+  test("Parsing single commands") {
 
-    val reader3 = new StringReader("(check-sat)")
-    val parser3 = new Parser(reader3)
-    assert(parser3.hasNext)
-    assert(parser3.next === CheckSat)
-    assert(!parser3.hasNext)
+    assert(parseUniqueCmd("(set-logic QF_UF)") === SetLogic(QF_UF))
 
-    val reader4 = new StringReader("(declare-sort A 0)")
-    val parser4 = new Parser(reader4)
-    assert(parser4.hasNext)
-    assert(parser4.next === DeclareSort("A", 0))
-    assert(!parser4.hasNext)
-
-    val reader5 = new StringReader("(define-sort A (B C) (Array B C))")
-    val parser5 = new Parser(reader5)
-    assert(parser5.hasNext)
-    assert(parser5.next === DefineSort("A", Seq("B", "C"), 
+    assert(parseUniqueCmd("(declare-sort A 0)") === DeclareSort("A", 0))
+    assert(parseUniqueCmd("(define-sort A (B C) (Array B C))") ===
+                          DefineSort("A", Seq("B", "C"), 
                                             SList(SSymbol("Array"), SSymbol("B"), SSymbol("C"))
-                                      ))
-    assert(!parser5.hasNext)
+                                    ))
+    assert(parseUniqueCmd("(declare-fun xyz (A B) C)") ===
+           DeclareFun("xyz", Seq(SSymbol("A"), SSymbol("B")), SSymbol("C")))
+
+    assert(parseUniqueCmd("(check-sat)") === CheckSat)
+
+    assert(parseUniqueCmd("(exit)") === Exit)
+  }
+
+  test("Parsing set-option command") {
+    assert(parseUniqueCmd("(set-option :print-success true)") === SetOption(PrintSuccess(true)))
+    assert(parseUniqueCmd("(set-option :print-success false)") === SetOption(PrintSuccess(false)))
+    assert(parseUniqueCmd("(set-option :expand-definitions true)") === SetOption(ExpandDefinitions(true)))
+    assert(parseUniqueCmd("(set-option :expand-definitions false)") === SetOption(ExpandDefinitions(false)))
+    assert(parseUniqueCmd("(set-option :interactive-mode true)") === SetOption(InteractiveMode(true)))
+    assert(parseUniqueCmd("(set-option :interactive-mode false)") === SetOption(InteractiveMode(false)))
+    assert(parseUniqueCmd("""(set-option :regular-output-channel "test")""") === 
+                          SetOption(RegularOutputChannel("test")))
+    assert(parseUniqueCmd("""(set-option :diagnostic-output-channel "toto")""") === 
+                          SetOption(DiagnosticOutputChannel("toto")))
+    assert(parseUniqueCmd("(set-option :random-seed 42)") === SetOption(RandomSeed(42)))
+    assert(parseUniqueCmd("(set-option :verbosity 4)") === SetOption(Verbosity(4)))
+
   }
 
   test("Unknown command") {
