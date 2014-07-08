@@ -99,14 +99,6 @@ object Commands {
     }
   }
 
-  object SBool {
-    def unapply(expr: SExpr): Option[Boolean] = expr match {
-      case SSymbol("true") => Some(true)
-      case SSymbol("false") => Some(false)
-      case _ => None
-    }
-  }
-
   object keyword {
     def apply(key: String): SExpr = SSymbol(key)
     def unapply(expr: SExpr): Option[String] = expr match {

@@ -93,13 +93,13 @@ class Parser(input: java.io.Reader) extends Iterator[Command] {
   }
 
   private def parseOption(option: List[SExpr]): SMTOption = option match {
-    case List(SQualifiedSymbol(None, SSymbol("print-success")), SBool(bv)) => PrintSuccess(bv)
-    case List(SQualifiedSymbol(None, SSymbol("expand-definitions")), SBool(bv)) => ExpandDefinitions(bv)
-    case List(SQualifiedSymbol(None, SSymbol("interactive-mode")), SBool(bv)) => InteractiveMode(bv)
-    case List(SQualifiedSymbol(None, SSymbol("produce-proofs")), SBool(bv)) => ProduceProofs(bv)
-    case List(SQualifiedSymbol(None, SSymbol("produce-unsat-cores")), SBool(bv)) => ProduceUnsatCores(bv)
-    case List(SQualifiedSymbol(None, SSymbol("produce-models")), SBool(bv)) => ProduceModels(bv)
-    case List(SQualifiedSymbol(None, SSymbol("produce-assignments")), SBool(bv)) => ProduceAssignments(bv)
+    case List(SQualifiedSymbol(None, SSymbol("print-success")), SBoolean(bv)) => PrintSuccess(bv)
+    case List(SQualifiedSymbol(None, SSymbol("expand-definitions")), SBoolean(bv)) => ExpandDefinitions(bv)
+    case List(SQualifiedSymbol(None, SSymbol("interactive-mode")), SBoolean(bv)) => InteractiveMode(bv)
+    case List(SQualifiedSymbol(None, SSymbol("produce-proofs")), SBoolean(bv)) => ProduceProofs(bv)
+    case List(SQualifiedSymbol(None, SSymbol("produce-unsat-cores")), SBoolean(bv)) => ProduceUnsatCores(bv)
+    case List(SQualifiedSymbol(None, SSymbol("produce-models")), SBoolean(bv)) => ProduceModels(bv)
+    case List(SQualifiedSymbol(None, SSymbol("produce-assignments")), SBoolean(bv)) => ProduceAssignments(bv)
     case List(SQualifiedSymbol(None, SSymbol("regular-output-channel")), SString(channel)) => RegularOutputChannel(channel)
     case List(SQualifiedSymbol(None, SSymbol("diagnostic-output-channel")), SString(channel)) => DiagnosticOutputChannel(channel)
     case List(SQualifiedSymbol(None, SSymbol("random-seed")), SInt(num)) => RandomSeed(num.toInt)
