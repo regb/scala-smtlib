@@ -9,6 +9,8 @@ object Tokens {
 
   /*
    * Need to be case class since each instance is different because of their positions
+   * Alternatively, we could create a Token wrapper class that would be Positioned and
+   * use the list of Tokens as a token information element.
    */
   case class OParen()              extends Token /* ( */
   case class CParen()              extends Token /* ) */
@@ -22,6 +24,9 @@ object Tokens {
 
 /*
  * TODO: Double vs BigDecimals ?
+ * TODO: Apparently, we should not merge all integer representation (decimal, binary and hexa) into
+ *       one IntLit token, but use different tokens for each of the Decimal, Binary and Hexadecimal
+ *       representation. Those should remain distinct when parsed in an s-expression
  */
 
 
