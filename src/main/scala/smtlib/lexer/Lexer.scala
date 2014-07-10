@@ -97,7 +97,7 @@ class Lexer(reader: java.io.Reader) {
       }
       case '(' => OParen()
       case ')' => CParen()
-      case ':' => QualifiedSymbol(None, readSymbol(nextChar))
+      case ':' => Keyword(readSymbol(nextChar))
       case '"' => {
         val buffer = new scala.collection.mutable.ArrayBuffer[Char]
         var c = nextChar
@@ -111,8 +111,8 @@ class Lexer(reader: java.io.Reader) {
       }
       case '#' => {
         nextChar match {
-          case 'b' => BinaryLit(readBinary)
-          case 'x' => HexadecimalLit(readHexadecimal)
+          case 'b' => BinaryLit(readBinary())
+          case 'x' => HexadecimalLit(readHexadecimal())
           case c => {
             throw new UnexpectedCharException(c,
               Position(_currentLine, _currentCol), 
@@ -120,7 +120,7 @@ class Lexer(reader: java.io.Reader) {
           }
         }
       }
-      case d if d.isDigit => { //TODO: a symbol can start with a digit !
+      case d if d.isDigit => {
         val intPart = readInt(d, 10)
         if(peek != '.')
           NumeralLit(intPart)
@@ -138,21 +138,13 @@ class Lexer(reader: java.io.Reader) {
       }
       case s if isSymbolChar(s) || s == '|' => {
         val sym = readSymbol(s)
-        if(peek == ':') {
-          nextChar
-          QualifiedSymbol(Some(sym), readSymbol(nextChar))
-        } else SymbolLit(sym)
+        SymbolLit(sym)
       }
     }
 
     res.setPos(currentPosition)
   }
 
-  /*
-   * There is a confusion with the 'official' S-Expression standard that
-   * suggest that symbols should be converted to upper case. We do not ignore
-   * case in order to be compatible with smtlib common implementations.
-   */
   private def readSymbol(currentChar: Char): String = {
     val buffer = new scala.collection.mutable.ArrayBuffer[Char]
     if(currentChar == '|') { //a symbol can be within quotes: |symb|
@@ -166,7 +158,7 @@ class Lexer(reader: java.io.Reader) {
     } else {
       buffer.append(currentChar)
       while(isSymbolChar(peek.toChar) || peek == '\\') {
-        if(peek == '\\') { 
+        if(peek == '\\') { //TODO: check what we should do here
           /*
 	         * Escaped char was intended to be interpreted in its actual case.
 	         * Probably not making a lot of sense in the SMT-LIB standard, but we
@@ -190,9 +182,9 @@ class Lexer(reader: java.io.Reader) {
     acc
   }
 
-  private def readBinary(currentChar: Char): Seq[Boolean] = {
+  private def readBinary(): Seq[Boolean] = {
     var res = new ListBuffer[Boolean]
-    if(peek != '1' || peek != '0')
+    if(peek != '1' && peek != '0')
       throw new Exception
     while(peek == '1' || peek == '0') {
       res.append(if(peek == '1') true else false)
@@ -200,12 +192,12 @@ class Lexer(reader: java.io.Reader) {
     }
     res.toList
   }
-  private def readHexadecimal(currentChar: Char): String = {
+  private def readHexadecimal(): String = { //normalize chars to upper case
     var res = ""
-    if(!isHexa(peek))
+    if(peek == -1 || !isHexa(peek.toChar))
       throw new Exception
-    while(isHexa(peek)) {
-      res += nextChar
+    while(peek != -1 && isHexa(peek.toChar)) {
+      res += nextChar.toUpper
     }
     res
   }
@@ -218,6 +210,18 @@ class Lexer(reader: java.io.Reader) {
   private def isHexa(c: Char): Boolean =
     c.isDigit || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
 
+
+  /* if c is digit in radix r (1 < r <= 36) */
+  private def isDigit(c: Char, r: Int): Boolean = {
+    require(r > 1 && r <= 36)
+    val d = (c - '0').toInt
+    if(d < 10 && d >= 0)
+      d < r
+    else {
+      val ld = (c.toLower - 'a').toInt
+      ld >= 0 && ld < r - 10
+    }
+  }
 
 }
 
