@@ -138,7 +138,8 @@ class Lexer(reader: java.io.Reader) {
       }
       case s if isSymbolChar(s) || s == '|' => {
         val sym = readSymbol(s)
-        SymbolLit(sym)
+        val res = toReserved(sym)
+        res.getOrElse(SymbolLit(sym))
       }
     }
 
@@ -221,6 +222,20 @@ class Lexer(reader: java.io.Reader) {
       val ld = (c.toLower - 'a').toInt
       ld >= 0 && ld < r - 10
     }
+  }
+
+  private def toReserved(s: String): Option[Token] = s match {
+    case "par" => Some(Par())
+    case "NUMERAL" => Some(NUMERAL())
+    case "DECIMAL" => Some(DECIMAL())
+    case "STRING" => Some(STRING())
+    case "_" => Some(Underscore())
+    case "!" => Some(ExclamationMark())
+    case "as" => Some(As())
+    case "let" => Some(Let())
+    case "forall" => Some(Forall())
+    case "exists" => Some(Exists())
+    case _ => None
   }
 
 }

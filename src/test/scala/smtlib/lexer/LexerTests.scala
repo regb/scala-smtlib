@@ -237,8 +237,12 @@ deF"""))
     assert(lexer1.nextToken === Let())
 
     val reader2 = new StringReader("!")
-    val lexer2 = new Lexer(reader1)
+    val lexer2 = new Lexer(reader2)
     assert(lexer2.nextToken === ExclamationMark())
+
+    val reader3 = new StringReader("_")
+    val lexer3 = new Lexer(reader3)
+    assert(lexer3.nextToken === Underscore())
   }
 
   test("Parentheses ending token") {
