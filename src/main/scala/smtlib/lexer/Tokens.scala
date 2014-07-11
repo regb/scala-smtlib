@@ -43,7 +43,25 @@ object Tokens {
   case class Forall() extends ReservedWord /* forall */
   case class Exists() extends ReservedWord /* exists */
 
-  //TODO: all commands are reserved words as well
+  case class Assert() extends ReservedWord
+  case class CheckSat() extends ReservedWord
+  case class DeclareSort() extends ReservedWord
+  case class DeclareFun() extends ReservedWord
+  case class DefineSort() extends ReservedWord
+  case class DefineFun() extends ReservedWord
+  case class Exit() extends ReservedWord
+  case class GetAssertions() extends ReservedWord
+  case class GetAssignment() extends ReservedWord
+  case class GetInfo() extends ReservedWord
+  case class GetOption() extends ReservedWord
+  case class GetProof() extends ReservedWord
+  case class GetUnsatCore() extends ReservedWord
+  case class GetValue() extends ReservedWord
+  case class Pop() extends ReservedWord
+  case class Push() extends ReservedWord
+  case class SetLogic() extends ReservedWord
+  case class SetInfo() extends ReservedWord
+  case class SetOption() extends ReservedWord
 
 
 }

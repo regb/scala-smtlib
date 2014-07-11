@@ -14,6 +14,15 @@ class LexerTests extends FunSuite with Timeouts {
 
   override def suiteName = "Lexer Test Suite"
 
+  //parse the string for a single command and asserts no more commands
+  private def lexUniqueToken(str: String): Token = {
+    val reader = new StringReader(str)
+    val lexer = new Lexer(reader)
+    val token = lexer.nextToken
+    assert(lexer.nextToken === null)
+    token
+  }
+
   test("eof read") {
     val reader1 = new StringReader("12")
     val lexer1 = new Lexer(reader1)
@@ -232,17 +241,36 @@ deF"""))
   }
 
   test("Reserved words") {
-    val reader1 = new StringReader("let")
-    val lexer1 = new Lexer(reader1)
-    assert(lexer1.nextToken === Let())
+    assert(lexUniqueToken("par") === Par())
+    assert(lexUniqueToken("NUMERAL") === NUMERAL())
+    assert(lexUniqueToken("DECIMAL") === DECIMAL())
+    assert(lexUniqueToken("STRING") === STRING())
+    assert(lexUniqueToken("_") === Underscore())
+    assert(lexUniqueToken("!") === ExclamationMark())
+    assert(lexUniqueToken("as") === As())
+    assert(lexUniqueToken("let") === Let())
+    assert(lexUniqueToken("forall") === Forall())
+    assert(lexUniqueToken("exists") === Exists())
 
-    val reader2 = new StringReader("!")
-    val lexer2 = new Lexer(reader2)
-    assert(lexer2.nextToken === ExclamationMark())
-
-    val reader3 = new StringReader("_")
-    val lexer3 = new Lexer(reader3)
-    assert(lexer3.nextToken === Underscore())
+    assert(lexUniqueToken("assert") === Assert())
+    assert(lexUniqueToken("check-sat") === CheckSat())
+    assert(lexUniqueToken("declare-sort") === DeclareSort())
+    assert(lexUniqueToken("declare-fun") === DeclareFun())
+    assert(lexUniqueToken("define-sort") === DefineSort())
+    assert(lexUniqueToken("define-fun") === DefineFun())
+    assert(lexUniqueToken("exit") === Exit())
+    assert(lexUniqueToken("get-assertions") === GetAssertions())
+    assert(lexUniqueToken("get-assignment") === GetAssignment())
+    assert(lexUniqueToken("get-info") === GetInfo())
+    assert(lexUniqueToken("get-option") === GetOption())
+    assert(lexUniqueToken("get-proof") === GetProof())
+    assert(lexUniqueToken("get-unsat-core") === GetUnsatCore())
+    assert(lexUniqueToken("get-value") === GetValue())
+    assert(lexUniqueToken("pop") === Pop())
+    assert(lexUniqueToken("push") === Push())
+    assert(lexUniqueToken("set-logic") === SetLogic())
+    assert(lexUniqueToken("set-info") === SetInfo())
+    assert(lexUniqueToken("set-option") === SetOption())
   }
 
   test("Parentheses ending token") {

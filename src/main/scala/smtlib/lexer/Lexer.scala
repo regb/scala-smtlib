@@ -235,6 +235,27 @@ class Lexer(reader: java.io.Reader) {
     case "let" => Some(Let())
     case "forall" => Some(Forall())
     case "exists" => Some(Exists())
+
+    case "assert" => Some(Assert())
+    case "check-sat" => Some(CheckSat())
+    case "declare-sort" => Some(DeclareSort())
+    case "declare-fun" => Some(DeclareFun())
+    case "define-sort" => Some(DefineSort())
+    case "define-fun" => Some(DefineFun())
+    case "exit" => Some(Exit())
+    case "get-assertions" => Some(GetAssertions())
+    case "get-assignment" => Some(GetAssignment())
+    case "get-info" => Some(GetInfo())
+    case "get-option" => Some(GetOption())
+    case "get-proof" => Some(GetProof())
+    case "get-unsat-core" => Some(GetUnsatCore())
+    case "get-value" => Some(GetValue())
+    case "pop" => Some(Pop())
+    case "push" => Some(Push())
+    case "set-logic" => Some(SetLogic())
+    case "set-info" => Some(SetInfo())
+    case "set-option" => Some(SetOption())
+
     case _ => None
   }
 
