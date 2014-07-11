@@ -97,7 +97,7 @@ class Lexer(reader: java.io.Reader) {
       }
       case '(' => OParen()
       case ')' => CParen()
-      case ':' => Keyword(readSymbol(nextChar))
+      case ':' => Keyword(readSymbol(nextChar)) //TODO: symbols after : can start with a digit, so sligthly different from symbols
       case '"' => {
         val buffer = new scala.collection.mutable.ArrayBuffer[Char]
         var c = nextChar

@@ -1,7 +1,7 @@
 package smtlib
 package parser
 
-import common.Positioned
+import common._
 
 
 /*
@@ -19,11 +19,32 @@ import Commands._
 
 object Terms {
 
-  sealed trait Term extends Positioned
-
-
   //an identifier is either a symbol or an indexed symbol: (_ symbol <numeral>+)
-  case class Identifier(symbol: SSymbol, ns: Seq[Int])
+  case class Identifier(symbol: SSymbol, ns: Seq[Int]) {
+    def isIndexed: Boolean = !ns.isEmpty
+  }
+
+  case class Sort(id: Identifier, subSorts: Seq[Sort])
+
+  case class Attribute(keyword: SKeyword, v: Option[SExpr])
+
+  case class SortedVar(symbol: SSymbol, sort: Sort)
+  case class VarBinding(symbol: SSymbol, term: Term)
+
+
+  sealed trait SExpr extends Positioned
+
+  case class SList(sexprs: List[SExpr]) extends SExpr
+  object SList {
+    def apply(sexprs: SExpr*): SList = SList(List(sexprs:_*))
+  }
+  case class SKeyword(name: SSymbol) extends SExpr
+  case class SSymbol(name: String) extends SExpr
+
+  /* SComment is never parsed, only used for pretty printing */
+  case class SComment(s: String) extends SExpr 
+
+  sealed trait Term extends Positioned with SExpr
 
   case class Let(binding: VarBinding, bindings: Seq[VarBinding], term: Term) extends Term
   case class ForAll(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
@@ -32,38 +53,17 @@ object Terms {
   case class AnnotatedTerm(term: Term, attribute: Attribute, attributes: Seq[Attribute]) extends Term
   case class FunctionApplication(fun: QualifiedIdentifier, terms: Seq[Term]) extends Term //TODO: should terms be at leat of length 1 ?
 
-
-  case class SortedVar(symbol: String, sort: Sort)
-  case class VarBinding(symbol: String, term: Term)
-
-
   trait Literal[T] extends Term {
     val value: T
   }
 
-  case class Numeral(value: BigInt) extends Literal[BigInt]
-  case class Decimal(value: BigDecimal) extends Literal[BigDecimal]
-  case class SMTLIBString(value: String) extends Literal[String]
+  case class SNumeral(value: BigInt) extends Literal[BigInt]
+  case class SHexaDecimal(value: Hexadecimal) extends Literal[Hexadecimal]
+  case class SBinary(value: List[Boolean]) extends Literal[List[Boolean]]
+  case class SDecimal(value: BigDecimal) extends Literal[BigDecimal]
+  case class SString(value: String) extends Literal[String]
+  case class SBoolean(value: Boolean) extends Literal[Boolean]
 
-
-  sealed trait SExpr extends Term
-
-  case class SList(sexprs: List[SExpr]) extends SExpr
-  object SList {
-    def apply(sexprs: SExpr*): SList = SList(List(sexprs:_*))
-  }
-
-  case class SNumeral(n: BigInt) extends SExpr
-  case class SHexaDecimal(content: String) extends SExpr
-  case class SBinary(content: List[Boolean]) extends SExpr
-  case class SDecimal(d: Double) extends SExpr
-  case class SString(s: String) extends SExpr
-  case class SBoolean(v: Boolean) extends SExpr
-  case class SSymbol(s: String) extends SExpr
-  case class SKeyword(s: SSymbol) extends SExpr
-
-  /* SComment is never parsed, only used for pretty printing */
-  case class SComment(s: String) extends SExpr 
 
 
 }

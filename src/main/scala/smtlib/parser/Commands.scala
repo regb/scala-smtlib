@@ -2,10 +2,11 @@ package smtlib
 package parser
 
 import parser.Terms._
+import common._
 
 object Commands {
 
-  sealed trait Command
+  sealed trait Command extends Positioned
 
   case class Script(commands: List[Command])
 
@@ -38,8 +39,6 @@ object Commands {
   //It can be used to send commands not supported in this library, such as non-standard commands like declare-datatypes
   case class NonStandardCommand(sexpr: SExpr) extends Command
 
-
-  case class Attribute(name: String, v: Option[SExpr])
 
   /* 
    * Info flags can be queried with get-info command and
@@ -76,10 +75,6 @@ object Commands {
   case class Verbosity(value: Int) extends SMTOption
   case class AttributeOption(attribute: Attribute) extends SMTOption
 
-
-  case class Sort(id: Identifier, subSorts: Seq[Sort])
-  //case class SymbolSort(symbol: SSymbol) extends Sort
-  //case class 
 
   sealed abstract trait Logic
   case object QF_UF extends Logic
