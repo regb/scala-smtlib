@@ -38,7 +38,7 @@ object Terms {
   object SList {
     def apply(sexprs: SExpr*): SList = SList(List(sexprs:_*))
   }
-  case class SKeyword(name: SSymbol) extends SExpr
+  case class SKeyword(name: String) extends SExpr
   case class SSymbol(name: String) extends SExpr
 
   /* SComment is never parsed, only used for pretty printing */

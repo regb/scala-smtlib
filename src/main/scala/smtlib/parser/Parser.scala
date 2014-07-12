@@ -78,6 +78,12 @@ class Parser(lexer: Lexer) {
         val logic = Logic.fromString(logicSymbol.name)
         SetLogic(logic)
       }
+      case Tokens.SetOption() => {
+        SetOption(parseOption)
+      }
+      case Tokens.SetInfo() => {
+        SetInfo(parseAttribute)
+      }
 
       case Tokens.Assert() => ???
 
@@ -88,6 +94,91 @@ class Parser(lexer: Lexer) {
     cmd.setPos(head)
   }
 
+  def parseInfoFlag: InfoFlag = {
+    nextToken match {
+      case Tokens.Keyword("error-behaviour") => ErrorBehaviourInfoFlag
+      case Tokens.Keyword("name") => NameInfoFlag
+      case Tokens.Keyword("authors") => AuthorsInfoFlag
+      case Tokens.Keyword("version") => VersionInfoFlag
+      case Tokens.Keyword("status") => StatusInfoFlag
+      case Tokens.Keyword("reason-unknown") => ReasonUnknownInfoFlag
+      case Tokens.Keyword("all-statistics") => AllStatisticsInfoFlag
+      case Tokens.Keyword(keyword) => KeywordInfoFlag(keyword)
+      case _ => sys.error("TODO")
+    }
+  }
+
+  def parseAttribute: Attribute = {
+    val keyword = parseKeyword
+    val attributeValue = tryParseAttributeValue
+    Attribute(keyword, attributeValue)
+  }
+
+  def tryParseAttributeValue: Option[SExpr] = {
+    nextToken match {
+      case Tokens.StringLit(s) => Some(SString(s))
+      case Tokens.SymbolLit(s) => Some(SSymbol(s))
+      case _ => None
+    }
+  }
+
+  def parseOption: SMTOption = {
+    peekToken match {
+      case Tokens.Keyword("print-success") =>
+        nextToken
+        PrintSuccess(parseBool)
+      case Tokens.Keyword("expand-definitions") => 
+        nextToken
+        ExpandDefinitions(parseBool)
+      case Tokens.Keyword("interactive-mode") => 
+        nextToken
+        InteractiveMode(parseBool)
+      case Tokens.Keyword("produce-proofs") => 
+        nextToken
+        ProduceProofs(parseBool)
+      case Tokens.Keyword("produce-unsat-cores") => 
+        nextToken
+        ProduceUnsatCores(parseBool)
+      case Tokens.Keyword("produce-models") => 
+        nextToken
+        ProduceModels(parseBool)
+      case Tokens.Keyword("produce-assignments") => 
+        nextToken
+        ProduceAssignments(parseBool)
+      case Tokens.Keyword("regular-output-channel") => 
+        nextToken
+        RegularOutputChannel(parseString.value)
+      case Tokens.Keyword("diagnostic-output-channel") => 
+        nextToken
+        DiagnosticOutputChannel(parseString.value)
+      case Tokens.Keyword("random-seed") => 
+        nextToken
+        RandomSeed(parseNumeral.value.toInt)
+      case Tokens.Keyword("verbosity") => 
+        nextToken
+        Verbosity(parseNumeral.value.toInt)
+      case _ => 
+        AttributeOption(parseAttribute)
+    }
+  }
+
+  def parseBool: Boolean = {
+    nextToken match {
+      case Tokens.SymbolLit("true") => true
+      case Tokens.SymbolLit("false") => false
+      case _ => sys.error("TODO")
+    }
+  }
+
+  def parseString: SString = {
+    nextToken match {
+      case t@Tokens.StringLit(s) => {
+        val str = SString(s)
+        str.setPos(t)
+      }
+      case _ => sys.error("TODO")
+    }
+  }
   def parseSymbol: SSymbol = {
     nextToken match {
       case t@Tokens.SymbolLit(s) => {
@@ -97,6 +188,27 @@ class Parser(lexer: Lexer) {
       case _ => sys.error("TODO")
     }
   }
+
+  def parseNumeral: SNumeral = {
+    nextToken match {
+      case t@Tokens.NumeralLit(n) => {
+        val num = SNumeral(n)
+        num.setPos(t)
+      }
+      case _ => sys.error("TODO")
+    }
+  }
+
+  def parseKeyword: SKeyword = {
+    nextToken match {
+      case t@Tokens.Keyword(k) => {
+        val keyword = SKeyword(k)
+        keyword.setPos(t)
+      }
+      case _ => sys.error("TODO")
+    }
+  }
+
 
 
 }
