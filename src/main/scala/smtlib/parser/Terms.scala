@@ -62,7 +62,6 @@ object Terms {
   case class QualifiedIdentifier(id: Identifier, sort: Option[Sort]) extends Term
   object QualifiedIdentifier {
     def apply(id: Identifier): QualifiedIdentifier = QualifiedIdentifier(id, None)
-    def apply(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(Identifier(sym, Seq()), None)
   }
 
   case class AnnotatedTerm(term: Term, attribute: Attribute, attributes: Seq[Attribute]) extends Term

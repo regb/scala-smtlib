@@ -31,7 +31,7 @@ class ParserTests extends FunSuite with Timeouts {
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
   private implicit def strToKeyword(str: String): SKeyword = SKeyword(str)
-  private implicit def symToTerm(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(sym)
+  private implicit def symToTerm(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(sym.name)
 
 
   test("Parsing attributes") {
@@ -88,7 +88,37 @@ class ParserTests extends FunSuite with Timeouts {
 
   }
 
-  test("Parsing Terms") {
+  def parseTerm(str: String): Term = {
+    val reader = new StringReader(str)
+    val lexer = new Lexer(reader)
+    val parser = new Parser(lexer)
+    val term = parser.parseTerm
+    term
+  }
+
+  test("Parsing simple Terms") {
+
+    assert(parseTerm("42") === SNumeral(42))
+    assert(parseTerm("abc") === QualifiedIdentifier("abc"))
+    assert(parseTerm("(f a b)") === 
+           FunctionApplication(
+            QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
+    assert(parseTerm("(let ((a x)) a)") ===
+           Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))
+
+    assert(parseTerm("(forall (a A) a)") ===
+           ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
+          )
+    assert(parseTerm("(exists (a A) a)") ===
+           Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
+          )
+    assert(parseTerm("(! a :note abcd)") ===
+           AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq())
+          )
+
+  }
+
+  test("Parsing composed Terms") {
 
   }
 
@@ -108,7 +138,7 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(push 4)") === Push(4))
     assert(parseUniqueCmd("(pop 1)") === Pop(1))
     assert(parseUniqueCmd("(pop 2)") === Pop(2))
-    assert(parseUniqueCmd("(assert true)") === Assert(QualifiedIdentifier(SSymbol("true"))))
+    assert(parseUniqueCmd("(assert true)") === Assert(QualifiedIdentifier("true")))
     assert(parseUniqueCmd("(check-sat)") === CheckSat())
 
     assert(parseUniqueCmd("(get-assertions)") === GetAssertions())
@@ -169,13 +199,13 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parser1.parseCommand === DeclareFun("a", Seq(), Sort("Int")))
     assert(parser1.parseCommand === 
            Assert(FunctionApplication(
-                    QualifiedIdentifier(SSymbol("=")),
+                    QualifiedIdentifier("="),
                     Seq(
                       FunctionApplication(
-                        QualifiedIdentifier(SSymbol("f")),
-                        Seq(QualifiedIdentifier(SSymbol("a")))
+                        QualifiedIdentifier("f"),
+                        Seq(QualifiedIdentifier("a"))
                       ),
-                      QualifiedIdentifier(SSymbol("a"))
+                      QualifiedIdentifier("a")
                     )
                   ))
            )
@@ -194,7 +224,7 @@ class ParserTests extends FunSuite with Timeouts {
     pis.write("(assert (< 1 3))")
     assert(parser.parseCommand === 
            Assert(FunctionApplication(
-             QualifiedIdentifier(SSymbol("<")),
+             QualifiedIdentifier("<"),
              Seq(
                SNumeral(1), 
                SNumeral(3)
