@@ -68,6 +68,23 @@ class ParserTests extends FunSuite with Timeouts {
 
     assert(parseSort("A") === Sort("A"))
     assert(parseSort("(A B)") === Sort("A", Seq(Sort("B"))))
+    assert(parseSort("(Array From To)") === Sort("Array", Seq(Sort("From"), Sort("To"))))
+
+  }
+
+  test("Parsing Identifiers") {
+    def parseId(str: String): Identifier = {
+      val reader = new StringReader(str)
+      val lexer = new Lexer(reader)
+      val parser = new Parser(lexer)
+      val id = parser.parseIdentifier
+      id
+    }
+
+    assert(parseId("abc") === Identifier("abc"))
+    assert(parseId("test") === Identifier("test"))
+    assert(parseId("(_ a 1)") === Identifier("a", Seq(1)))
+    assert(parseId("(_ a 42 12)") === Identifier("a", Seq(42, 12)))
 
   }
 

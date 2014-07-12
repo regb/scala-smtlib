@@ -315,8 +315,21 @@ class Parser(lexer: Lexer) {
   }
 
   def parseIdentifier: Identifier = { //TODO: indexed id: (_ id 1)
-    val sym = parseSymbol
-    Identifier(sym)
+    if(peekToken == Tokens.OParen()) {
+      eat(Tokens.OParen())
+      eat(Tokens.Underscore())
+      val sym = parseSymbol
+
+      val firstIndex = parseNumeral.value.toInt
+      var indices = new ListBuffer[Int]
+      while(peekToken != Tokens.CParen())
+        indices.append(parseNumeral.value.toInt)
+      eat(Tokens.CParen())
+      Identifier(sym, firstIndex :: indices.toList)
+    } else {
+      val sym = parseSymbol
+      Identifier(sym)
+    }
   }
 
   def parseTerm: Term = {
