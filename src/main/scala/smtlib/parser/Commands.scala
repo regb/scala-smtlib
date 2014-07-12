@@ -27,10 +27,10 @@ object Commands {
   case class GetAssertions() extends Command
   case class GetProof() extends Command
   case class GetUnsatCore() extends Command
-  case class GetValue(term: SExpr, terms: Seq[SExpr]) extends Command
+  case class GetValue(term: Term, terms: Seq[Term]) extends Command
   case class GetAssignment() extends Command
 
-  case class GetOption(key: String) extends Command
+  case class GetOption(key: SKeyword) extends Command
   case class GetInfo(flag: InfoFlag) extends Command
 
   case class Exit() extends Command

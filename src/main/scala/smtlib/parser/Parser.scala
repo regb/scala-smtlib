@@ -135,20 +135,26 @@ class Parser(lexer: Lexer) {
       case Tokens.GetProof() => GetProof()
       case Tokens.GetUnsatCore() => GetUnsatCore()
       case Tokens.GetValue() => {
-        ??? 
+        eat(Tokens.OParen())
+        val ts = new ListBuffer[Term]
+        while(peekToken != Tokens.CParen())
+          ts.append(parseTerm)
+        eat(Tokens.CParen())
+        GetValue(ts.head, ts.tail.toList)
       }
       case Tokens.GetAssignment() => GetAssignment()
 
       case Tokens.GetOption() => {
-        ???
-
+        val keyword = parseKeyword
+        GetOption(keyword)
       }
       case Tokens.GetInfo() => {
-        ???
-
+        val infoFlag = parseInfoFlag
+        GetInfo(infoFlag)
       }
 
       case Tokens.Exit() => Exit()
+
       case t => {
         throw new UnknownCommandException("command: " + t)
       }
@@ -263,6 +269,16 @@ class Parser(lexer: Lexer) {
     }
   }
 
+  def parseDecimal: SDecimal = {
+    nextToken match {
+      case t@Tokens.DecimalLit(n) => {
+        val dec = SDecimal(n)
+        dec.setPos(t)
+      }
+      case _ => sys.error("TODO")
+    }
+  }
+
   def parseKeyword: SKeyword = {
     nextToken match {
       case t@Tokens.Keyword(k) => {
@@ -272,6 +288,9 @@ class Parser(lexer: Lexer) {
       case _ => sys.error("TODO")
     }
   }
+
+  def parseHexadecimal: SHexaDecimal = ???
+  def parseBinary: SBinary = ???
 
   def parseSort: Sort = {
     if(peekToken == Tokens.OParen()) {
@@ -295,8 +314,21 @@ class Parser(lexer: Lexer) {
     Identifier(sym)
   }
 
-  def parseTerm: Term = ???
+  def parseTerm: Term = {
+    val cst = tryParseConstant
+    cst.getOrElse(QualifiedIdentifier(parseIdentifier))
+  }
 
+  def tryParseConstant: Option[Constant] = {
+    peekToken match {
+      case Tokens.NumeralLit(_) => Some(parseNumeral)
+      case Tokens.HexadecimalLit(_) => Some(parseHexadecimal)
+      case Tokens.BinaryLit(_) => Some(parseBinary)
+      case Tokens.DecimalLit(_) => Some(parseDecimal)
+      case Tokens.StringLit(_) => Some(parseString)
+      case _ => None
+    }
+  }
 
 
 }

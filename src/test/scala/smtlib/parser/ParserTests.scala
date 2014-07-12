@@ -30,6 +30,8 @@ class ParserTests extends FunSuite with Timeouts {
 
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
+  private implicit def strToKeyword(str: String): SKeyword = SKeyword(str)
+  private implicit def symToTerm(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(sym)
 
   test("Parsing single commands") {
 
@@ -47,7 +49,7 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(push 4)") === Push(4))
     assert(parseUniqueCmd("(pop 1)") === Pop(1))
     assert(parseUniqueCmd("(pop 2)") === Pop(2))
-    assert(parseUniqueCmd("(assert true)") === Assert(SBoolean(true)))
+    assert(parseUniqueCmd("(assert true)") === Assert(QualifiedIdentifier(SSymbol("true"))))
     assert(parseUniqueCmd("(check-sat)") === CheckSat())
 
     assert(parseUniqueCmd("(get-assertions)") === GetAssertions())

@@ -65,7 +65,9 @@ object Terms {
   case class AnnotatedTerm(term: Term, attribute: Attribute, attributes: Seq[Attribute]) extends Term
   case class FunctionApplication(fun: QualifiedIdentifier, terms: Seq[Term]) extends Term //TODO: should terms be at leat of length 1 ?
 
-  trait Literal[T] extends Term {
+  trait Constant extends Term
+
+  trait Literal[T] extends Constant {
     val value: T
   }
 
