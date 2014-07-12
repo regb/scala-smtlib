@@ -28,6 +28,9 @@ object Terms {
   }
 
   case class Sort(id: Identifier, subSorts: Seq[Sort])
+  object Sort {
+    def apply(id: Identifier): Sort = Sort(id, Seq())
+  }
 
   case class Attribute(keyword: SKeyword, v: Option[SExpr])
 

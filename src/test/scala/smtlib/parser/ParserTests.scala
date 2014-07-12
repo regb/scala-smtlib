@@ -13,6 +13,8 @@ import org.scalatest.FunSuite
 import org.scalatest.concurrent.Timeouts
 import org.scalatest.time.SpanSugar._
 
+import scala.language.implicitConversions
+
 class ParserTests extends FunSuite with Timeouts {
 
   override def suiteName = "SMT-LIB Parser suite"
@@ -26,6 +28,9 @@ class ParserTests extends FunSuite with Timeouts {
     cmd
   }
 
+  private implicit def strToSym(str: String): SSymbol = SSymbol(str)
+  private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
+
   test("Parsing single commands") {
 
     assert(parseUniqueCmd("(set-logic QF_UF)") === SetLogic(QF_UF))
@@ -33,10 +38,10 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(declare-sort A 0)") === DeclareSort("A", 0))
     assert(parseUniqueCmd("(define-sort A (B C) (Array B C))") ===
                           DefineSort("A", Seq("B", "C"), 
-                                            SList(SSymbol("Array"), SSymbol("B"), SSymbol("C"))
+                                            Sort(Identifier("Array"), Seq(Sort("B"), Sort("C")))
                                     ))
     assert(parseUniqueCmd("(declare-fun xyz (A B) C)") ===
-           DeclareFun("xyz", Seq(SSymbol("A"), SSymbol("B")), SSymbol("C")))
+           DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
 
     assert(parseUniqueCmd("(push 1)") === Push(1))
     assert(parseUniqueCmd("(push 4)") === Push(4))
@@ -98,8 +103,8 @@ class ParserTests extends FunSuite with Timeouts {
     val lexer1 = new Lexer(reader1)
     val parser1 = new Parser(lexer1)
     assert(parser1.parseCommand === SetLogic(QF_UF))
-    assert(parser1.parseCommand === DeclareFun("f", Seq(SSymbol("Int")), SSymbol("Int")))
-    assert(parser1.parseCommand === DeclareFun("a", Seq(), SSymbol("Int")))
+    assert(parser1.parseCommand === DeclareFun("f", Seq(Sort("Int")), Sort("Int")))
+    assert(parser1.parseCommand === DeclareFun("a", Seq(), Sort("Int")))
     assert(parser1.parseCommand === 
            Assert(FunctionApplication(
                     QualifiedIdentifier(SSymbol("=")),

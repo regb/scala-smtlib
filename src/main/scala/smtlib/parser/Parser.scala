@@ -10,6 +10,7 @@ import Commands._
 
 import common._
 
+import scala.collection.mutable.ListBuffer
 
 class Parser(lexer: Lexer) {
 
@@ -84,6 +85,37 @@ class Parser(lexer: Lexer) {
       case Tokens.SetInfo() => {
         SetInfo(parseAttribute)
       }
+
+      case Tokens.DeclareSort() => {
+        val sym = parseSymbol
+        val arity = parseNumeral
+        DeclareSort(sym, arity.value.toInt)
+      }
+      case Tokens.DefineSort() => {
+        val sym = parseSymbol
+
+        val vars = new ListBuffer[SSymbol]
+        eat(Tokens.OParen())
+        while(peekToken != Tokens.CParen())
+          vars.append(parseSymbol)
+        eat(Tokens.CParen())
+
+        val sort = parseSort
+        DefineSort(sym, vars.toList, sort)
+      }
+      case Tokens.DeclareFun() => {
+        val sym = parseSymbol
+
+        val params = new ListBuffer[Sort]
+        eat(Tokens.OParen())
+        while(peekToken != Tokens.CParen())
+          params.append(parseSort)
+        eat(Tokens.CParen())
+
+        val sort = parseSort
+        DeclareFun(sym, params.toList, sort)
+      }
+      case Tokens.DefineFun() => ???
 
       case Tokens.Assert() => ???
 
@@ -207,6 +239,28 @@ class Parser(lexer: Lexer) {
       }
       case _ => sys.error("TODO")
     }
+  }
+
+  def parseSort: Sort = {
+    if(peekToken == Tokens.OParen()) {
+      eat(Tokens.OParen())
+      val name = parseIdentifier
+
+      var subSorts = new ListBuffer[Sort]
+      while(peekToken != Tokens.CParen())
+        subSorts.append(parseSort)
+      eat(Tokens.CParen())
+
+      Sort(name, subSorts.toList)
+    } else {
+      val id = parseIdentifier
+      Sort(id)
+    }
+  }
+
+  def parseIdentifier: Identifier = { //TODO: indexed id: (_ id 1)
+    val sym = parseSymbol
+    Identifier(sym)
   }
 
 

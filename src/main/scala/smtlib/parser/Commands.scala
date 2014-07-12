@@ -14,9 +14,9 @@ object Commands {
   case class SetOption(option: SMTOption) extends Command
   case class SetInfo(attribute: Attribute) extends Command
 
-  case class DeclareSort(name: String, arity: Int) extends Command
-  case class DefineSort(name: String, params: Seq[String], sort: SExpr) extends Command
-  case class DeclareFun(name: String, paramSorts: Seq[SExpr], returnSort: SExpr) extends Command
+  case class DeclareSort(name: SSymbol, arity: Int) extends Command
+  case class DefineSort(name: SSymbol, params: Seq[SSymbol], sort: Sort) extends Command
+  case class DeclareFun(name: SSymbol, paramSorts: Seq[Sort], returnSort: Sort) extends Command
   //case class DefineFun(name: String, params: Seq[
 
   case class Push(n: Int) extends Command
