@@ -33,6 +33,9 @@ object Terms {
   }
 
   case class Attribute(keyword: SKeyword, v: Option[SExpr])
+  object Attribute {
+    def apply(key: SKeyword): Attribute = Attribute(key, None)
+  }
 
   case class SortedVar(symbol: SSymbol, sort: Sort)
   case class VarBinding(symbol: SSymbol, term: Term)

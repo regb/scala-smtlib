@@ -185,9 +185,14 @@ class Parser(lexer: Lexer) {
   }
 
   def tryParseAttributeValue: Option[SExpr] = {
-    nextToken match {
-      case Tokens.StringLit(s) => Some(SString(s))
-      case Tokens.SymbolLit(s) => Some(SSymbol(s))
+    peekToken match {
+      case Tokens.NumeralLit(_) => Some(parseNumeral)
+      case Tokens.BinaryLit(_) => Some(parseBinary)
+      case Tokens.HexadecimalLit(_) => Some(parseHexadecimal)
+      case Tokens.DecimalLit(_) => Some(parseDecimal)
+      case Tokens.StringLit(_) => Some(parseString)
+      case Tokens.SymbolLit(_) => Some(parseSymbol)
+      case Tokens.OParen() => Some(parseSList)
       case _ => None
     }
   }
@@ -330,6 +335,29 @@ class Parser(lexer: Lexer) {
     }
   }
 
+  def parseSList: SList = {
+    eat(Tokens.OParen())
+    var exprs = new ListBuffer[SExpr]
+    while(peekToken != Tokens.CParen())
+      exprs.append(parseSExpr)
+    eat(Tokens.CParen())
+    SList(exprs.toList)
+  }
+
+
+  def parseSExpr: SExpr = {
+    peekToken match {
+      case Tokens.SymbolLit(_) => parseSymbol
+      case Tokens.NumeralLit(_) => parseNumeral
+      case Tokens.BinaryLit(_) => parseBinary
+      case Tokens.HexadecimalLit(_) => parseHexadecimal
+      case Tokens.DecimalLit(_) => parseDecimal
+      case Tokens.StringLit(_) => parseString
+      case Tokens.Keyword(_) => parseKeyword
+      case Tokens.OParen() => parseSList
+      case _ => sys.error("TODO")
+    }
+  }
 
 }
 
