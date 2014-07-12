@@ -23,17 +23,17 @@ object Commands {
   case class Pop(n: Int) extends Command
   case class Assert(term: Term) extends Command
 
-  case object CheckSat extends Command
-  case object GetAssertions extends Command
-  case object GetProof extends Command
-  case object GetUnsatCore extends Command
+  case class CheckSat() extends Command
+  case class GetAssertions() extends Command
+  case class GetProof() extends Command
+  case class GetUnsatCore() extends Command
   case class GetValue(term: SExpr, terms: Seq[SExpr]) extends Command
-  case object GetAssignment extends Command
+  case class GetAssignment() extends Command
 
   case class GetOption(key: String) extends Command
   case class GetInfo(flag: InfoFlag) extends Command
 
-  case object Exit extends Command
+  case class Exit() extends Command
 
   //this command can be used to create and print arbitrary commands using the s-expression
   //It can be used to send commands not supported in this library, such as non-standard commands like declare-datatypes

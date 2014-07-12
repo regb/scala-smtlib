@@ -48,18 +48,18 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(pop 1)") === Pop(1))
     assert(parseUniqueCmd("(pop 2)") === Pop(2))
     assert(parseUniqueCmd("(assert true)") === Assert(SBoolean(true)))
-    assert(parseUniqueCmd("(check-sat)") === CheckSat)
+    assert(parseUniqueCmd("(check-sat)") === CheckSat())
 
-    assert(parseUniqueCmd("(get-assertions)") === GetAssertions)
-    assert(parseUniqueCmd("(get-proof)") === GetProof)
-    assert(parseUniqueCmd("(get-unsat-core)") === GetUnsatCore)
+    assert(parseUniqueCmd("(get-assertions)") === GetAssertions())
+    assert(parseUniqueCmd("(get-proof)") === GetProof())
+    assert(parseUniqueCmd("(get-unsat-core)") === GetUnsatCore())
     assert(parseUniqueCmd("(get-value (x y z))") === GetValue(SSymbol("x"), Seq(SSymbol("y"), SSymbol("z"))))
-    assert(parseUniqueCmd("(get-assignment)") === GetAssignment)
+    assert(parseUniqueCmd("(get-assignment)") === GetAssignment())
 
     assert(parseUniqueCmd("(get-option :keyword)") === GetOption("keyword"))
     assert(parseUniqueCmd("(get-info :authors)") === GetInfo(AuthorsInfoFlag))
 
-    assert(parseUniqueCmd("(exit)") === Exit)
+    assert(parseUniqueCmd("(exit)") === Exit())
   }
 
   test("Parsing set-option command") {
@@ -117,7 +117,7 @@ class ParserTests extends FunSuite with Timeouts {
                     )
                   ))
            )
-    assert(parser1.parseCommand === CheckSat)
+    assert(parser1.parseCommand === CheckSat())
 
   }
 

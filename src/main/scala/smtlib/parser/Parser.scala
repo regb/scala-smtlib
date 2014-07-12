@@ -117,9 +117,41 @@ class Parser(lexer: Lexer) {
       }
       case Tokens.DefineFun() => ???
 
-      case Tokens.Assert() => ???
+      case Tokens.Push() => {
+        val n = parseNumeral
+        Push(n.value.toInt)
+      }
+      case Tokens.Pop() => {
+        val n = parseNumeral
+        Pop(n.value.toInt)
+      }
 
-      case _ => sys.error("TODO")
+      case Tokens.Assert() => {
+        Assert(parseTerm)
+      }
+
+      case Tokens.CheckSat() => CheckSat()
+      case Tokens.GetAssertions() => GetAssertions()
+      case Tokens.GetProof() => GetProof()
+      case Tokens.GetUnsatCore() => GetUnsatCore()
+      case Tokens.GetValue() => {
+        ??? 
+      }
+      case Tokens.GetAssignment() => GetAssignment()
+
+      case Tokens.GetOption() => {
+        ???
+
+      }
+      case Tokens.GetInfo() => {
+        ???
+
+      }
+
+      case Tokens.Exit() => Exit()
+      case t => {
+        throw new UnknownCommandException("command: " + t)
+      }
     }
     eat(Tokens.CParen())
 
@@ -263,11 +295,16 @@ class Parser(lexer: Lexer) {
     Identifier(sym)
   }
 
+  def parseTerm: Term = ???
+
 
 
 }
 
-//object Parser {
+object Parser {
+
+  class UnknownCommandException(msg: String) extends Exception(msg)
+
 //
 //  class EOFBeforeMatchingParenthesisException(startPos: Position) extends
 //    Exception("Opened parenthesis at position: " + startPos + " has no matching closing parenthesis")
@@ -292,6 +329,4 @@ class Parser(lexer: Lexer) {
 //    val parser = new Parser(lexer)
 //    parser.next
 //  }
-//}
-//
-//// vim: set ts=4 sw=4 et:
+}
