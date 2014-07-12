@@ -23,6 +23,9 @@ object Terms {
   case class Identifier(symbol: SSymbol, ns: Seq[Int]) {
     def isIndexed: Boolean = !ns.isEmpty
   }
+  object Identifier {
+    def apply(symbol: SSymbol): Identifier = Identifier(symbol, Seq())
+  }
 
   case class Sort(id: Identifier, subSorts: Seq[Sort])
 
@@ -49,7 +52,13 @@ object Terms {
   case class Let(binding: VarBinding, bindings: Seq[VarBinding], term: Term) extends Term
   case class ForAll(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
   case class Exists(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
+
   case class QualifiedIdentifier(id: Identifier, sort: Option[Sort]) extends Term
+  object QualifiedIdentifier {
+    def apply(id: Identifier): QualifiedIdentifier = QualifiedIdentifier(id, None)
+    def apply(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(Identifier(sym, Seq()), None)
+  }
+
   case class AnnotatedTerm(term: Term, attribute: Attribute, attributes: Seq[Attribute]) extends Term
   case class FunctionApplication(fun: QualifiedIdentifier, terms: Seq[Term]) extends Term //TODO: should terms be at leat of length 1 ?
 

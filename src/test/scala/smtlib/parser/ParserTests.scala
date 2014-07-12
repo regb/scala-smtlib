@@ -100,26 +100,40 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parser1.parseCommand === SetLogic(QF_UF))
     assert(parser1.parseCommand === DeclareFun("f", Seq(SSymbol("Int")), SSymbol("Int")))
     assert(parser1.parseCommand === DeclareFun("a", Seq(), SSymbol("Int")))
-    assert(parser1.parseCommand === Assert(SList(
-                                    SSymbol("="), SList(SSymbol("f"), SSymbol("a")), SSymbol("a"))))
+    assert(parser1.parseCommand === 
+           Assert(FunctionApplication(
+                    QualifiedIdentifier(SSymbol("=")),
+                    Seq(
+                      FunctionApplication(
+                        QualifiedIdentifier(SSymbol("f")),
+                        Seq(QualifiedIdentifier(SSymbol("a")))
+                      ),
+                      QualifiedIdentifier(SSymbol("a"))
+                    )
+                  ))
+           )
     assert(parser1.parseCommand === CheckSat)
 
   }
 
   test("interactive parser") {
     val pis = new SynchronousPipedReader
-    val parser = failAfter(3 seconds) { new Parser(pis) }
+    val lexer = failAfter(3 seconds) { new Lexer(pis) }
+    val parser = failAfter(3 seconds) { new Parser(lexer) }
 
     pis.write("(set-logic QF_LRA)")
-    assert(parser.hasNext)
-    assert(parser.next === SetLogic(QF_LRA))
+    assert(parser.parseCommand === SetLogic(QF_LRA))
 
     pis.write("(assert (< 1 3))")
-    assert(parser.hasNext)
-    assert(parser.next === Assert(SList(SSymbol("<"), SInt(1), SInt(3))))
+    assert(parser.parseCommand === 
+           Assert(FunctionApplication(
+             QualifiedIdentifier(SSymbol("<")),
+             Seq(
+               SNumeral(1), 
+               SNumeral(3)
+             )
+           )))
+
   }
-
-
-  //TODO: testing exceptions and error handling
 
 }
