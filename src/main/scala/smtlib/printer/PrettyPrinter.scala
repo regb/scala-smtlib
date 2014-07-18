@@ -108,7 +108,44 @@ object PrettyPrinter {
     }
   }
 
-  def printTerm(term: Term, writer: Writer): Unit = ???
+  def printTerm(term: Term, writer: Writer): Unit = term match {
+    case Let(vb, vbs, t) =>
+      writer.write("(let (")
+      printVarBinding(vb, writer)
+      printNary(writer, vbs, printVarBinding _, "", " ", ") ")
+      printTerm(t, writer)
+      writer.write(")")
+    case ForAll(sortedVar, sortedVars, t) =>
+      writer.write("(forall (")
+      printSortedVar(sortedVar, writer)
+      printNary(writer, sortedVars, printSortedVar _, "", " ", ") ")
+      printTerm(t, writer)
+      writer.write(")")
+    case Exists(sortedVar, sortedVars, t) =>
+      writer.write("(exists (")
+      printSortedVar(sortedVar, writer)
+      printNary(writer, sortedVars, printSortedVar _, "", " ", ") ")
+      printTerm(t, writer)
+      writer.write(")")
+    case FunctionApplication(fun, ts) =>
+
+  }
+
+  def printVarBinding(vb: VarBinding, writer: Writer): Unit = {
+    writer.write('(')
+    writer.write(vb.name.name)
+    writer.write(' ')
+    printTerm(vb.term, writer)
+    writer.write(')')
+  }
+
+  def printSortedVar(sv: SortedVar, writer: Writer): Unit = {
+    writer.write('(')
+    writer.write(sv.name.name)
+    writer.write(' ')
+    printSort(sv.sort, writer)
+    writer.write(')')
+  }
 
   private def printSort(sort: Sort, writer: Writer): Unit = ???
 
@@ -190,17 +227,21 @@ object PrettyPrinter {
       writer.write(keyword)
   }
 
-  //private def ppNary(writer: Writer, exprs: Seq[SExpr], pre: String, op: String, post: String): Unit = {
-  //  writer.write(pre)
-  //  var c = 0
-  //  var sz = exprs.size
+  private def printNary[A](
+    writer: Writer, as: Seq[A], printer: (A, Writer) => Unit,
+    pre: String, op: String, post: String): Unit = {
 
-  //  exprs.foreach(e => {
-  //    apply(e, writer)
-  //    c += 1
-  //    if(c < sz) writer.write(op)
-  //  })
-  //  writer.write(post)
-  //}
+    writer.write(pre)
+
+    var c = 0
+    var sz = as.size
+
+    as.foreach(a => {
+      printer(a, writer)
+      c += 1
+      if(c < sz) writer.write(op)
+    })
+    writer.write(post)
+  }
 
 }

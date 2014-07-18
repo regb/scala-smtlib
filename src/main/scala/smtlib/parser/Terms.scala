@@ -37,8 +37,8 @@ object Terms {
     def apply(key: SKeyword): Attribute = Attribute(key, None)
   }
 
-  case class SortedVar(symbol: SSymbol, sort: Sort)
-  case class VarBinding(symbol: SSymbol, term: Term)
+  case class SortedVar(name: SSymbol, sort: Sort)
+  case class VarBinding(name: SSymbol, term: Term)
 
 
   sealed trait SExpr extends Positioned
