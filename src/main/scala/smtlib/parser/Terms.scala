@@ -20,8 +20,8 @@ import Commands._
 object Terms {
 
   //an identifier is either a symbol or an indexed symbol: (_ symbol <numeral>+)
-  case class Identifier(symbol: SSymbol, ns: Seq[Int]) {
-    def isIndexed: Boolean = !ns.isEmpty
+  case class Identifier(symbol: SSymbol, indices: Seq[Int]) {
+    def isIndexed: Boolean = !indices.isEmpty
   }
   object Identifier {
     def apply(symbol: SSymbol): Identifier = Identifier(symbol, Seq())

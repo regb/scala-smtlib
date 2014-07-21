@@ -128,7 +128,50 @@ object PrettyPrinter {
       printTerm(t, writer)
       writer.write(")")
     case FunctionApplication(fun, ts) =>
+      writer.write("(")
+      printQualifiedId(fun, writer)
+      printNary(writer, ts, printTerm _, "", " ", ")")
+    case AnnotatedTerm(term, attr, attrs) => ???
+    case id@QualifiedIdentifier(_, _) => 
+      printQualifiedId(id, writer)
 
+    case (c: Constant) => printConstant(c, writer)
+  }
+
+  def printConstant(c: Constant, writer: Writer): Unit = c match {
+    case SNumeral(value) => writer.write(value.toString)
+    case SHexaDecimal(value) => ???
+    case SBinary(value) => ???
+    case SDecimal(value) => ???
+    case SString(value) =>
+      writer.write("\"")
+      writer.write(value) //TODO: insert \"
+      writer.write("\"")
+    case SBoolean(value) => writer.write(value.toString)
+  }
+
+  def printQualifiedId(qi: QualifiedIdentifier, writer: Writer): Unit = qi.sort match {
+    case None =>
+      printId(qi.id, writer)
+    case Some(sort) =>
+      writer.write("(as ")
+      printId(qi.id, writer)
+      writer.write(" ")
+      printSort(sort, writer)
+      writer.write(")")
+  }
+
+
+  def printId(id: Identifier, writer: Writer): Unit = {
+    if(id.indices.isEmpty)
+      writer.write(id.symbol.name)
+    else {
+      writer.write("(_ ")
+      writer.write(id.symbol.name)
+      writer.write(id.indices.head.toString)
+      id.indices.tail.foreach(n => writer.write(n.toString))
+      writer.write(")")
+    }
   }
 
   def printVarBinding(vb: VarBinding, writer: Writer): Unit = {
@@ -162,7 +205,7 @@ object PrettyPrinter {
   }
 
   def printAttribute(attribute: Attribute, writer: Writer): Unit = {
-
+    ???
   }
 
   def printOption(option: SMTOption, writer: Writer): Unit = option match {
