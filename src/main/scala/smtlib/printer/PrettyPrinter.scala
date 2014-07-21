@@ -22,6 +22,12 @@ object PrettyPrinter {
     sWriter.toString
   }
 
+  def toString(term: Term): String = {
+    val sWriter = new BufferedWriter(new StringWriter)
+    printTerm(term, sWriter)
+    sWriter.toString
+  }
+
   def printScript(script: Script, writer: Writer): Unit = ???
 
   def printCommand(command: Command, writer: Writer): Unit = command match {

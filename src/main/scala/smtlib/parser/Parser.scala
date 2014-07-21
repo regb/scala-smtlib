@@ -378,16 +378,15 @@ object Parser {
 
   class UnknownCommandException(msg: String) extends Exception(msg)
 
-//
+  def fromString(str: String): Parser = {
+    val lexer = new Lexer(new java.io.StringReader(str))
+    new Parser(lexer)
+  }
+
 //  class EOFBeforeMatchingParenthesisException(startPos: Position) extends
 //    Exception("Opened parenthesis at position: " + startPos + " has no matching closing parenthesis")
 //  class UnexpectedTokenException(token: Token, pos: Position) extends
 //    Exception("Unexpected token: " + token + " at position: " + pos)
-//
-//  def fromString(str: String): Parser = {
-//    val lexer = new Lexer(new java.io.StringReader(str))
-//    new Parser(lexer)
-//  }
 //
 //  def fromReader(reader: java.io.Reader): Parser = {
 //    val lexer = new Lexer(reader)
