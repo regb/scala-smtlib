@@ -1,33 +1,42 @@
 package smtlib
 package printer
 
+import lexer.Lexer
 import parser.Terms._
 import parser.Commands._
 import parser.Parser
+
+import common._
 
 import java.io.StringReader
 
 import org.scalatest.FunSuite
 
+import scala.language.implicitConversions
+
 class PrinterTests extends FunSuite {
 
   override def suiteName = "Printer suite"
 
+  private implicit def strToSym(str: String): SSymbol = SSymbol(str)
+  private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
+  private implicit def strToKeyword(str: String): SKeyword = SKeyword(str)
+  private implicit def symToTerm(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(sym.name)
+
+
   private def checkTerm(term: Term): Unit = {
 
-    val directPrint: String = Printer.toString(term)
+    val directPrint: String = PrettyPrinter.toString(term)
 
-    val parser = parser.Parser.fromString(directPrint)
+    val parser = Parser.fromString(directPrint)
     val parsedAgain: Term = parser.parseTerm
-    val printAgain: String = Printer.toString(parsedAgain)
+    val printAgain: String = PrettyPrinter.toString(parsedAgain)
 
     assert(directPrint === printAgain)
     assert(term === parsedAgain)
   }
 
-
-
-  test("Parsing attributes") {
+  test("Printing attributes") {
     def parseAttribute(str: String): Attribute = {
       val reader = new StringReader(str)
       val lexer = new Lexer(reader)
@@ -50,7 +59,7 @@ class PrinterTests extends FunSuite {
                                    ))
   }
 
-  test("Parsing Sorts") {
+  test("Printing Sorts") {
     def parseSort(str: String): Sort = {
       val reader = new StringReader(str)
       val lexer = new Lexer(reader)
@@ -65,7 +74,7 @@ class PrinterTests extends FunSuite {
 
   }
 
-  test("Parsing Identifiers") {
+  test("Printing Identifiers") {
     def parseId(str: String): Identifier = {
       val reader = new StringReader(str)
       val lexer = new Lexer(reader)
@@ -81,33 +90,17 @@ class PrinterTests extends FunSuite {
 
   }
 
-  def parseTerm(str: String): Term = {
-    val reader = new StringReader(str)
-    val lexer = new Lexer(reader)
-    val parser = new Parser(lexer)
-    val term = parser.parseTerm
-    term
-  }
+  test("Printing simple Terms") {
 
-  test("Parsing simple Terms") {
-
-    assert(parseTerm("42") === SNumeral(42))
-    assert(parseTerm("abc") === QualifiedIdentifier("abc"))
-    assert(parseTerm("(f a b)") === 
-           FunctionApplication(
+    checkTerm(SNumeral(42))
+    checkTerm(QualifiedIdentifier("abc"))
+    checkTerm(FunctionApplication(
             QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
-    assert(parseTerm("(let ((a x)) a)") ===
-           Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))
+    checkTerm(Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))
 
-    assert(parseTerm("(forall (a A) a)") ===
-           ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
-          )
-    assert(parseTerm("(exists (a A) a)") ===
-           Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
-          )
-    assert(parseTerm("(! a :note abcd)") ===
-           AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq())
-          )
+    checkTerm(ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
+    checkTerm(Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
+    checkTerm(AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq()))
 
   }
 
@@ -115,6 +108,7 @@ class PrinterTests extends FunSuite {
 
   }
 
+/*
   test("Parsing single commands") {
 
     assert(parseUniqueCmd("(set-logic QF_UF)") === SetLogic(QF_UF))
@@ -145,7 +139,9 @@ class PrinterTests extends FunSuite {
 
     assert(parseUniqueCmd("(exit)") === Exit())
   }
+  */
 
+  /*
   test("Parsing set-option command") {
     assert(parseUniqueCmd("(set-option :print-success true)") === SetOption(PrintSuccess(true)))
     assert(parseUniqueCmd("(set-option :print-success false)") === SetOption(PrintSuccess(false)))
@@ -161,7 +157,9 @@ class PrinterTests extends FunSuite {
     assert(parseUniqueCmd("(set-option :verbosity 4)") === SetOption(Verbosity(4)))
 
   }
+  */
 
+  /*
   test("Parsing set-info command") {
     assert(parseUniqueCmd("""(set-info :author "Reg")""") === SetInfo(Attribute(SKeyword("author"), Some(SString("Reg")))))
     assert(parseUniqueCmd("""(set-info :number 42)""") === SetInfo(Attribute(SKeyword("number"), Some(SNumeral(42)))))
@@ -176,7 +174,9 @@ class PrinterTests extends FunSuite {
       parser1.parseCommand
     }
   }
+  */
 
+/*
   test("simple benchmark") {
     val reader1 = new StringReader("""
       (set-logic QF_UF)
@@ -205,26 +205,6 @@ class PrinterTests extends FunSuite {
     assert(parser1.parseCommand === CheckSat())
 
   }
+  */
 
-  test("interactive parser") {
-    val pis = new SynchronousPipedReader
-    val lexer = failAfter(3 seconds) { new Lexer(pis) }
-    val parser = failAfter(3 seconds) { new Parser(lexer) }
-
-    pis.write("(set-logic QF_LRA)")
-    assert(parser.parseCommand === SetLogic(QF_LRA))
-
-    pis.write("(assert (< 1 3))")
-    assert(parser.parseCommand === 
-           Assert(FunctionApplication(
-             QualifiedIdentifier("<"),
-             Seq(
-               SNumeral(1), 
-               SNumeral(3)
-             )
-           )))
-
-  }
-
-}
 }

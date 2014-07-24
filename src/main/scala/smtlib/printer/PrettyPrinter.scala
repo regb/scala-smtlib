@@ -11,21 +11,24 @@ import java.io.BufferedWriter
 object PrettyPrinter {
 
   def toString(script: Script): String = {
-    val sWriter = new BufferedWriter(new StringWriter)
+    val output = new StringWriter
+    val sWriter = new BufferedWriter(output)
     printScript(script, sWriter)
-    sWriter.toString
+    output.toString
   }
 
   def toString(command: Command): String = {
-    val sWriter = new BufferedWriter(new StringWriter)
+    val output = new StringWriter
+    val sWriter = new BufferedWriter(output)
     printCommand(command, sWriter)
-    sWriter.toString
+    output.toString
   }
 
   def toString(term: Term): String = {
-    val sWriter = new BufferedWriter(new StringWriter)
+    val output = new StringWriter
+    val sWriter = new BufferedWriter(output)
     printTerm(term, sWriter)
-    sWriter.toString
+    output.toString
   }
 
   def printScript(script: Script, writer: Writer): Unit = ???
