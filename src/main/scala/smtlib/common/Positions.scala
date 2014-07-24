@@ -11,6 +11,8 @@ case class Position(line: Int, col: Int) extends Ordered[Position] {
     }
   }
 
+  override def toString: String = s"($line, $col)"
+
 }
 
 

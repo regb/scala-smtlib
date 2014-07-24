@@ -58,9 +58,9 @@ class Parser(lexer: Lexer) {
     check(token, expected)
   }
 
-  private def check(current: Token, expected: Token): Unit = {
-    if(current != expected) {
-      sys.error("unexpected token")
+  private def check(current: Token, exp: Token): Unit = {
+    if(current != exp) {
+      expected(exp, current)
     }
   }
 
@@ -260,7 +260,7 @@ class Parser(lexer: Lexer) {
         val symbol = SSymbol(s)
         symbol.setPos(t)
       }
-      case _ => sys.error("TODO")
+      case t => expected(Tokens.SymbolLit("x"), t)
     }
   }
 
@@ -314,7 +314,7 @@ class Parser(lexer: Lexer) {
     }
   }
 
-  def parseIdentifier: Identifier = { //TODO: indexed id: (_ id 1)
+  def parseIdentifier: Identifier = {
     if(peekToken == Tokens.OParen()) {
       eat(Tokens.OParen())
       eat(Tokens.Underscore())
@@ -332,9 +332,67 @@ class Parser(lexer: Lexer) {
     }
   }
 
-  def parseTerm: Term = {
-    val cst = tryParseConstant
-    cst.getOrElse(QualifiedIdentifier(parseIdentifier))
+  def parseTerm: Term = { 
+    if(peekToken == Tokens.OParen()) {
+      eat(Tokens.OParen())
+
+      nextToken match {
+        case Tokens.Let() =>
+          val bindings = parseMany(parseVarBinding _)
+          val term = parseTerm
+          eat(Tokens.CParen())
+          Let(bindings.head, bindings.tail, term)
+        case Tokens.ForAll() =>
+          val vars = parseMany(parseSortedVar _)
+          val term = parseTerm
+          eat(Tokens.CParen())
+          ForAll(vars.head, vars.tail, term)
+        case Tokens.Exists() =>
+          val vars = parseMany(parseSortedVar _)
+          val term = parseTerm
+          eat(Tokens.CParen())
+          Exists(vars.head, vars.tail, term)
+        case Tokens.SymbolLit(s) =>
+          val terms = new ListBuffer[Term]
+          while(peekToken != Tokens.CParen())
+            terms.append(parseTerm)
+          eat(Tokens.CParen())
+          FunctionApplication(
+            QualifiedIdentifier(Identifier(SSymbol(s))),
+            terms.toList)
+
+        case Tokens.ExclamationMark() => ???
+        case _ => sys.error("TODO")
+      }
+    } else {
+      val cst = tryParseConstant
+      cst.getOrElse(QualifiedIdentifier(parseIdentifier))
+    }
+  }
+
+  def parseVarBinding: VarBinding = {
+    eat(Tokens.OParen())
+    val sym = parseSymbol
+    val term = parseTerm
+    eat(Tokens.CParen())
+    VarBinding(sym, term)
+  }
+  def parseSortedVar: SortedVar = {
+    eat(Tokens.OParen())
+    val sym = parseSymbol
+    val sort = parseSort
+    eat(Tokens.CParen())
+    SortedVar(sym, sort)
+  }
+
+  /* Parse a sequence of A inside () */
+  def parseMany[A](parseFun: () => A): Seq[A] = {
+    val items = new ListBuffer[A]
+    eat(Tokens.OParen())
+    while(peekToken != Tokens.CParen())
+      items.append(parseFun())
+    eat(Tokens.CParen())
+    items.toList
   }
 
   def tryParseConstant: Option[Constant] = {
@@ -372,11 +430,18 @@ class Parser(lexer: Lexer) {
     }
   }
 
+  //TODO: we need a token class/type, instead of precise token with content + position
+  def expected(expected: Token, found: Token): Nothing = {
+    throw new UnexpectedTokenException(expected, found)
+  }
+
 }
 
 object Parser {
 
   class UnknownCommandException(msg: String) extends Exception(msg)
+  class UnexpectedTokenException(expected: Token, found: Token) 
+    extends Exception("Unexpected token at position: " + found.getPos + ". Expected: " + expected + ". Found: " + found)
 
   def fromString(str: String): Parser = {
     val lexer = new Lexer(new java.io.StringReader(str))

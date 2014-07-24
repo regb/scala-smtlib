@@ -40,7 +40,7 @@ object Tokens {
   case class ExclamationMark() extends ReservedWord /* ! */
   case class As() extends ReservedWord /* as */
   case class Let() extends ReservedWord /* let */
-  case class Forall() extends ReservedWord /* forall */
+  case class ForAll() extends ReservedWord /* forall */
   case class Exists() extends ReservedWord /* exists */
 
   case class Assert() extends ReservedWord

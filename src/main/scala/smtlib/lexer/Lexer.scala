@@ -233,7 +233,7 @@ class Lexer(reader: java.io.Reader) {
     case "!" => Some(ExclamationMark())
     case "as" => Some(As())
     case "let" => Some(Let())
-    case "forall" => Some(Forall())
+    case "forall" => Some(ForAll())
     case "exists" => Some(Exists())
 
     case "assert" => Some(Assert())

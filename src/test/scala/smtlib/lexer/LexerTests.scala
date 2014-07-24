@@ -249,7 +249,7 @@ deF"""))
     assert(lexUniqueToken("!") === ExclamationMark())
     assert(lexUniqueToken("as") === As())
     assert(lexUniqueToken("let") === Let())
-    assert(lexUniqueToken("forall") === Forall())
+    assert(lexUniqueToken("forall") === ForAll())
     assert(lexUniqueToken("exists") === Exists())
 
     assert(lexUniqueToken("assert") === Assert())
