@@ -14,6 +14,7 @@ object PrettyPrinter {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printScript(script, sWriter)
+    sWriter.flush
     output.toString
   }
 
@@ -21,6 +22,7 @@ object PrettyPrinter {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printCommand(command, sWriter)
+    sWriter.flush
     output.toString
   }
 
@@ -28,6 +30,7 @@ object PrettyPrinter {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printTerm(term, sWriter)
+    sWriter.flush
     output.toString
   }
 
@@ -139,8 +142,12 @@ object PrettyPrinter {
     case FunctionApplication(fun, ts) =>
       writer.write("(")
       printQualifiedId(fun, writer)
-      printNary(writer, ts, printTerm _, "", " ", ")")
-    case AnnotatedTerm(term, attr, attrs) => ???
+      printNary(writer, ts, printTerm _, " ", " ", ")")
+    case AnnotatedTerm(term, attr, attrs) => {
+      writer.write("(! ")
+      printTerm(term, writer)
+      printNary(writer, attr +: attrs, printAttribute _, " ", " ", ")")
+    }
     case id@QualifiedIdentifier(_, _) => 
       printQualifiedId(id, writer)
 
@@ -199,7 +206,16 @@ object PrettyPrinter {
     writer.write(')')
   }
 
-  private def printSort(sort: Sort, writer: Writer): Unit = ???
+  private def printSort(sort: Sort, writer: Writer): Unit = {
+    val id = sort.id
+    if(sort.subSorts.isEmpty)
+      printId(id, writer)
+    else {
+      writer.write("(")
+      printId(id, writer)
+      printNary(writer, sort.subSorts, printSort _, " ", " ", ")")
+    }
+  }
 
   private def printLogic(logic: Logic, writer: Writer): Unit = logic match {
     case QF_UF => 
@@ -214,8 +230,35 @@ object PrettyPrinter {
   }
 
   def printAttribute(attribute: Attribute, writer: Writer): Unit = {
-    ???
+    printKeyword(attribute.keyword, writer)
+    attribute.v match {
+      case Some(sexpr) => 
+        writer.write(" ")
+        printSExpr(sexpr, writer)
+      case None => ()
+    }
   }
+
+  def printKeyword(keyword: SKeyword, writer: Writer): Unit = {
+    writer.write(":")
+    writer.write(keyword.name)
+  }
+
+  def printSExpr(sexpr: SExpr, writer: Writer): Unit = sexpr match {
+    case SList(es) =>
+      printNary(writer, es, printSExpr _, "(", " ", ")")
+    case SKeyword(key) =>
+      writer.write(":")
+      writer.write(key)
+    case SSymbol(sym) =>
+      writer.write(sym)
+    case SComment(_) => ???
+    case (c: Command) => 
+      printCommand(c, writer)
+    case (t: Term) => 
+      printTerm(t, writer)
+  }
+
 
   def printOption(option: SMTOption, writer: Writer): Unit = option match {
     case PrintSuccess(value) => 

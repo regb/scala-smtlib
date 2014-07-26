@@ -260,7 +260,7 @@ class Parser(lexer: Lexer) {
         val symbol = SSymbol(s)
         symbol.setPos(t)
       }
-      case t => expected(Tokens.SymbolLit("x"), t)
+      case t => expected(Tokens.SymbolLit("x"), t) //TODO: expected should be of token class
     }
   }
 
@@ -361,7 +361,14 @@ class Parser(lexer: Lexer) {
             QualifiedIdentifier(Identifier(SSymbol(s))),
             terms.toList)
 
-        case Tokens.ExclamationMark() => ???
+        case Tokens.ExclamationMark() =>
+          val term = parseTerm
+          val attrs = new ListBuffer[Attribute]
+          while(peekToken != Tokens.CParen())
+            attrs.append(parseAttribute)
+          eat(Tokens.CParen())
+          AnnotatedTerm(term, attrs.head, attrs.tail)
+        case Tokens.Underscore() => ???//TODO
         case _ => sys.error("TODO")
       }
     } else {

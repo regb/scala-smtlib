@@ -27,6 +27,7 @@ class PrinterTests extends FunSuite {
   private def checkTerm(term: Term): Unit = {
 
     val directPrint: String = PrettyPrinter.toString(term)
+    println("printed: " + directPrint)
 
     val parser = Parser.fromString(directPrint)
     val parsedAgain: Term = parser.parseTerm
