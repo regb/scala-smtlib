@@ -55,19 +55,24 @@ object PrettyPrinter {
     case DeclareSort(name, arity) => {
       writer.write("(declare-sort ")
       writer.write(name.name)
-      writer.write(arity.toInt)
+      writer.write(" ")
+      writer.write(arity.toString)
       writer.write(")\n")
     }
     case DefineSort(name, params, sort) => {
       writer.write("(define-sort ")
       writer.write(name.name)
-      writer.write(params.map(_.name).mkString("(", " ", ")"))
+      writer.write(params.map(_.name).mkString(" (", " ", ") "))
       printSort(sort, writer)
       writer.write(")\n")
     }
-    case DeclareFun(name, paramSorts, returnSort) => ???
-    //  SList(SSymbol("declare-fun"), SSymbol(name), SList(paramSorts.toList), returnSort)
-    //case class DefineFun
+    case DeclareFun(name, paramSorts, returnSort) => {
+      writer.write("(declare-fun ")
+      writer.write(name.name)
+      printNary(writer, paramSorts, printSort _, " (", " ", ") ")
+      printSort(returnSort, writer)
+      writer.write(")\n")
+    }
     case Push(n) => {
       writer.write("(push ")
       writer.write(n.toString)
@@ -97,7 +102,7 @@ object PrettyPrinter {
     }
     case GetValue(t, ts) => {
       writer.write("(get-value ")
-      ???
+      printNary(writer, t +: ts, printTerm _, "(", " ", "))")
     }
     case GetAssignment() => {
       writer.write("(get-assignment)\n")
@@ -308,7 +313,7 @@ object PrettyPrinter {
     case NameInfoFlag => 
       writer.write(":name")
     case AuthorsInfoFlag => 
-      writer.write(":author")
+      writer.write(":authors")
     case VersionInfoFlag => 
       writer.write(":version")
     case StatusInfoFlag => 
