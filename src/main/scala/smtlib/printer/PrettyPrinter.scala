@@ -168,7 +168,6 @@ object PrettyPrinter {
       writer.write("\"")
       writer.write(value) //TODO: insert \"
       writer.write("\"")
-    case SBoolean(value) => writer.write(value.toString)
   }
 
   def printQualifiedId(qi: QualifiedIdentifier, writer: Writer): Unit = qi.sort match {

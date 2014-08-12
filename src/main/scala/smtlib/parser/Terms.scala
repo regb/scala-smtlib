@@ -78,8 +78,5 @@ object Terms {
   case class SBinary(value: List[Boolean]) extends Literal[List[Boolean]]
   case class SDecimal(value: BigDecimal) extends Literal[BigDecimal]
   case class SString(value: String) extends Literal[String]
-  case class SBoolean(value: Boolean) extends Literal[Boolean]
-
-
 
 }
