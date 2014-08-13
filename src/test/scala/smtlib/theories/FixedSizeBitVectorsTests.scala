@@ -1,7 +1,6 @@
 package smtlib
 package theories
 
-import Core._
 import FixedSizeBitVectors._
 
 import org.scalatest.FunSuite
@@ -38,65 +37,57 @@ class FixedSizeBitVectorsTests extends FunSuite {
   }
 
 
-  //test("smtlib format") {
-  //  import parser.Parser
+  test("smtlib format") {
+    import parser.Parser
 
-  //  Parser.fromString("true").parseTerm match {
-  //    case True() => assert(true)
-  //    case _ => assert(false)
-  //  }
+    Parser.fromString("#b101").parseTerm match {
+      case BitVectorLit(List(true, false, true)) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("#xf0").parseTerm match {
+      case BitVectorLit(List(true, true, true, true, false, false, false, false)) => assert(true)
+      case _ => assert(false)
+    }
 
-  //  Parser.fromString("false").parseTerm match {
-  //    case False() => assert(true)
-  //    case _ => assert(false)
-  //  }
+    Parser.fromString("(concat #101 #01)").parseTerm match {
+      case Concat(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
 
-  //  Parser.fromString("(not true)").parseTerm match {
-  //    case False() => assert(false)
-  //    case True() => assert(false)
-  //    case Not(True()) => assert(true)
-  //    case _ => assert(false)
-  //  }
+    Parser.fromString("(bvand #101 #011)").parseTerm match {
+      case And(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
 
-  //  Parser.fromString("(or true false)").parseTerm match {
-  //    case False() => assert(false)
-  //    case True() => assert(false)
-  //    case Not(True()) => assert(false)
-  //    case And(True(), False()) => assert(false)
-  //    case Or(True(), True()) => assert(false)
-  //    case Or(True(), False()) => assert(true)
-  //    case _ => assert(false)
-  //  }
+    Parser.fromString("(bvor #101 #011)").parseTerm match {
+      case Or(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
 
-  //  Parser.fromString("(and true false)").parseTerm match {
-  //    case False() => assert(false)
-  //    case True() => assert(false)
-  //    case Not(True()) => assert(false)
-  //    case Or(True(), False()) => assert(false)
-  //    case And(True(), True()) => assert(false)
-  //    case And(True(), False()) => assert(true)
-  //    case _ => assert(false)
-  //  }
+    Parser.fromString("(bvadd #101 #011)").parseTerm match {
+      case Add(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
 
-  //  Parser.fromString("(=> true false)").parseTerm match {
-  //    case False() => assert(false)
-  //    case True() => assert(false)
-  //    case Not(True()) => assert(false)
-  //    case Or(True(), False()) => assert(false)
-  //    case Implies(True(), True()) => assert(false)
-  //    case Implies(True(), False()) => assert(true)
-  //    case _ => assert(false)
-  //  }
+    Parser.fromString("(bvmul #101 #011)").parseTerm match {
+      case Mul(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
 
-  //  Parser.fromString("(xor true false)").parseTerm match {
-  //    case False() => assert(false)
-  //    case True() => assert(false)
-  //    case Not(True()) => assert(false)
-  //    case Or(True(), False()) => assert(false)
-  //    case Xor(True(), True()) => assert(false)
-  //    case Xor(True(), False()) => assert(true)
-  //    case _ => assert(false)
-  //  }
-  //}
-
+  }
 }

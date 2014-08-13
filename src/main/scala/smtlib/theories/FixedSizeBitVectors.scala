@@ -52,4 +52,79 @@ object FixedSizeBitVectors {
 
   }
 
+  object And {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvand"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvand"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object Or {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvor"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvor"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object Add {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvadd"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvadd"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object Mul {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvmul"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvmul"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
 }
