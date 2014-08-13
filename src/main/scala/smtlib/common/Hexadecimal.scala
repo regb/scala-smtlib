@@ -13,6 +13,27 @@ class Hexadecimal private(val rep: String) {
     })
   }
 
+  def toBinary: List[Boolean] = {
+    rep.flatMap{
+      case '0' => List(false, false, false, false)
+      case '1' => List(false, false, false, true )
+      case '2' => List(false, false, true , false)
+      case '3' => List(false, false, true , true )
+      case '4' => List(false, true , false, false)
+      case '5' => List(false, true , false, true )
+      case '6' => List(false, true , true , false)
+      case '7' => List(false, true , true , true )
+      case '8' => List(true , false, false, false)
+      case '9' => List(true , false, false, true )
+      case 'A' => List(true , false, true , false)
+      case 'B' => List(true , false, true , true )
+      case 'C' => List(true , true , false, false)
+      case 'D' => List(true , true , false, true )
+      case 'E' => List(true , true , true , false)
+      case 'F' => List(true , true , true , true )
+    }.toList
+  }
+
   override def toString: String = "#x" + rep
 
   override def equals(that: Any): Boolean = (that != null) && (that match {
