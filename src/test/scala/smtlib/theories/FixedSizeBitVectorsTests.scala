@@ -49,7 +49,7 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case _ => assert(false)
     }
 
-    Parser.fromString("(concat #101 #01)").parseTerm match {
+    Parser.fromString("(concat #b101 #b01)").parseTerm match {
       case Concat(
             BitVectorLit(List(true, false, true)),
             BitVectorLit(List(false, true))
@@ -57,7 +57,7 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case _ => assert(false)
     }
 
-    Parser.fromString("(bvand #101 #011)").parseTerm match {
+    Parser.fromString("(bvand #b101 #b011)").parseTerm match {
       case And(
             BitVectorLit(List(true, false, true)),
             BitVectorLit(List(false, true, true))
@@ -65,7 +65,7 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case _ => assert(false)
     }
 
-    Parser.fromString("(bvor #101 #011)").parseTerm match {
+    Parser.fromString("(bvor #b101 #b011)").parseTerm match {
       case Or(
             BitVectorLit(List(true, false, true)),
             BitVectorLit(List(false, true, true))
@@ -73,7 +73,7 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case _ => assert(false)
     }
 
-    Parser.fromString("(bvadd #101 #011)").parseTerm match {
+    Parser.fromString("(bvadd #b101 #b011)").parseTerm match {
       case Add(
             BitVectorLit(List(true, false, true)),
             BitVectorLit(List(false, true, true))
@@ -81,7 +81,7 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case _ => assert(false)
     }
 
-    Parser.fromString("(bvmul #101 #011)").parseTerm match {
+    Parser.fromString("(bvmul #b101 #b011)").parseTerm match {
       case Mul(
             BitVectorLit(List(true, false, true)),
             BitVectorLit(List(false, true, true))

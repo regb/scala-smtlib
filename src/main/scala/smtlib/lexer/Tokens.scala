@@ -24,12 +24,7 @@ object Tokens {
   case class NumeralLit(n: BigInt) extends Token /* 42 */
   case class DecimalLit(d: Double) extends Token /* 42.24 */ //TODO: infinite precision ?
   case class BinaryLit(content: Seq[Boolean]) extends Token /* #b0101 */ 
-  case class HexadecimalLit(content: String) extends Token /* #xFF1D */ {
-    //should be normalized to upper cases
-    require(content.forall(c =>
-      (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')
-    ))
-  }
+  case class HexadecimalLit(content: Hexadecimal) extends Token /* #xFF1D */
 
   sealed trait ReservedWord extends Token
   case class Par() extends ReservedWord

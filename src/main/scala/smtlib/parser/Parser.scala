@@ -294,8 +294,25 @@ class Parser(lexer: Lexer) {
     }
   }
 
-  def parseHexadecimal: SHexaDecimal = ???
-  def parseBinary: SBinary = ???
+  def parseHexadecimal: SHexaDecimal = {
+    nextToken match {
+      case t@Tokens.HexadecimalLit(h) => {
+        val hexa = SHexaDecimal(h)
+        hexa.setPos(t)
+      }
+      case _ => sys.error("TODO")
+    }
+  }
+
+  def parseBinary: SBinary = {
+    nextToken match {
+      case t@Tokens.BinaryLit(b) => {
+        val bin = SBinary(b.toList)
+        bin.setPos(t)
+      }
+      case _ => sys.error("TODO")
+    }
+  }
 
   def parseSort: Sort = {
     if(peekToken == Tokens.OParen()) {

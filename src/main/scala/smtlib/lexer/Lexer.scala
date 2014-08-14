@@ -193,14 +193,14 @@ class Lexer(reader: java.io.Reader) {
     }
     res.toList
   }
-  private def readHexadecimal(): String = { //normalize chars to upper case
+  private def readHexadecimal(): Hexadecimal = {
     var res = ""
     if(peek == -1 || !isHexa(peek.toChar))
       throw new Exception
     while(peek != -1 && isHexa(peek.toChar)) {
       res += nextChar.toUpper
     }
-    res
+    Hexadecimal.fromString(res).get
   }
 
   private var extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&', '_', 
