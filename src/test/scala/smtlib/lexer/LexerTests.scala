@@ -37,20 +37,20 @@ class LexerTests extends FunSuite with Timeouts {
 
     val reader2 = new StringReader("#xF")
     val lexer2 = new Lexer(reader2)
-    assert(lexer2.nextToken === Hexadecimal.fromString("F").get)
+    assert(lexer2.nextToken === HexadecimalLit(Hexadecimal.fromString("F").get))
 
     val reader3 = new StringReader("#x002a")
     val lexer3 = new Lexer(reader3)
-    assert(lexer3.nextToken === Hexadecimal.fromString("002A").get)
+    assert(lexer3.nextToken === HexadecimalLit(Hexadecimal.fromString("002A").get))
 
     val reader4 = new StringReader("#x1F")
     val lexer4 = new Lexer(reader4)
-    assert(lexer4.nextToken === Hexadecimal.fromString("1F").get)
+    assert(lexer4.nextToken === HexadecimalLit(Hexadecimal.fromString("1F").get))
 
     val reader5 = new StringReader("123 #x11 12")
     val lexer5 = new Lexer(reader5)
     assert(lexer5.nextToken === NumeralLit(123))
-    assert(lexer5.nextToken === Hexadecimal.fromString("11").get)
+    assert(lexer5.nextToken === HexadecimalLit(Hexadecimal.fromString("11").get))
     assert(lexer5.nextToken === NumeralLit(12))
 
     val reader6 = new StringReader("#b1010")
