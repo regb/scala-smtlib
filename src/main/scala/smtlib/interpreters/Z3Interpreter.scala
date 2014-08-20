@@ -1,8 +1,9 @@
 package smtlib
 package interpreters
 
-import Commands._
+import parser.Commands._
 import CommandResponses._
+import printer.PrettyPrinter
 
 //import scala.sys.process._
 import java.io._
@@ -24,7 +25,7 @@ class Z3Interpreter extends Interpreter {
   val z3In = new BufferedWriter(new OutputStreamWriter(z3.getOutputStream))
   val z3Out = new BufferedReader(new InputStreamReader(z3.getInputStream))
 
-  PrettyPrinter(SetOption(PrintSuccess(true)), z3In)
+  PrettyPrinter.printCommand(SetOption(PrintSuccess(true)), z3In)
   z3In.write("\n")
   z3In.flush
 
@@ -32,7 +33,7 @@ class Z3Interpreter extends Interpreter {
   parser.next
 
   override def eval(cmd: Command): CommandResponse = {
-    PrettyPrinter(cmd, z3In)
+    PrettyPrinter.printCommand(cmd, z3In)
     z3In.write("\n")
     z3In.flush
     parser.next

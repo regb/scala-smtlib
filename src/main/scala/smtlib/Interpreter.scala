@@ -1,6 +1,7 @@
 package smtlib
 
-import Commands.{Script, Command}
+import parser.Commands.{Script, Command}
+import parser.Parser
 import CommandResponses.CommandResponse
 
 /*
@@ -39,13 +40,23 @@ object Interpreter {
   }
 
   def execute(scriptReader: Reader)(implicit interpreter: Interpreter): Unit = {
-    val parser = new Parser(scriptReader)
-    execute(Script(parser))
+    val parser = new Parser(new lexer.Lexer(scriptReader))
+    var cmd: Command = null
+    do {
+      val cmd = parser.parseCommand
+      if(cmd != null)
+        interpreter.eval(cmd)
+    } while(cmd != null)
   }
 
   def execute(file: File)(implicit interpreter: Interpreter): Unit = {
-    val parser = new Parser(new BufferedReader(new FileReader(file)))
-    execute(Script(parser))
+    val parser = new Parser(new lexer.Lexer(new BufferedReader(new FileReader(file))))
+    var cmd: Command = null
+    do {
+      cmd = parser.parseCommand
+      if(cmd != null)
+        interpreter.eval(cmd)
+    } while(cmd != null)
   }
 
 }

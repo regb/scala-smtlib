@@ -1,6 +1,6 @@
 package smtlib
 
-import Commands.Attribute
+import parser.Terms.Attribute
 import sexpr.SExprs._
 
 object CommandResponses {

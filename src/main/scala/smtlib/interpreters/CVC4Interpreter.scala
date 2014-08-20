@@ -1,8 +1,9 @@
 package smtlib
 package interpreters
 
-import Commands._
+import parser.Commands._
 import CommandResponses._
+import printer.PrettyPrinter
 
 //import scala.sys.process._
 import java.io._
@@ -24,14 +25,14 @@ class CVC4Interpreter extends Interpreter {
   val parser = new ResponseParser(cvc4Out)
 
   override def eval(cmd: Command): CommandResponse = {
-    PrettyPrinter(cmd, cvc4In)
+    PrettyPrinter.printCommand(cmd, cvc4In)
     cvc4In.write("\n")
     cvc4In.flush
     parser.next
   }
 
   override def free(): Unit = {
-    PrettyPrinter(Exit, cvc4In)
+    PrettyPrinter.printCommand(Exit(), cvc4In)
     cvc4In.write("\n")
     cvc4In.flush
 

@@ -1,10 +1,10 @@
 package smtlib
 
 import common._
-import Commands._
+import parser.Commands._
 import CommandResponses._
 import sexpr.SExprs._
-import Parser._
+import parser.Parser._
 
 import java.io.StringReader
 
