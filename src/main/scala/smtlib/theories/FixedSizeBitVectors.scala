@@ -90,6 +90,38 @@ object FixedSizeBitVectors {
 
   }
 
+  object Not {
+
+    def apply(t: Term): Term = 
+      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("bvnot"))), Seq(t))
+    
+    def unapply(term: Term): Option[Term] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvnot"), Seq()),
+          None
+        ), Seq(t)) => Some(t)
+      case _ => None
+    }
+  }
+
+
+  object Neg {
+
+    def apply(t: Term): Term = 
+      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("bvneg"))), Seq(t))
+    
+    def unapply(term: Term): Option[Term] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvneg"), Seq()),
+          None
+        ), Seq(t)) => Some(t)
+      case _ => None
+    }
+  }
+
+
   object Add {
 
     def apply(t1: Term, t2: Term): Term =
@@ -109,6 +141,7 @@ object FixedSizeBitVectors {
 
   }
 
+
   object Mul {
 
     def apply(t1: Term, t2: Term): Term =
@@ -121,6 +154,63 @@ object FixedSizeBitVectors {
       case FunctionApplication(
         QualifiedIdentifier(
           Identifier(SSymbol("bvmul"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object UDiv {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvudiv"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvudiv"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object URem {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvurem"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvurem"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object ULessThan {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvult"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvult"), Seq()),
           None
         ), Seq(t1, t2)) => Some((t1, t2))
       case _ => None

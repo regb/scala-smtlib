@@ -17,6 +17,10 @@ object Core {
 
   }
 
+  object BoolConst {
+    def apply(v: Boolean): Term = if(v) True() else False()
+  }
+
   object True {
 
     def apply(): Term = QualifiedIdentifier(Identifier(SSymbol("true")))
@@ -59,7 +63,7 @@ object Core {
     
     def apply(t1: Term, t2: Term): Term = 
       FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("=>"))), Seq(t1, t2))
-    
+
     def unapply(term: Term): Option[(Term, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
@@ -75,6 +79,13 @@ object Core {
     
     def apply(t1: Term, t2: Term): Term = 
       FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("and"))), Seq(t1, t2))
+
+    def apply(ts: Term*): Term = 
+      if(ts.isEmpty) True()
+      else if(ts.size == 1) ts.head
+      else ts.foldLeft(ts.head)((acc, t) => And(acc, t))
+      
+    
     
     def unapply(term: Term): Option[(Term, Term)] = term match {
       case FunctionApplication(
@@ -91,6 +102,11 @@ object Core {
     
     def apply(t1: Term, t2: Term): Term = 
       FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("or"))), Seq(t1, t2))
+
+    def apply(ts: Term*): Term = 
+      if(ts.isEmpty) False()
+      else if(ts.size == 1) ts.head
+      else ts.foldLeft(ts.head)((acc, t) => Or(acc, t))
     
     def unapply(term: Term): Option[(Term, Term)] = term match {
       case FunctionApplication(
@@ -120,4 +136,36 @@ object Core {
 
   }
 
+  object Equals {
+    
+    def apply(t1: Term, t2: Term): Term = 
+      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("="))), Seq(t1, t2))
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("="), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+
+  object ITE {
+    
+    def apply(c: Term, t1: Term, t2: Term): Term = 
+      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("ite"))), Seq(c, t1, t2))
+    
+    def unapply(term: Term): Option[(Term, Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("ite"), Seq()),
+          None
+        ), Seq(c, t1, t2)) => Some((c, t1, t2))
+      case _ => None
+    }
+
+  }
 }
