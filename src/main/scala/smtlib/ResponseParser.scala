@@ -1,6 +1,6 @@
 package smtlib
 
-import sexpr.SExprs._
+import parser.Terms._
 import CommandResponses._
 
 import scala.collection.Iterator

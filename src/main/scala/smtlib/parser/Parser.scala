@@ -164,6 +164,24 @@ class Parser(lexer: Lexer) {
     cmd.setPos(head)
   }
 
+  def parseResponse: CommandResponse = {
+    nextToken match {
+      case Tokens.SymbolLit("success") =>
+
+
+    }
+
+      case SSymbol("success") => Success
+      case SSymbol("unsupported") => Unsupported
+      case SList(List(SSymbol("error"), SString(msg))) => Error(msg)
+      case SSymbol("sat") | SSymbol("SAT") => CheckSatResponse(SatStatus)
+      case SSymbol("unsat") | SSymbol("UNSAT") => CheckSatResponse(UnsatStatus)
+      case SSymbol("unknown") | SSymbol("UNKNOWN") => CheckSatResponse(UnknownStatus)
+      case SList(List(SSymbol(""), SString(msg))) => Error(msg)
+      case sexpr => SExprResponse(sexpr)
+
+  }
+
   def parseInfoFlag: InfoFlag = {
     nextToken match {
       case Tokens.Keyword("error-behaviour") => ErrorBehaviourInfoFlag
