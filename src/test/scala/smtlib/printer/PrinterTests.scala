@@ -84,6 +84,7 @@ class PrinterTests extends FunSuite {
     checkSort(Sort(Identifier(SSymbol("A"), Seq(42))))
     checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
     checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
+    checkSort(Sort(Identifier(SSymbol("A")), Seq(Sort("B"), Sort("C"))))
   }
 
   test("Printing single commands") {
