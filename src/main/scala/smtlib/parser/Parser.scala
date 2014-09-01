@@ -7,6 +7,7 @@ import lexer.Lexer
 
 import Terms._
 import Commands._
+import CommandsResponses._
 
 import common._
 
@@ -166,20 +167,28 @@ class Parser(lexer: Lexer) {
 
   def parseResponse: CommandResponse = {
     nextToken match {
-      case Tokens.SymbolLit("success") =>
+      case Tokens.SymbolLit("success") => Success
+      case Tokens.SymbolLit("unsupported") => Unsupported
 
+      case Tokens.SymbolLit("sat") => CheckSatResponse(SatStatus)
+      case Tokens.SymbolLit("unsat") => CheckSatResponse(UnsatStatus)
+      case Tokens.SymbolLit("unknown") => CheckSatResponse(UnknownStatus)
 
+      case Tokens.OParen() => {
+        peekToken match {
+          case Tokens.SymbolLit("error") => {
+            nextToken
+            val msg = parseString.value
+            eat(Tokens.CParen())
+            Error(msg)
+          }
+          case _ => {
+            val lst = parseSList
+            SExprResponse(lst)
+          }
+        }
+      }
     }
-
-      case SSymbol("success") => Success
-      case SSymbol("unsupported") => Unsupported
-      case SList(List(SSymbol("error"), SString(msg))) => Error(msg)
-      case SSymbol("sat") | SSymbol("SAT") => CheckSatResponse(SatStatus)
-      case SSymbol("unsat") | SSymbol("UNSAT") => CheckSatResponse(UnsatStatus)
-      case SSymbol("unknown") | SSymbol("UNKNOWN") => CheckSatResponse(UnknownStatus)
-      case SList(List(SSymbol(""), SString(msg))) => Error(msg)
-      case sexpr => SExprResponse(sexpr)
-
   }
 
   def parseInfoFlag: InfoFlag = {

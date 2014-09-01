@@ -4,6 +4,7 @@ package parser
 import lexer._
 import common._
 import Commands._
+import CommandsResponses._
 import Terms._
 import Parser._
 
@@ -26,6 +27,13 @@ class ParserTests extends FunSuite with Timeouts {
     val parser = new Parser(lexer)
     val cmd = parser.parseCommand
     cmd
+  }
+
+  private def parseResponse(str: String): CommandResponse = {
+    val reader = new StringReader(str)
+    val lexer = new Lexer(reader)
+    val parser = new Parser(lexer)
+    parser.parseResponse
   }
   
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
@@ -173,6 +181,14 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("""(set-info :author "Reg")""") === SetInfo(Attribute(SKeyword("author"), Some(SString("Reg")))))
     assert(parseUniqueCmd("""(set-info :number 42)""") === SetInfo(Attribute(SKeyword("number"), Some(SNumeral(42)))))
     assert(parseUniqueCmd("""(set-info :test)""") === SetInfo(Attribute(SKeyword("test"), None)))
+  }
+
+  test("basic responses") {
+    assert(parseResponse("success") === Success)
+    assert(parseResponse("unsupported") === Unsupported)
+    assert(parseResponse("sat") === CheckSatResponse(SatStatus))
+    assert(parseResponse("unsat") === CheckSatResponse(UnsatStatus))
+    assert(parseResponse("unknown") === CheckSatResponse(UnknownStatus))
   }
 
   test("Unknown command") {

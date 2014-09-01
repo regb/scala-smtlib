@@ -1,8 +1,10 @@
 package smtlib
 package interpreters
 
+import lexer.Lexer
+import parser.Parser
 import parser.Commands._
-import CommandResponses._
+import parser.CommandsResponses._
 import printer.PrettyPrinter
 
 //import scala.sys.process._
@@ -29,14 +31,14 @@ class Z3Interpreter extends Interpreter {
   z3In.write("\n")
   z3In.flush
 
-  val parser = new ResponseParser(z3Out)
-  parser.next
+  val parser = new Parser(new Lexer(z3Out))
+  parser.parseResponse
 
   override def eval(cmd: Command): CommandResponse = {
     PrettyPrinter.printCommand(cmd, z3In)
     z3In.write("\n")
     z3In.flush
-    parser.next
+    parser.parseResponse
   }
 
   override def free(): Unit = {

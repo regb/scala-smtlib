@@ -1,8 +1,8 @@
 package smtlib
 
 import parser.Commands.{Script, Command}
+import parser.CommandsResponses.CommandResponse
 import parser.Parser
-import CommandResponses.CommandResponse
 
 /*
  * An interpreter is a stateful object that can eval Commands and returns

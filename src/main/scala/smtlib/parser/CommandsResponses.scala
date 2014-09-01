@@ -1,8 +1,9 @@
 package smtlib
+package parser
 
 import parser.Terms._
 
-object CommandResponses {
+object CommandsResponses {
 
   sealed trait CommandResponse
 
