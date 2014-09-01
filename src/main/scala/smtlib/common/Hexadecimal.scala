@@ -60,10 +60,30 @@ object Hexadecimal {
     if(error) None else Some(new Hexadecimal(rep))
   }
 
+  /*
+   * return a 32-bits hexadecimal integer
+   */
   def fromInt(n: Int): Option[Hexadecimal] = {
     if(n < 0) None else {
-      ???
+
+      var i = 0
+      var rest = n
+      var rep = ""
+
+      while(i < 8) {
+        val end = rest & 15
+        rest = rest >> 4
+        rep = toDigit(end) + rep
+        i += 1
+      }
+
+      fromString(rep)
     }
+  }
+
+  def toDigit(n: Int): Char = {
+    require(n >= 0 && n < 16)
+    if(n >= 0 && n < 10) (n + '0').toChar else ('A' + (n - 10)).toChar
   }
 
   def isDigit(c: Char): Boolean =

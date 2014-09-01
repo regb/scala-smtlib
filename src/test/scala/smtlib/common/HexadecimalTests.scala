@@ -25,4 +25,11 @@ class HexadecimalTests extends FunSuite {
     assert(Hexadecimal.fromString("001a").get.toInt === 26)
   }
 
+  test("Hexadecimal from Integer") {
+    assert(Hexadecimal.fromInt(0).get.rep === "00000000")
+    assert(Hexadecimal.fromInt(1).get.rep === "00000001")
+    assert(Hexadecimal.fromInt(15).get.rep === "0000000F")
+    assert(Hexadecimal.fromInt(30).get.rep === "0000001E")
+    assert(Hexadecimal.fromInt(-30) === None)
+  }
 }
