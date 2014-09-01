@@ -26,7 +26,7 @@ object FixedSizeBitVectors {
     
     def unapply(term: Term): Option[List[Boolean]] = term match {
       case SBinary(content) => Some(content)
-      case SHexaDecimal(hexa) => Some(hexa.toBinary)
+      case SHexadecimal(hexa) => Some(hexa.toBinary)
       case _ => None
     }
 

@@ -169,9 +169,9 @@ object PrettyPrinter {
 
   def printConstant(c: Constant, writer: Writer): Unit = c match {
     case SNumeral(value) => writer.write(value.toString)
-    case SHexaDecimal(value) => ???
-    case SBinary(value) => ???
-    case SDecimal(value) => ???
+    case SHexadecimal(value) => writer.write(value.toString)
+    case SBinary(value) => writer.write("#b" + value.map(if(_) "1" else "0").mkString)
+    case SDecimal(value) => writer.write(value.toString)
     case SString(value) =>
       writer.write("\"")
       writer.write(value) //TODO: insert \"

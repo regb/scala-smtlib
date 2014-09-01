@@ -74,7 +74,7 @@ object Terms {
   }
 
   case class SNumeral(value: BigInt) extends Literal[BigInt]
-  case class SHexaDecimal(value: Hexadecimal) extends Literal[Hexadecimal]
+  case class SHexadecimal(value: Hexadecimal) extends Literal[Hexadecimal]
   case class SBinary(value: List[Boolean]) extends Literal[List[Boolean]]
   case class SDecimal(value: BigDecimal) extends Literal[BigDecimal]
   case class SString(value: String) extends Literal[String]

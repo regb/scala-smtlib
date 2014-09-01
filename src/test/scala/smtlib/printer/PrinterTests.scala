@@ -63,7 +63,12 @@ class PrinterTests extends FunSuite {
 
   test("Printing simple Terms") {
 
+    checkTerm(SNumeral(0))
     checkTerm(SNumeral(42))
+    checkTerm(SHexadecimal(Hexadecimal.fromString("FF").get))
+    checkTerm(SHexadecimal(Hexadecimal.fromString("123abcDeF").get))
+    checkTerm(SBinary(List(true)))
+    checkTerm(SBinary(List(true, false, true)))
     checkTerm(QualifiedIdentifier("abc"))
     checkTerm(FunctionApplication(
             QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
@@ -72,6 +77,7 @@ class PrinterTests extends FunSuite {
     checkTerm(ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
     checkTerm(Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
     checkTerm(AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq()))
+
 
   }
 

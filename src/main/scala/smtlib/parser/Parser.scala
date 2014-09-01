@@ -321,10 +321,10 @@ class Parser(lexer: Lexer) {
     }
   }
 
-  def parseHexadecimal: SHexaDecimal = {
+  def parseHexadecimal: SHexadecimal = {
     nextToken match {
       case t@Tokens.HexadecimalLit(h) => {
-        val hexa = SHexaDecimal(h)
+        val hexa = SHexadecimal(h)
         hexa.setPos(t)
       }
       case _ => sys.error("TODO")
