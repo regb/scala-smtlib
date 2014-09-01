@@ -140,6 +140,9 @@ object PrettyPrinter {
     case NonStandardCommand(expr) => {
       printSExpr(expr, writer)
     }
+    case GetModel() => {
+      writer.write("(get-model)\n")
+    }
   }
 
   def printTerm(term: Term, writer: Writer): Unit = term match {

@@ -191,6 +191,14 @@ class Parser(lexer: Lexer) {
             eat(Tokens.CParen())
             Error(msg)
           }
+          case Tokens.SymbolLit("model") => {
+            nextToken
+            var funs: ListBuffer[DefineFun] = new ListBuffer
+            while(peekToken != Tokens.CParen())
+              funs.append(parseCommand.asInstanceOf[DefineFun])
+            eat(Tokens.CParen())
+            GetModelResponse(funs.toList)
+          }
           case _ => {
             var exprs = new ListBuffer[SExpr]
             while(peekToken != Tokens.CParen())
@@ -200,6 +208,8 @@ class Parser(lexer: Lexer) {
           }
         }
       }
+
+      case t => sys.error("TODO: " + t)
     }
   }
 
