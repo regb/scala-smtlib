@@ -34,6 +34,14 @@ object PrettyPrinter {
     output.toString
   }
 
+  def toString(sort: Sort): String = {
+    val output = new StringWriter
+    val sWriter = new BufferedWriter(output)
+    printSort(sort, sWriter)
+    sWriter.flush
+    output.toString
+  }
+
   def printScript(script: Script, writer: Writer): Unit = ???
 
   def printCommand(command: Command, writer: Writer): Unit = command match {

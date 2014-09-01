@@ -58,5 +58,4 @@ object Tokens {
   case class SetInfo() extends ReservedWord
   case class SetOption() extends ReservedWord
 
-
 }

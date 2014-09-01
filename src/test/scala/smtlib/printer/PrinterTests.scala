@@ -24,6 +24,18 @@ class PrinterTests extends FunSuite {
   private implicit def symToTerm(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(sym.name)
 
 
+  private def checkSort(sort: Sort): Unit = {
+
+    val directPrint: String = PrettyPrinter.toString(sort)
+
+    val parser = Parser.fromString(directPrint)
+    val parsedAgain: Sort = parser.parseSort
+    val printAgain: String = PrettyPrinter.toString(parsedAgain)
+
+    assert(directPrint === printAgain)
+    assert(sort === parsedAgain)
+  }
+
   private def checkTerm(term: Term): Unit = {
 
     val directPrint: String = PrettyPrinter.toString(term)
@@ -66,6 +78,13 @@ class PrinterTests extends FunSuite {
   test("Printing composed Terms") {
 
   }
+
+  //test("Printing Sorts") {
+  //  checkSort(Sort(Identifier(SSymbol("A"))))
+  //  checkSort(Sort(Identifier(SSymbol("A"), Seq(42))))
+  //  checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
+  //  checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
+  //}
 
   test("Printing single commands") {
 

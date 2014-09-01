@@ -344,32 +344,43 @@ class Parser(lexer: Lexer) {
   def parseSort: Sort = {
     if(peekToken == Tokens.OParen()) {
       eat(Tokens.OParen())
-      val name = parseIdentifier
 
-      var subSorts = new ListBuffer[Sort]
-      while(peekToken != Tokens.CParen())
-        subSorts.append(parseSort)
-      eat(Tokens.CParen())
+      if(peekToken == Tokens.Underscore()) {
+        val id = parseUnderscoreIdentifier
+        Sort(id)
+      } else {
 
-      Sort(name, subSorts.toList)
+        val name = parseIdentifier
+
+        var subSorts = new ListBuffer[Sort]
+        while(peekToken != Tokens.CParen())
+          subSorts.append(parseSort)
+        eat(Tokens.CParen())
+
+        Sort(name, subSorts.toList)
+      }
     } else {
       val id = parseIdentifier
       Sort(id)
     }
   }
 
+  def parseUnderscoreIdentifier: Identifier = {
+    eat(Tokens.Underscore())
+    val sym = parseSymbol
+
+    val firstIndex = parseNumeral.value.toInt
+    var indices = new ListBuffer[Int]
+    while(peekToken != Tokens.CParen())
+      indices.append(parseNumeral.value.toInt)
+    eat(Tokens.CParen())
+    Identifier(sym, firstIndex :: indices.toList)
+  }
+
   def parseIdentifier: Identifier = {
     if(peekToken == Tokens.OParen()) {
       eat(Tokens.OParen())
-      eat(Tokens.Underscore())
-      val sym = parseSymbol
-
-      val firstIndex = parseNumeral.value.toInt
-      var indices = new ListBuffer[Int]
-      while(peekToken != Tokens.CParen())
-        indices.append(parseNumeral.value.toInt)
-      eat(Tokens.CParen())
-      Identifier(sym, firstIndex :: indices.toList)
+      parseUnderscoreIdentifier
     } else {
       val sym = parseSymbol
       Identifier(sym)

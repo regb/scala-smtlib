@@ -77,6 +77,7 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseSort("A") === Sort("A"))
     assert(parseSort("(A B)") === Sort("A", Seq(Sort("B"))))
     assert(parseSort("(Array From To)") === Sort("Array", Seq(Sort("From"), Sort("To"))))
+    assert(parseSort("(_ A 42)") === Sort(Identifier("A", Seq(42))))
 
   }
 
