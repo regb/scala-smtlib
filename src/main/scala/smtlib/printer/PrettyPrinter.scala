@@ -196,8 +196,9 @@ object PrettyPrinter {
     else {
       writer.write("(_ ")
       writer.write(id.symbol.name)
+      writer.write(' ')
       writer.write(id.indices.head.toString)
-      id.indices.tail.foreach(n => writer.write(n.toString))
+      id.indices.tail.foreach(n => writer.write(" " + n.toString))
       writer.write(")")
     }
   }

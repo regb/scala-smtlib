@@ -79,12 +79,12 @@ class PrinterTests extends FunSuite {
 
   }
 
-  //test("Printing Sorts") {
-  //  checkSort(Sort(Identifier(SSymbol("A"))))
-  //  checkSort(Sort(Identifier(SSymbol("A"), Seq(42))))
-  //  checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
-  //  checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
-  //}
+  test("Printing Sorts") {
+    checkSort(Sort(Identifier(SSymbol("A"))))
+    checkSort(Sort(Identifier(SSymbol("A"), Seq(42))))
+    checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
+    checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
+  }
 
   test("Printing single commands") {
 
