@@ -129,7 +129,7 @@ object PrettyPrinter {
       writer.write("(exit)\n")
     }
     case NonStandardCommand(expr) => {
-      ???
+      printSExpr(expr, writer)
     }
   }
 

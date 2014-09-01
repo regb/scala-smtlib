@@ -78,7 +78,6 @@ class PrinterTests extends FunSuite {
     checkTerm(Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
     checkTerm(AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq()))
 
-
   }
 
   test("Printing composed Terms") {
