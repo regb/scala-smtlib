@@ -183,8 +183,11 @@ class Parser(lexer: Lexer) {
             Error(msg)
           }
           case _ => {
-            val lst = parseSList
-            SExprResponse(lst)
+            var exprs = new ListBuffer[SExpr]
+            while(peekToken != Tokens.CParen())
+              exprs.append(parseSExpr)
+            eat(Tokens.CParen())
+            SExprResponse(SList(exprs.toList))
           }
         }
       }

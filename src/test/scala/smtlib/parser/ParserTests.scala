@@ -190,6 +190,13 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseResponse("sat") === CheckSatResponse(SatStatus))
     assert(parseResponse("unsat") === CheckSatResponse(UnsatStatus))
     assert(parseResponse("unknown") === CheckSatResponse(UnknownStatus))
+
+    assert(parseResponse("(model (a b c))") === 
+      SExprResponse(SList(List(
+        SSymbol("model"),
+        SList(List(SSymbol("a"), SSymbol("b"), SSymbol("c")))
+      )))
+    )
   }
 
   test("Unknown command") {
