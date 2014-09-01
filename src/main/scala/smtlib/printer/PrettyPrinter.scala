@@ -81,6 +81,15 @@ object PrettyPrinter {
       printSort(returnSort, writer)
       writer.write(")\n")
     }
+    case DefineFun(name, sortedVars, returnSort, body) => {
+      writer.write("(define-fun ")
+      writer.write(name.name)
+      printNary(writer, sortedVars, printSortedVar _, " (", " ", ") ")
+      printSort(returnSort, writer)
+      writer.write(" ")
+      printTerm(body, writer)
+      writer.write(")\n")
+    }
     case Push(n) => {
       writer.write("(push ")
       writer.write(n.toString)

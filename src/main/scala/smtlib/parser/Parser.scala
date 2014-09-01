@@ -116,8 +116,17 @@ class Parser(lexer: Lexer) {
         val sort = parseSort
         DeclareFun(sym, params.toList, sort)
       }
-      case Tokens.DefineFun() => ???
+      case Tokens.DefineFun() => {
+        val name = parseSymbol
 
+        val sortedVars = parseMany(parseSortedVar _)
+
+        val sort = parseSort
+
+        val body = parseTerm
+
+        DefineFun(name, sortedVars, sort, body)
+      }
       case Tokens.Push() => {
         val n = parseNumeral
         Push(n.value.toInt)

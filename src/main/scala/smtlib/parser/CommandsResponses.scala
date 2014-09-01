@@ -1,7 +1,8 @@
 package smtlib
 package parser
 
-import parser.Terms._
+import Commands._
+import Terms._
 
 object CommandsResponses {
 
@@ -93,5 +94,11 @@ object CommandsResponses {
       case _ => None
     }
   }
+
+  sealed trait NonStandardResponse extends CommandResponse
+
+  //Z3 get-model
+  case class GetModelResponse(model: List[DefineFun]) extends NonStandardResponse
+
 
 }

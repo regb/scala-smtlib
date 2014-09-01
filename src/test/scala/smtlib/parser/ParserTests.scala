@@ -142,6 +142,8 @@ class ParserTests extends FunSuite with Timeouts {
                                     ))
     assert(parseUniqueCmd("(declare-fun xyz (A B) C)") ===
            DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
+    assert(parseUniqueCmd("(define-fun f ((a A)) B a)") ===
+           DefineFun("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a")))
 
     assert(parseUniqueCmd("(push 1)") === Push(1))
     assert(parseUniqueCmd("(push 4)") === Push(4))

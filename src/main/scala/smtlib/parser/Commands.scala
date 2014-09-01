@@ -17,7 +17,7 @@ object Commands {
   case class DeclareSort(name: SSymbol, arity: Int) extends Command
   case class DefineSort(name: SSymbol, params: Seq[SSymbol], sort: Sort) extends Command
   case class DeclareFun(name: SSymbol, paramSorts: Seq[Sort], returnSort: Sort) extends Command
-  //case class DefineFun(name: String, params: Seq[
+  case class DefineFun(name: SSymbol, params: Seq[SortedVar], returnSort: Sort, body: Term) extends Command
 
   case class Push(n: Int) extends Command
   case class Pop(n: Int) extends Command

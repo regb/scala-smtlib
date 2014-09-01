@@ -100,6 +100,7 @@ class PrinterTests extends FunSuite {
     checkCommand(DefineSort("A", Seq("B", "C"), 
                  Sort(Identifier("Array"), Seq(Sort("B"), Sort("C")))))
     checkCommand(DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
+    checkCommand(DefineFun("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a")))
 
     checkCommand(Push(1))
     checkCommand(Push(4))
