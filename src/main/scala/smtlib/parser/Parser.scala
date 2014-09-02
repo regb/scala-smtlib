@@ -399,6 +399,27 @@ class Parser(lexer: Lexer) {
     Identifier(sym, firstIndex :: indices.toList)
   }
 
+  def parseQualifiedId: QualifiedIdentifier = {
+    peekToken match {
+      case Tokens.OParen() => {
+        eat(Tokens.OParen())
+        peekToken match {
+          case Tokens.As() => {
+            eat(Tokens.As())
+            val id = parseIdentifier
+            val sort = parseSort
+            QualifiedIdentifier(id, Some(sort))
+          }
+          case Tokens.Underscore() => {
+            QualifiedIdentifier(parseUnderscoreIdentifier)
+          }
+          case _ => sys.error("TODO")
+        }
+      }
+      case _ => QualifiedIdentifier(parseIdentifier)
+    }
+  }
+
   def parseIdentifier: Identifier = {
     if(peekToken == Tokens.OParen()) {
       eat(Tokens.OParen())
@@ -413,40 +434,42 @@ class Parser(lexer: Lexer) {
     if(peekToken == Tokens.OParen()) {
       eat(Tokens.OParen())
 
-      nextToken match {
+      peekToken match {
         case Tokens.Let() =>
+          nextToken
           val bindings = parseMany(parseVarBinding _)
           val term = parseTerm
           eat(Tokens.CParen())
           Let(bindings.head, bindings.tail, term)
         case Tokens.ForAll() =>
+          nextToken
           val vars = parseMany(parseSortedVar _)
           val term = parseTerm
           eat(Tokens.CParen())
           ForAll(vars.head, vars.tail, term)
         case Tokens.Exists() =>
+          nextToken
           val vars = parseMany(parseSortedVar _)
           val term = parseTerm
           eat(Tokens.CParen())
           Exists(vars.head, vars.tail, term)
-        case Tokens.SymbolLit(s) =>
-          val terms = new ListBuffer[Term]
-          while(peekToken != Tokens.CParen())
-            terms.append(parseTerm)
-          eat(Tokens.CParen())
-          FunctionApplication(
-            QualifiedIdentifier(Identifier(SSymbol(s))),
-            terms.toList)
 
         case Tokens.ExclamationMark() =>
+          nextToken
           val term = parseTerm
           val attrs = new ListBuffer[Attribute]
           while(peekToken != Tokens.CParen())
             attrs.append(parseAttribute)
           eat(Tokens.CParen())
           AnnotatedTerm(term, attrs.head, attrs.tail)
-        case Tokens.Underscore() => ???//TODO
-        case _ => sys.error("TODO")
+        case _ => //should be function application
+          val id = parseQualifiedId 
+
+          val terms = new ListBuffer[Term]
+          while(peekToken != Tokens.CParen())
+            terms.append(parseTerm)
+          eat(Tokens.CParen())
+          FunctionApplication(id, terms.toList)
       }
     } else {
       val cst = tryParseConstant

@@ -127,8 +127,11 @@ class ParserTests extends FunSuite with Timeouts {
 
   }
 
-  test("Parsing composed Terms") {
-
+  test("Parsing complicated terms") {
+    assert(parseTerm("((_ f 1) a b)") === 
+           FunctionApplication(
+            QualifiedIdentifier(Identifier("f", Seq(1))),
+            Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
   }
 
   test("Parsing single commands") {
