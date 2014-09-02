@@ -240,4 +240,29 @@ object FixedSizeBitVectors {
     }
 
   }
+
+  object SignedLessThan {
+
+    private def firstBit(t: Term) = Extract(31, 31, t)
+    private def lastBits(t: Term) = Extract(30, 0, t)
+
+    def apply(t1: Term, t2: Term): Term =
+      Core.Or(
+        ULessThan(firstBit(t2), firstBit(t1)),
+        Core.And(
+          Core.Equals(firstBit(t1), firstBit(t2)),
+          Core.Or(
+            And(
+              Core.Equals(firstBit(t1), BitVectorLit(List(true))),
+              ULessThan(Neg(t2), Neg(t1))
+            ),
+            And(
+              Core.Equals(firstBit(t1), BitVectorLit(List(false))),
+              ULessThan(t1, t2)
+            )
+          )
+        )
+      )
+      
+  }
 }
