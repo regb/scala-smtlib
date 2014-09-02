@@ -56,6 +56,10 @@ class FixedSizeBitVectorsTests extends FunSuite {
            ) => assert(true)
       case _ => assert(false)
     }
+    Parser.fromString("((_ extract 1 2) #b101)").parseTerm match {
+      case Extract(1, 2, BitVectorLit(List(true, false, true))) => assert(true)
+      case _ => assert(false)
+    }
 
     Parser.fromString("(bvand #b101 #b011)").parseTerm match {
       case And(

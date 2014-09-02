@@ -3,6 +3,8 @@ package theories
 
 import parser.Terms._
 
+import common._
+
 object FixedSizeBitVectors {
 
 
@@ -23,6 +25,8 @@ object FixedSizeBitVectors {
   object BitVectorLit {
 
     def apply(content: List[Boolean]): Term = SBinary(content)
+
+    def apply(content: Hexadecimal): Term = SHexadecimal(content)
     
     def unapply(term: Term): Option[List[Boolean]] = term match {
       case SBinary(content) => Some(content)
@@ -47,6 +51,25 @@ object FixedSizeBitVectors {
           Identifier(SSymbol("concat"), Seq()),
           None
         ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object Extract {
+
+    def apply(i: Int, j: Int, t: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("extract"), Seq(i, j))),
+        Seq(t)
+      )
+    
+    def unapply(term: Term): Option[(Int, Int, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("extract"), Seq(i, j)),
+          None
+        ), Seq(t)) => Some((i, j, t))
       case _ => None
     }
 
