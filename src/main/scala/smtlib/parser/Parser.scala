@@ -399,16 +399,13 @@ class Parser(lexer: Lexer) {
     Identifier(sym, firstIndex :: indices.toList)
   }
 
-  def parseQualifiedId: QualifiedIdentifier = {
+  def parseQualifiedIdentifier: QualifiedIdentifier = {
     peekToken match {
       case Tokens.OParen() => {
         eat(Tokens.OParen())
         peekToken match {
           case Tokens.As() => {
-            eat(Tokens.As())
-            val id = parseIdentifier
-            val sort = parseSort
-            QualifiedIdentifier(id, Some(sort))
+            parseAsIdentifier
           }
           case Tokens.Underscore() => {
             QualifiedIdentifier(parseUnderscoreIdentifier)
@@ -418,6 +415,13 @@ class Parser(lexer: Lexer) {
       }
       case _ => QualifiedIdentifier(parseIdentifier)
     }
+  }
+
+  def parseAsIdentifier: QualifiedIdentifier = {
+    eat(Tokens.As())
+    val id = parseIdentifier
+    val sort = parseSort
+    QualifiedIdentifier(id, Some(sort))
   }
 
   def parseIdentifier: Identifier = {
@@ -462,8 +466,14 @@ class Parser(lexer: Lexer) {
             attrs.append(parseAttribute)
           eat(Tokens.CParen())
           AnnotatedTerm(term, attrs.head, attrs.tail)
+
+        case Tokens.As() =>
+          parseAsIdentifier
+        case Tokens.Underscore() =>
+          QualifiedIdentifier(parseUnderscoreIdentifier)
+
         case _ => //should be function application
-          val id = parseQualifiedId 
+          val id = parseQualifiedIdentifier 
 
           val terms = new ListBuffer[Term]
           while(peekToken != Tokens.CParen())

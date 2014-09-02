@@ -109,6 +109,8 @@ class ParserTests extends FunSuite with Timeouts {
 
     assert(parseTerm("42") === SNumeral(42))
     assert(parseTerm("abc") === QualifiedIdentifier("abc"))
+    assert(parseTerm("(as abc A)") === QualifiedIdentifier("abc", Some(Sort("A"))))
+    assert(parseTerm("(_ abc 42)") === QualifiedIdentifier(Identifier("abc", Seq(42))))
     assert(parseTerm("(f a b)") === 
            FunctionApplication(
             QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
