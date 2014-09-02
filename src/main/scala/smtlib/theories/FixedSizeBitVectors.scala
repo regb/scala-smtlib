@@ -252,11 +252,11 @@ object FixedSizeBitVectors {
         Core.And(
           Core.Equals(firstBit(t1), firstBit(t2)),
           Core.Or(
-            And(
+            Core.And(
               Core.Equals(firstBit(t1), BitVectorLit(List(true))),
               ULessThan(Neg(t2), Neg(t1))
             ),
-            And(
+            Core.And(
               Core.Equals(firstBit(t1), BitVectorLit(List(false))),
               ULessThan(t1, t2)
             )
