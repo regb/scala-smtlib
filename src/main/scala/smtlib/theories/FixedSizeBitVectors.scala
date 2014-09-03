@@ -241,28 +241,137 @@ object FixedSizeBitVectors {
 
   }
 
-  object SignedLessThan {
-
-    private def firstBit(t: Term) = Extract(31, 31, t)
-    private def lastBits(t: Term) = Extract(30, 0, t)
+  object ULessEquals {
 
     def apply(t1: Term, t2: Term): Term =
-      Core.Or(
-        ULessThan(firstBit(t2), firstBit(t1)),
-        Core.And(
-          Core.Equals(firstBit(t1), firstBit(t2)),
-          Core.Or(
-            Core.And(
-              Core.Equals(firstBit(t1), BitVectorLit(List(true))),
-              ULessThan(Neg(t2), Neg(t1))
-            ),
-            Core.And(
-              Core.Equals(firstBit(t1), BitVectorLit(List(false))),
-              ULessThan(t1, t2)
-            )
-          )
-        )
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvule"))),
+        Seq(t1, t2)
       )
-      
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvule"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
   }
+
+  object UGreaterThan {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvugt"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvugt"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object UGreaterEquals {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvuge"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvuge"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object SLessThan {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvslt"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvslt"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object SLessEquals {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvsle"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvsle"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object SGreaterThan {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvsgt"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvsgt"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+
+  object SGreaterEquals {
+
+    def apply(t1: Term, t2: Term): Term =
+      FunctionApplication(
+        QualifiedIdentifier(Identifier(SSymbol("bvsge"))),
+        Seq(t1, t2)
+      )
+    
+    def unapply(term: Term): Option[(Term, Term)] = term match {
+      case FunctionApplication(
+        QualifiedIdentifier(
+          Identifier(SSymbol("bvsge"), Seq()),
+          None
+        ), Seq(t1, t2)) => Some((t1, t2))
+      case _ => None
+    }
+
+  }
+      
 }
