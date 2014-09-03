@@ -39,9 +39,13 @@ object Commands {
   //It can be used to send commands not supported in this library, such as non-standard commands like declare-datatypes
   case class NonStandardCommand(sexpr: SExpr) extends Command
 
+
   //z3 get-model
   case class GetModel() extends Command
+  //non standard declare-datatypes (no support for parametric types)
+  case class DeclareDatatypes(datatypes: Seq[(SSymbol, Seq[Constructor])]) extends Command
 
+  case class Constructor(sym: SSymbol, fields: Seq[(SSymbol, Sort)])
 
   /* 
    * Info flags can be queried with get-info command and

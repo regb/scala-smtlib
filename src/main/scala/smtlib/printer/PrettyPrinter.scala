@@ -143,6 +143,31 @@ object PrettyPrinter {
     case GetModel() => {
       writer.write("(get-model)\n")
     }
+    case DeclareDatatypes(datatypes) => {
+      writer.write("(declare-datatypes () (")
+
+      datatypes.foreach{ case (name, constructors) => {
+        writer.write(name.name)
+        constructors.foreach{ 
+          case Constructor(sym, Seq()) => {
+            writer.write(" ")
+            writer.write(sym.name)
+          }
+          case Constructor(sym, fields) => {
+            writer.write(" (")
+            writer.write(sym.name)
+            fields.foreach{ case (field, sort) => {
+              writer.write(field.name)
+              writer.write(" ")
+              printSort(sort, writer)
+            }}
+          }
+        }
+      }}
+
+      writer.write("))\n")
+
+    }
   }
 
   def printTerm(term: Term, writer: Writer): Unit = term match {

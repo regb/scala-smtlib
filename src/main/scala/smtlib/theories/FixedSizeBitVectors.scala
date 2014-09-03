@@ -2,7 +2,6 @@ package smtlib
 package theories
 
 import parser.Terms._
-
 import common._
 
 object FixedSizeBitVectors {
@@ -222,6 +221,7 @@ object FixedSizeBitVectors {
     }
 
   }
+
   object Neg {
 
     def apply(t: Term): Term = 
@@ -236,7 +236,6 @@ object FixedSizeBitVectors {
       case _ => None
     }
   }
-
 
   object Add {
 
