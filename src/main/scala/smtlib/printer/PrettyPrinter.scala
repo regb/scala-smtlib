@@ -158,9 +158,11 @@ object PrettyPrinter {
             writer.write(" (")
             writer.write(sym.name)
             fields.foreach{ case (field, sort) => {
+              writer.write(" (")
               writer.write(field.name)
               writer.write(" ")
               printSort(sort, writer)
+              writer.write(")")
             }}
             writer.write(")")
           }
