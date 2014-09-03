@@ -6,7 +6,9 @@ import common._
 
 object Commands {
 
-  sealed trait Command extends Positioned
+  sealed trait Command extends Positioned {
+    override def toString: String = printer.PrettyPrinter.toString(this)
+  }
 
   case class Script(commands: List[Command])
 

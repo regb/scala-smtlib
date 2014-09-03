@@ -27,7 +27,9 @@ object Terms {
     def apply(symbol: SSymbol): Identifier = Identifier(symbol, Seq())
   }
 
-  case class Sort(id: Identifier, subSorts: Seq[Sort])
+  case class Sort(id: Identifier, subSorts: Seq[Sort]) {
+    override def toString: String = printer.PrettyPrinter.toString(this)
+  }
   object Sort {
     def apply(id: Identifier): Sort = Sort(id, Seq())
   }
@@ -53,7 +55,9 @@ object Terms {
   /* SComment is never parsed, only used for pretty printing */
   case class SComment(s: String) extends SExpr 
 
-  sealed trait Term extends Positioned with SExpr
+  sealed trait Term extends Positioned with SExpr {
+    override def toString: String = printer.PrettyPrinter.toString(this)
+  }
 
   case class Let(binding: VarBinding, bindings: Seq[VarBinding], term: Term) extends Term
   case class ForAll(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
