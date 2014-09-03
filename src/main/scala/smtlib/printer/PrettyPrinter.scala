@@ -147,6 +147,7 @@ object PrettyPrinter {
       writer.write("(declare-datatypes () (")
 
       datatypes.foreach{ case (name, constructors) => {
+        writer.write(" (")
         writer.write(name.name)
         constructors.foreach{ 
           case Constructor(sym, Seq()) => {
@@ -161,8 +162,10 @@ object PrettyPrinter {
               writer.write(" ")
               printSort(sort, writer)
             }}
+            writer.write(")")
           }
         }
+        writer.write(") ")
       }}
 
       writer.write("))\n")
