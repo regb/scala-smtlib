@@ -6,29 +6,19 @@ import Terms._
 
 object CommandsResponses {
 
-  sealed trait CommandResponse
+  sealed trait CommandResponse {
+    override def toString: String = printer.PrettyPrinter.toString(this)
+  }
 
   sealed trait GenResponse extends CommandResponse
-  case object Success extends GenResponse {
-    override def toString = "success"
-  }
-  case object Unsupported extends GenResponse {
-    override def toString = "unsupported"
-  }
-  case class Error(msg: String) extends GenResponse {
-    override def toString = """(error "%s")""".format(msg)
-  }
+  case object Success extends GenResponse
+  case object Unsupported extends GenResponse
+  case class Error(msg: String) extends GenResponse
 
   sealed trait Status
-  case object SatStatus extends Status {
-    override def toString = "sat"
-  }
-  case object UnsatStatus extends Status {
-    override def toString = "unsat"
-  }
-  case object UnknownStatus extends Status {
-    override def toString = "unknown"
-  }
+  case object SatStatus extends Status
+  case object UnsatStatus extends Status
+  case object UnknownStatus extends Status
 
   sealed trait ErrorBehaviour
   case object ImmediateExitErrorBehaviour extends ErrorBehaviour {
@@ -80,20 +70,12 @@ object CommandsResponses {
   //TODO: attributeValue trait more precise than SExpr
   case class GetOptionResponse(attributeValue: SExpr) extends CommandResponse
 
-  case class SExprResponse(sexpr: SExpr) extends CommandResponse
 
-  object GetValueResponse {
-    def apply(values: Seq[(SExpr, SExpr)]): CommandResponse = SExprResponse(SList(values.map(p => SList(p._1, p._2)).toList))
-    def unapply(cmdRes: CommandResponse): Option[Seq[(SExpr, SExpr)]] = cmdRes match {
-      case SExprResponse(SList(values)) => {
-        scala.util.Try(values.map{
-          case SList(List(s, v)) => (s, v)
-          case _ => throw new Exception
-        }).toOption
-      }
-      case _ => None
-    }
-  }
+  case class GetValueResponse(valuationPairs: Seq[(Term, Term)]) extends CommandResponse
+
+
+
+  case class SExprResponse(sexpr: SExpr) extends CommandResponse
 
   sealed trait NonStandardResponse extends CommandResponse
 

@@ -2,6 +2,7 @@ package smtlib
 package printer
 
 import parser.Commands._
+import parser.CommandsResponses._
 import parser.Terms._
 
 import java.io.Writer
@@ -38,6 +39,14 @@ object PrettyPrinter {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printSort(sort, sWriter)
+    sWriter.flush
+    output.toString
+  }
+
+  def toString(response: CommandResponse): String = {
+    val output = new StringWriter
+    val sWriter = new BufferedWriter(output)
+    printCommandResponse(response, sWriter)
     sWriter.flush
     output.toString
   }
@@ -375,6 +384,24 @@ object PrettyPrinter {
     case KeywordInfoFlag(keyword) =>
       writer.write(':')
       writer.write(keyword)
+  }
+
+  def printCommandResponse(response: CommandResponse, writer: Writer): Unit = response match {
+    case Success => 
+      writer.write("success\n")
+    case Unsupported =>
+      writer.write("unsupported\n")
+    case Error(msg) =>
+      writer.write("(error ")
+      writer.write(msg)
+      writer.write(")\n")
+    case CheckSatResponse(SatStatus) =>
+      writer.write("sat\n")
+    case CheckSatResponse(UnsatStatus) =>
+      writer.write("unsat\n")
+    case CheckSatResponse(UnknownStatus) =>
+      writer.write("unknown\n")
+    case _ => ???
   }
 
   private def printNary[A](
