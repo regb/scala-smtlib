@@ -391,12 +391,20 @@ class Parser(lexer: Lexer) {
     eat(Tokens.Underscore())
     val sym = parseSymbol
 
-    val firstIndex = parseNumeral.value.toInt
-    var indices = new ListBuffer[Int]
-    while(peekToken != Tokens.CParen())
-      indices.append(parseNumeral.value.toInt)
-    eat(Tokens.CParen())
-    Identifier(sym, firstIndex :: indices.toList)
+    peekToken match {
+      case Tokens.SymbolLit(_) => {
+        val ext = parseSymbol
+        ExtendedIdentifier(sym, parseSymbol)
+      }
+      case _ => {
+        val firstIndex = parseNumeral.value.toInt
+        var indices = new ListBuffer[Int]
+        while(peekToken != Tokens.CParen())
+          indices.append(parseNumeral.value.toInt)
+        eat(Tokens.CParen())
+        Identifier(sym, firstIndex :: indices.toList)
+      }
+    }
   }
 
   def parseQualifiedIdentifier: QualifiedIdentifier = {
