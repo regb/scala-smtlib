@@ -20,11 +20,27 @@ import Commands._
 object Terms {
 
   //an identifier is either a symbol or an indexed symbol: (_ symbol <numeral>+)
-  case class Identifier(symbol: SSymbol, indices: Seq[Int]) {
+  trait Identifier {
+    val symbol: SSymbol
+    val indices: Seq[Int]
+
     def isIndexed: Boolean = !indices.isEmpty
   }
+  //provide apply/unapply for standard Identifier
   object Identifier {
-    def apply(symbol: SSymbol): Identifier = Identifier(symbol, Seq())
+    def apply(symbol: SSymbol, indices: Seq[Int] = Seq()): Identifier = 
+      StandardIdentifier(symbol, indices)
+
+    def unapply(id: Identifier): Option[(SSymbol, Seq[Int])] = id match {
+      case StandardIdentifier(s, is) => Some((s, is))
+      case _ => None
+    }
+  }
+
+  case class StandardIdentifier(symbol: SSymbol, indices: Seq[Int]) extends Identifier
+  //non standard, example:  (_ map or)
+  case class ExtendedIdentifier(symbol: SSymbol, extension: SSymbol) extends Identifier {
+    val indices: Seq[Int] = Seq()
   }
 
   case class Sort(id: Identifier, subSorts: Seq[Sort]) {
