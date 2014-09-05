@@ -6,7 +6,7 @@ import common._
 
 object Commands {
 
-  sealed trait Command extends Positioned {
+  sealed abstract class Command extends Positioned {
     override def toString: String = printer.PrettyPrinter.toString(this)
   }
 
@@ -55,7 +55,7 @@ object Commands {
    * flags. Additional solver-specific flags are supported via the general
    * KeywordInfoFlag
    */
-  sealed trait InfoFlag
+  sealed abstract class InfoFlag
   case object ErrorBehaviourInfoFlag extends InfoFlag
   case object NameInfoFlag extends InfoFlag
   case object AuthorsInfoFlag extends InfoFlag
@@ -70,7 +70,7 @@ object Commands {
    * A bunch of standard option (defined by the SMT-LIB standard) and
    * a generic syntax via attribute allows for solver-specific options
    */
-  sealed trait SMTOption
+  sealed abstract class SMTOption
   case class PrintSuccess(value: Boolean) extends SMTOption
   case class ExpandDefinitions(value: Boolean) extends SMTOption
   case class InteractiveMode(value: Boolean) extends SMTOption
@@ -85,7 +85,7 @@ object Commands {
   case class AttributeOption(attribute: Attribute) extends SMTOption
 
 
-  sealed abstract trait Logic
+  sealed abstract class Logic
   case object QF_UF extends Logic
   case object QF_LRA extends Logic
   case object QF_AX extends Logic

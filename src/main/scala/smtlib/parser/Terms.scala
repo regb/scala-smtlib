@@ -55,7 +55,7 @@ object Terms {
   /* SComment is never parsed, only used for pretty printing */
   case class SComment(s: String) extends SExpr 
 
-  sealed trait Term extends Positioned with SExpr {
+  sealed abstract class Term extends Positioned with SExpr {
     override def toString: String = printer.PrettyPrinter.toString(this)
   }
 

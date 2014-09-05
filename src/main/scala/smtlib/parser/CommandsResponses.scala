@@ -6,7 +6,7 @@ import Terms._
 
 object CommandsResponses {
 
-  sealed trait CommandResponse {
+  sealed abstract class CommandResponse {
     override def toString: String = printer.PrettyPrinter.toString(this)
   }
 
