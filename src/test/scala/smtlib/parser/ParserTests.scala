@@ -63,6 +63,11 @@ class ParserTests extends FunSuite with Timeouts {
                                     Some(SList(
                                           List(SSymbol("abc"), SSymbol("def"))))
                                    ))
+    assert(parseAttribute(""":left-assoc""") === Attribute(SKeyword("left-assoc")))
+    assert(parseAttribute(""":status unsat""") === Attribute(SKeyword("status"), Some(SSymbol("unsat"))))
+    assert(parseAttribute(""":my_attribute (humpty dumpty)""") ===  
+           Attribute(SKeyword("my_attribute"), Some(SList(List(SSymbol("humpty"), SSymbol("dumpty"))))))
+    assert(parseAttribute(""":authors "Jack and Jill" """) === Attribute(SKeyword("authors"), Some(SString("Jack and Jill"))))
   }
 
   test("Parsing Sorts") {
