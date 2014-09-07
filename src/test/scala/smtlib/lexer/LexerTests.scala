@@ -33,22 +33,26 @@ class LexerTests extends FunSuite with Timeouts {
   test("ignoring comments") {
     assert(lexUniqueToken(""";blablablabla blabla 42
                              12
-                          """) == NumeralLit(12))
+                          """) === NumeralLit(12))
     assert(lexUniqueToken(""";test
                              "13"
                              ;retest
-                          """) == StringLit("13"))
-    assert(lexUniqueToken("""14 ;retest""") == NumeralLit(14))
+                          """) === StringLit("13"))
+    assert(lexUniqueToken("""14 ;retest""") === NumeralLit(14))
     assert(lexUniqueToken(""";this is a comment
                              15;this is a comment very close to the literal
-                          """) == NumeralLit(15))
+                          """) === NumeralLit(15))
   }
 
   test("integer literals") {
+    assert(lexUniqueToken("0") === NumeralLit(0))
+    assert(lexUniqueToken("1") === NumeralLit(1))
+    assert(lexUniqueToken("100") === NumeralLit(100))
     val reader1 = new StringReader("12")
     val lexer1 = new Lexer(reader1)
     assert(lexer1.nextToken === NumeralLit(12))
 
+    assert(lexUniqueToken("#x0") === HexadecimalLit(Hexadecimal.fromString("0").get))
     val reader2 = new StringReader("#xF")
     val lexer2 = new Lexer(reader2)
     assert(lexer2.nextToken === HexadecimalLit(Hexadecimal.fromString("F").get))
@@ -67,6 +71,9 @@ class LexerTests extends FunSuite with Timeouts {
     assert(lexer5.nextToken === HexadecimalLit(Hexadecimal.fromString("11").get))
     assert(lexer5.nextToken === NumeralLit(12))
 
+    assert(lexUniqueToken("#b0") === BinaryLit(Seq(false)))
+    assert(lexUniqueToken("#b1") === BinaryLit(Seq(true)))
+    assert(lexUniqueToken("#b001") === BinaryLit(Seq(false, false, true)))
     val reader6 = new StringReader("#b1010")
     val lexer6 = new Lexer(reader6)
     assert(lexer6.nextToken === BinaryLit(Seq(true, false, true, false)))
@@ -88,6 +95,13 @@ class LexerTests extends FunSuite with Timeouts {
     val reader4 = new StringReader(""" "\"abc\"" """)
     val lexer4 = new Lexer(reader4)
     assert(lexer4.nextToken === StringLit("\"abc\""))
+
+    assert(lexUniqueToken(""" "abc\ndef" """) === StringLit("""abc\ndef"""))
+    assert(lexUniqueToken(""" "abc\n def" """) === StringLit("""abc\n def"""))
+    assert(lexUniqueToken(""" "123\d456" """) === StringLit("""123\d456"""))
+
+    assert(lexUniqueToken(""" "123\\456" """) === StringLit("""123\456"""))
+    assert(lexUniqueToken(""" "test\\" """) === StringLit("""test\"""))
   }
 
 
