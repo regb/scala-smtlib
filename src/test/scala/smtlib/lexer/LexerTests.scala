@@ -130,6 +130,19 @@ deF|
     assert(lexer5.nextToken === SymbolLit(
 """abc
 deF"""))
+
+
+    assert(lexUniqueToken(""" AbCdEf """) === SymbolLit("AbCdEf"))
+    assert(lexUniqueToken(""" abc!def """) === SymbolLit("abc!def"))
+    assert(lexUniqueToken(""" a@$%f """) === SymbolLit("a@$%f"))
+    assert(lexUniqueToken(""" _+_ """) === SymbolLit("_+_"))
+    assert(lexUniqueToken(""" <= """) === SymbolLit("<="))
+    assert(lexUniqueToken(""" /// """) === SymbolLit("///"))
+    assert(lexUniqueToken("""<abc>""") === SymbolLit("<abc>"))
+    assert(lexUniqueToken(""".42""") === SymbolLit(".42"))
+
+    assert(lexUniqueToken("""||""") === SymbolLit(""))
+    assert(lexUniqueToken("""|af klj^*(0(&*)&(#^>>?"']]984|""") === SymbolLit("""af klj^*(0(&*)&(#^>>?"']]984"""))
   }
 
   test("keywords") {
@@ -148,6 +161,10 @@ deF"""))
     val reader5 = new StringReader(""" :|deF| """)
     val lexer5 = new Lexer(reader5)
     assert(lexer5.nextToken === Keyword("deF"))
+
+    assert(lexUniqueToken(""":42""") === Keyword("42"))
+    assert(lexUniqueToken(""":->""") === Keyword("->"))
+    assert(lexUniqueToken(""":~=""") === Keyword("~="))
   }
 
   test("lexer compose") {

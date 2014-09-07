@@ -105,7 +105,7 @@ class Lexer(reader: java.io.Reader) {
     val res: Token = c match {
       case '(' => OParen()
       case ')' => CParen()
-      case ':' => Keyword(readSymbol(nextChar)) //TODO: symbols after : can start with a digit, so sligthly different from symbols
+      case ':' => Keyword(readSymbol(nextChar))
       case '"' => {
         val buffer = new scala.collection.mutable.ArrayBuffer[Char]
         var c = nextChar
@@ -144,7 +144,7 @@ class Lexer(reader: java.io.Reader) {
           DecimalLit(intPart.toDouble + fracPart/base)
         }
       }
-      case s if isSymbolChar(s) || s == '|' => {
+      case s if isSymbolChar(s) || s == '|' => { //this case is after digits, since a symbol cannot start with a digit
         val sym = readSymbol(s)
         val res = toReserved(sym)
         res.getOrElse(SymbolLit(sym))
@@ -154,6 +154,12 @@ class Lexer(reader: java.io.Reader) {
     res.setPos(currentPosition)
   }
 
+  /*
+   * Parse a symbol that can possibly starts with a digit.
+   */
+  //if this gets called for a full symbol, then we know that current char cannot be a
+  //digit and hence we can ignore that case. If it gets called from keyword case, then
+  //it might be a digit and this is fine according to the standard
   private def readSymbol(currentChar: Char): String = {
     val buffer = new scala.collection.mutable.ArrayBuffer[Char]
     if(currentChar == '|') { //a symbol can be within quotes: |symb|
