@@ -394,7 +394,8 @@ class Parser(lexer: Lexer) {
     peekToken match {
       case Tokens.SymbolLit(_) => {
         val ext = parseSymbol
-        ExtendedIdentifier(sym, parseSymbol)
+        eat(Tokens.CParen())
+        ExtendedIdentifier(sym, ext)
       }
       case _ => {
         val firstIndex = parseNumeral.value.toInt

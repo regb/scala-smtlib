@@ -95,6 +95,10 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseId("(_ a 1)") === Identifier("a", Seq(1)))
     assert(parseId("(_ a 42 12)") === Identifier("a", Seq(42, 12)))
 
+    //non standard syntax used by Z3 for extensions
+    assert(parseId("(_ a sym)") === ExtendedIdentifier("a", SSymbol("sym")))
+    assert(parseId("(_ map f)") === ExtendedIdentifier("map", SSymbol("f")))
+
   }
 
   def parseTerm(str: String): Term = {
