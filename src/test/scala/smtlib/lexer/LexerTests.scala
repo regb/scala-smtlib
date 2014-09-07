@@ -30,6 +30,20 @@ class LexerTests extends FunSuite with Timeouts {
     assert(lexer1.nextToken === null)
   }
 
+  test("ignoring comments") {
+    assert(lexUniqueToken(""";blablablabla blabla 42
+                             12
+                          """) == NumeralLit(12))
+    assert(lexUniqueToken(""";test
+                             "13"
+                             ;retest
+                          """) == StringLit("13"))
+    assert(lexUniqueToken("""14 ;retest""") == NumeralLit(14))
+    assert(lexUniqueToken(""";this is a comment
+                             15;this is a comment very close to the literal
+                          """) == NumeralLit(15))
+  }
+
   test("integer literals") {
     val reader1 = new StringReader("12")
     val lexer1 = new Lexer(reader1)

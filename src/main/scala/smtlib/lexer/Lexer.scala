@@ -81,20 +81,28 @@ class Lexer(reader: java.io.Reader) {
   def nextToken: Token = if(peek == -1) null else {
 
     var c: Char = nextChar
-    while(isBlank(c)) {
-      if(peek == -1)
-        return null
-      c = nextChar
+
+    while(isBlank(c) || c == ';') {
+
+      if(c == ';') {
+        while(!isNewLine(c)) {
+          if(peek == -1)
+            return null
+          c = nextChar
+        }
+      }
+
+      while(isBlank(c)) {
+        if(peek == -1)
+          return null
+        c = nextChar
+      }
+
     }
 
     val currentPosition = Position(_currentLine, _currentCol)
 
     val res: Token = c match {
-      case ';' => {
-        while(!isNewLine(nextChar))
-          ()
-        nextToken
-      }
       case '(' => OParen()
       case ')' => CParen()
       case ':' => Keyword(readSymbol(nextChar)) //TODO: symbols after : can start with a digit, so sligthly different from symbols
