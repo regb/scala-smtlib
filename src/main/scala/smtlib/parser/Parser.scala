@@ -213,6 +213,44 @@ class Parser(lexer: Lexer) {
     }
   }
 
+  def parseInfoResponse: InfoResponse = {
+    peekToken match {
+      case Tokens.Keyword("error-behaviour") =>
+        nextToken
+        val behaviour = nextToken match {
+          case Tokens.SymbolLit("immediate-exit") => ImmediateExitErrorBehaviour
+          case Tokens.SymbolLit("continued-execution") => ContinueExecutionErrorBehaviour
+          case _ => sys.error("TODO")
+        }
+        ErrorBehaviourInfoResponse(behaviour)
+      case Tokens.Keyword("name") =>
+        nextToken
+        NameInfoResponse(parseString.value)
+      case Tokens.Keyword("authors") =>
+        nextToken
+        AuthorsInfoResponse(parseString.value)
+      case Tokens.Keyword("version") =>
+        nextToken
+        VersionInfoResponse(parseString.value)
+      case Tokens.Keyword("reason-unknown") =>
+        nextToken
+        val reason = nextToken match {
+          case Tokens.SymbolLit("timeout") => TimeoutReasonUnknown
+          case Tokens.SymbolLit("memout") => MemoutReasonUnknown
+          case Tokens.SymbolLit("incomplete") => IncompleteReasonUnknown
+          case _ => sys.error("TODO")
+        }
+        ReasonUnkownionInfoResponse(reason)
+      case _ =>
+        AttributeInfoResponse(parseAttribute)
+    }
+  }
+
+  def parseGetInfoResponse: GetInfoResponse = {
+    val responses = parseMany(parseInfoResponse _)
+    GetInfoResponse(responses.head, responses.tail)
+  }
+
   def parseInfoFlag: InfoFlag = {
     nextToken match {
       case Tokens.Keyword("error-behaviour") => ErrorBehaviourInfoFlag

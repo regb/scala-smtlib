@@ -29,10 +29,13 @@ object CommandsResponses {
   }
 
   sealed trait ReasonUnknown
-  case object TimeoutReasonUnknown extends ErrorBehaviour {
+  case object TimeoutReasonUnknown extends ReasonUnknown {
     override def toString = "timeout"
   }
-  case object IncompleteReasonUnknown extends ErrorBehaviour {
+  case object MemoutReasonUnknown extends ReasonUnknown {
+    override def toString = "memout"
+  }
+  case object IncompleteReasonUnknown extends ReasonUnknown {
     override def toString = "incomplete"
   }
 
@@ -60,9 +63,10 @@ object CommandsResponses {
   case class ReasonUnkownionInfoResponse(reason: ReasonUnknown) extends InfoResponse {
     override def toString = ":reason-unknown " + reason.toString
   }
-  case class StatusInfoResponse(status: Status) extends InfoResponse {
-    override def toString = ":status " + status.toString
-  }
+  //as far as I can tell, that one is not in the specification, although there is a corresponding get-info
+  //case class StatusInfoResponse(status: Status) extends InfoResponse {
+  //  override def toString = ":status " + status.toString
+  //}
   case class AttributeInfoResponse(attribute: Attribute) extends InfoResponse {
     override def toString = attribute.toString
   }

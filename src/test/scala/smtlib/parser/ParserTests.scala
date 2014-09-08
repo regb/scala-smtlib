@@ -127,9 +127,13 @@ class ParserTests extends FunSuite with Timeouts {
   test("Parsing simple Terms") {
 
     assert(parseTerm("42") === SNumeral(42))
+    assert(parseTerm("42.12") === SDecimal(42.12))
+    assert(parseTerm("#xF") === SHexadecimal(Hexadecimal.fromString("F").get))
+    assert(parseTerm("#b1") === SBinary(List(true)))
     assert(parseTerm("abc") === QualifiedIdentifier("abc"))
     assert(parseTerm("(as abc A)") === QualifiedIdentifier("abc", Some(Sort("A"))))
     assert(parseTerm("(_ abc 42)") === QualifiedIdentifier(Identifier("abc", Seq(42))))
+    assert(parseTerm("(as (_ abc 42) A)") === QualifiedIdentifier(Identifier("abc", Seq(42)), Some(Sort("A"))))
     assert(parseTerm("(f a b)") === 
            FunctionApplication(
             QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
@@ -153,6 +157,14 @@ class ParserTests extends FunSuite with Timeouts {
            FunctionApplication(
             QualifiedIdentifier(Identifier("f", Seq(1))),
             Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
+
+    assert(
+      parseTerm("(let ((x 42)) (f x a))") ===
+      Let(VarBinding("x", SNumeral(42)),
+          Seq(),
+          FunctionApplication(
+            QualifiedIdentifier("f"), 
+            Seq(QualifiedIdentifier("x"), QualifiedIdentifier("a")))))
   }
 
   test("Parsing single commands") {
