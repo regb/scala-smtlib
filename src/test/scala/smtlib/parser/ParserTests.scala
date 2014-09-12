@@ -29,12 +29,12 @@ class ParserTests extends FunSuite with Timeouts {
     cmd
   }
 
-  private def parseResponse(str: String): CommandResponse = {
-    val reader = new StringReader(str)
-    val lexer = new Lexer(reader)
-    val parser = new Parser(lexer)
-    parser.parseResponse
-  }
+  //private def parseResponse(str: String): CommandResponse = {
+  //  val reader = new StringReader(str)
+  //  val lexer = new Lexer(reader)
+  //  val parser = new Parser(lexer)
+  //  parser.parseResponse
+  //}
   
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
@@ -223,13 +223,13 @@ class ParserTests extends FunSuite with Timeouts {
   }
 
   test("basic responses") {
-    assert(parseResponse("success") === Success)
-    assert(parseResponse("unsupported") === Unsupported)
-    assert(parseResponse("sat") === CheckSatResponse(SatStatus))
-    assert(parseResponse("unsat") === CheckSatResponse(UnsatStatus))
-    assert(parseResponse("unknown") === CheckSatResponse(UnknownStatus))
-    
-    assert(parseResponse("(model (define-fun z () Int 0))") === 
+    assert(Parser.fromString("success").parseGenResponse === Success)
+    assert(Parser.fromString("unsupported").parseGenResponse === Unsupported)
+
+    assert(Parser.fromString("sat").parseCheckSatResponse === CheckSatResponse(SatStatus))
+    assert(Parser.fromString("unsat").parseCheckSatResponse === CheckSatResponse(UnsatStatus))
+    assert(Parser.fromString("unknown").parseCheckSatResponse === CheckSatResponse(UnknownStatus))
+    assert(Parser.fromString("(model (define-fun z () Int 0))").parseGetModelResponse === 
       GetModelResponse(List(
         DefineFun("z", Seq(), Sort("Int"), SNumeral(0))))
     )

@@ -30,7 +30,21 @@ class CVC4Interpreter extends Interpreter {
     PrettyPrinter.printCommand(cmd, cvc4In)
     cvc4In.write("\n")
     cvc4In.flush
-    parser.parseResponse
+    cmd match {
+      case CheckSat() => parser.parseCheckSatResponse
+      case GetAssertions() => parser.parseGetAssertionsResponse
+      case GetUnsatCore() => parser.parseGetUnsatCoreResponse
+      case GetProof() => parser.parseGetProofResponse
+      case GetValue(_, _) => parser.parseGetValueResponse
+      case GetAssignment() => parser.parseGetAssignmentResponse
+
+      case GetOption(_) => parser.parseGetOptionResponse
+      case GetInfo(_) => parser.parseGetInfoResponse
+
+      case GetModel() => parser.parseGetModelResponse
+
+      case _ => parser.parseGenResponse
+    }
   }
 
   override def free(): Unit = {

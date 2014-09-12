@@ -316,11 +316,7 @@ object PrettyPrinter {
       writer.write(key)
     case SSymbol(sym) =>
       writer.write(sym)
-    case SComment(_) => ???
-    case (c: Command) => 
-      printCommand(c, writer)
-    case (t: Term) => 
-      printTerm(t, writer)
+    case _ => sys.error("TODO")
   }
 
 

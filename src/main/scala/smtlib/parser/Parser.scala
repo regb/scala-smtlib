@@ -174,43 +174,75 @@ class Parser(lexer: Lexer) {
     cmd.setPos(head)
   }
 
-  def parseResponse: CommandResponse = {
+  def parseGenResponse: GenResponse = {
     nextToken match {
       case Tokens.SymbolLit("success") => Success
       case Tokens.SymbolLit("unsupported") => Unsupported
-
-      case Tokens.SymbolLit("sat") => CheckSatResponse(SatStatus)
-      case Tokens.SymbolLit("unsat") => CheckSatResponse(UnsatStatus)
-      case Tokens.SymbolLit("unknown") => CheckSatResponse(UnknownStatus)
-
       case Tokens.OParen() => {
-        peekToken match {
+        nextToken match {
           case Tokens.SymbolLit("error") => {
-            nextToken
             val msg = parseString.value
             eat(Tokens.CParen())
             Error(msg)
           }
-          case Tokens.SymbolLit("model") => {
-            nextToken
-            var funs: ListBuffer[DefineFun] = new ListBuffer
-            while(peekToken != Tokens.CParen())
-              funs.append(parseCommand.asInstanceOf[DefineFun])
-            eat(Tokens.CParen())
-            GetModelResponse(funs.toList)
-          }
-          case _ => {
-            var exprs = new ListBuffer[SExpr]
-            while(peekToken != Tokens.CParen())
-              exprs.append(parseSExpr)
-            eat(Tokens.CParen())
-            SExprResponse(SList(exprs.toList))
-          }
+          case _ => sys.error("TODO")
         }
       }
-
-      case t => sys.error("TODO: " + t)
+      case _ => sys.error("TODO")
     }
+  }
+
+  def parseGetAssignmentResponse: GetAssignmentResponse = {
+    def parsePair: (SSymbol, Boolean) = {
+      eat(Tokens.OParen())
+      val sym = parseSymbol
+      val bool = parseBool
+      eat(Tokens.CParen())
+      (sym, bool)
+    }
+
+    val pairs = parseMany(parsePair _)
+    GetAssignmentResponse(pairs)
+  }
+
+  def parseGetValueResponse: GetValueResponse = {
+    def parsePair: (Term, Term) = {
+      eat(Tokens.OParen())
+      val t1 = parseTerm
+      val t2 = parseTerm
+      eat(Tokens.CParen())
+      (t1, t2)
+    }
+
+    val pairs = parseMany(parsePair _)
+    GetValueResponse(pairs)
+  }
+
+  def parseGetOptionResponse: GetOptionResponse = {
+    GetOptionResponse(parseSExpr)
+  }
+
+  def parseGetProofResponse: GetProofResponse = {
+    GetProofResponse(parseSExpr)
+  }
+
+  def parseGetModelResponse: GetModelResponse = {
+    eat(Tokens.OParen())
+    eat(Tokens.SymbolLit("model"))
+    var funs: ListBuffer[DefineFun] = new ListBuffer
+    while(peekToken != Tokens.CParen())
+      funs.append(parseCommand.asInstanceOf[DefineFun])
+    eat(Tokens.CParen())
+    GetModelResponse(funs.toList)
+  }
+
+  def parseSExprResponse: SExprResponse = {
+    eat(Tokens.OParen())
+    var exprs = new ListBuffer[SExpr]
+    while(peekToken != Tokens.CParen())
+      exprs.append(parseSExpr)
+    eat(Tokens.CParen())
+    SExprResponse(SList(exprs.toList))
   }
 
   def parseInfoResponse: InfoResponse = {
@@ -249,6 +281,25 @@ class Parser(lexer: Lexer) {
   def parseGetInfoResponse: GetInfoResponse = {
     val responses = parseMany(parseInfoResponse _)
     GetInfoResponse(responses.head, responses.tail)
+  }
+
+  def parseCheckSatResponse: CheckSatResponse = {
+    nextToken match {
+      case Tokens.SymbolLit("sat") => CheckSatResponse(SatStatus)
+      case Tokens.SymbolLit("unsat") => CheckSatResponse(UnsatStatus)
+      case Tokens.SymbolLit("unknown") => CheckSatResponse(UnknownStatus)
+      case _ => sys.error("TODO")
+    }
+  }
+
+  def parseGetAssertionsResponse: GetAssertionsResponse = {
+    val terms = parseMany(parseTerm _)
+    GetAssertionsResponse(terms)
+  }
+
+  def parseGetUnsatCoreResponse: GetUnsatCoreResponse = {
+    val syms = parseMany(parseSymbol _)
+    GetUnsatCoreResponse(syms)
   }
 
   def parseInfoFlag: InfoFlag = {

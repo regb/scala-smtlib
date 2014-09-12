@@ -77,6 +77,13 @@ object CommandsResponses {
 
   case class GetValueResponse(valuationPairs: Seq[(Term, Term)]) extends CommandResponse
 
+  case class GetAssertionsResponse(assertions: Seq[Term]) extends CommandResponse
+
+  case class GetUnsatCoreResponse(symbols: Seq[SSymbol]) extends CommandResponse
+
+  case class GetAssignmentResponse(valuationPair: Seq[(SSymbol, Boolean)]) extends CommandResponse
+
+  case class GetProofResponse(proof: SExpr) extends CommandResponse
 
 
   case class SExprResponse(sexpr: SExpr) extends CommandResponse
