@@ -41,49 +41,32 @@ class IntsTests extends FunSuite {
       case _ => assert(false)
     }
 
-    //Parser.fromString("(concat #b101 #b01)").parseTerm match {
-    //  case Concat(
-    //        BitVectorLit(List(true, false, true)),
-    //        BitVectorLit(List(false, true))
-    //       ) => assert(true)
-    //  case _ => assert(false)
-    //}
-    //Parser.fromString("((_ extract 1 2) #b101)").parseTerm match {
-    //  case Extract(1, 2, BitVectorLit(List(true, false, true))) => assert(true)
-    //  case _ => assert(false)
-    //}
 
-    //Parser.fromString("(bvand #b101 #b011)").parseTerm match {
-    //  case And(
-    //        BitVectorLit(List(true, false, true)),
-    //        BitVectorLit(List(false, true, true))
-    //       ) => assert(true)
-    //  case _ => assert(false)
-    //}
-
-    //Parser.fromString("(bvor #b101 #b011)").parseTerm match {
-    //  case Or(
-    //        BitVectorLit(List(true, false, true)),
-    //        BitVectorLit(List(false, true, true))
-    //       ) => assert(true)
-    //  case _ => assert(false)
-    //}
-
-    //Parser.fromString("(bvadd #b101 #b011)").parseTerm match {
-    //  case Add(
-    //        BitVectorLit(List(true, false, true)),
-    //        BitVectorLit(List(false, true, true))
-    //       ) => assert(true)
-    //  case _ => assert(false)
-    //}
-
-    //Parser.fromString("(bvmul #b101 #b011)").parseTerm match {
-    //  case Mul(
-    //        BitVectorLit(List(true, false, true)),
-    //        BitVectorLit(List(false, true, true))
-    //       ) => assert(true)
-    //  case _ => assert(false)
-    //}
+    Parser.fromString("(- 13)").parseTerm match {
+      case Neg(NumeralLit(n)) => assert(n == 13)
+      case _ => assert(false)
+    }
+    Parser.fromString("(- 13 17)").parseTerm match {
+      case Sub(
+            NumeralLit(n1),
+            NumeralLit(n2)
+           ) => assert(n1 == 13 && n2 == 17)
+      case _ => assert(false)
+    }
+    Parser.fromString("(+ 13 17)").parseTerm match {
+      case Add(
+            NumeralLit(n1),
+            NumeralLit(n2)
+           ) => assert(n1 == 13 && n2 == 17)
+      case _ => assert(false)
+    }
+    Parser.fromString("(* 13 17)").parseTerm match {
+      case Mul(
+            NumeralLit(n1),
+            NumeralLit(n2)
+           ) => assert(n1 == 13 && n2 == 17)
+      case _ => assert(false)
+    }
 
   }
 }
