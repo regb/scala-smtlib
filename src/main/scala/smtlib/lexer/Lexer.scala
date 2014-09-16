@@ -61,7 +61,7 @@ class Lexer(reader: java.io.Reader) {
   }
 
   //peek assumes that there should be something to read, encountering eof
-  //should return -1, but at least the call should not be blocking
+  //should return -1, and the call should not be blocking
   private def peek: Int = _futureChar match {
     case Some(i) => i
     case None => {

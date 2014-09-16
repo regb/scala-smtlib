@@ -336,6 +336,12 @@ deF"""))
     intercept[Lexer.UnexpectedEOFException] {
       lexer1.nextToken
     }
+
+    val reader2 = new StringReader(""" "abcd \""") //EOF while reading a string
+    val lexer2 = new Lexer(reader2)
+    intercept[Lexer.UnexpectedEOFException] {
+      lexer2.nextToken
+    }
   }
 
 }
