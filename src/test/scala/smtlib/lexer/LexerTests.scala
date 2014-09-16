@@ -333,15 +333,17 @@ deF"""))
   test("Unexpected EOF") {
     val reader1 = new StringReader(""" "abcd """) //EOF while reading a string
     val lexer1 = new Lexer(reader1)
-    intercept[Lexer.UnexpectedEOFException] {
+    val eofException1 = intercept[Lexer.UnexpectedEOFException] {
       lexer1.nextToken
     }
+    assert(eofException1.position === Position(1, 7))
 
     val reader2 = new StringReader(""" "abcd \""") //EOF while reading a string
     val lexer2 = new Lexer(reader2)
-    intercept[Lexer.UnexpectedEOFException] {
+    val eofException2 = intercept[Lexer.UnexpectedEOFException] {
       lexer2.nextToken
     }
+    assert(eofException2.position === Position(1, 8))
   }
 
 }

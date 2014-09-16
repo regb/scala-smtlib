@@ -33,7 +33,7 @@ class Lexer(reader: java.io.Reader) {
   private def nextChar: Char = {
     _futureChar match {
       case Some(i) => {
-        if(_futureChar == -1)
+        if(i == -1)
           throw new UnexpectedEOFException(Position(_currentLine, _currentCol))
         _currentChar = i
         _futureChar = None
@@ -277,9 +277,9 @@ class Lexer(reader: java.io.Reader) {
 
 object Lexer {
 
-  class UnexpectedCharException(char: Char, position: Position, msg: String) extends
+  class UnexpectedCharException(val char: Char, val position: Position, val msg: String) extends
     Exception("Encountered unexpected character: '" + char + "' at " + position + ": " + msg)
 
-  class UnexpectedEOFException(position: Position) extends Exception
+  class UnexpectedEOFException(val position: Position) extends Exception
 
 }
