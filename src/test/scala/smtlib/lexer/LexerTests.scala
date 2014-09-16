@@ -330,4 +330,12 @@ deF"""))
     assert(lexer2.nextToken === CParen())
   }
 
+  test("Unexpected EOF") {
+    val reader1 = new StringReader(""" "abcd """) //EOF while reading a string
+    val lexer1 = new Lexer(reader1)
+    intercept[Lexer.UnexpectedEOFException] {
+      lexer1.nextToken
+    }
+  }
+
 }
