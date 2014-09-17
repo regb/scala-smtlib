@@ -166,7 +166,7 @@ class Parser(lexer: Lexer) {
       case Tokens.Exit() => Exit()
 
       case t => {
-        throw new UnknownCommandException("command: " + t)
+        throw new UnknownCommandException(t)
       }
     }
     eat(Tokens.CParen())
@@ -229,11 +229,26 @@ class Parser(lexer: Lexer) {
   def parseGetModelResponse: GetModelResponse = {
     eat(Tokens.OParen())
     eat(Tokens.SymbolLit("model"))
-    var funs: ListBuffer[DefineFun] = new ListBuffer
-    while(peekToken != Tokens.CParen())
-      funs.append(parseCommand.asInstanceOf[DefineFun])
+    var exprs: ListBuffer[SExpr] = new ListBuffer
+    while(peekToken != Tokens.CParen()) {
+      try {
+        exprs.append(parseCommand)
+      } catch {
+        case ex: UnknownCommandException => {
+          ex.commandName match { //recover for exceptions case in get-model
+            case Tokens.ForAll() =>
+              val vars = parseMany(parseSortedVar _)
+              val term = parseTerm
+              eat(Tokens.CParen())
+              exprs.append(ForAll(vars.head, vars.tail, term))
+            case _ =>
+              throw ex
+          }
+        }
+      }
+    }
     eat(Tokens.CParen())
-    GetModelResponse(funs.toList)
+    GetModelResponse(exprs.toList)
   }
 
   def parseSExprResponse: SExprResponse = {
@@ -654,7 +669,7 @@ class Parser(lexer: Lexer) {
 
 object Parser {
 
-  class UnknownCommandException(msg: String) extends Exception(msg)
+  class UnknownCommandException(val commandName: Token) extends Exception("Unknown command name token: " + commandName)
   class UnexpectedTokenException(expected: Token, found: Token) 
     extends Exception("Unexpected token at position: " + found.getPos + ". Expected: " + expected + ". Found: " + found)
 

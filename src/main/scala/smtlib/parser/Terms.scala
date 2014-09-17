@@ -59,7 +59,7 @@ object Terms {
   case class VarBinding(name: SSymbol, term: Term)
 
 
-  sealed trait SExpr extends Positioned
+  trait SExpr extends Positioned
 
   case class SList(sexprs: List[SExpr]) extends SExpr
   object SList {

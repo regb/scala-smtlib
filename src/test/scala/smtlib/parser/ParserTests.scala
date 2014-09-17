@@ -240,6 +240,19 @@ class ParserTests extends FunSuite with Timeouts {
       GetModelResponse(List(
         DefineFun("z", Seq(), Sort("Int"), SNumeral(0))))
     )
+
+    assert(Parser.fromString(
+"""(model 
+  (define-fun z () Int 0)
+  (declare-fun a () A)
+  (forall ((x A)) x)
+)""").parseGetModelResponse === 
+      GetModelResponse(List(
+        DefineFun("z", Seq(), Sort("Int"), SNumeral(0)),
+        DeclareFun("a", Seq(), Sort("A")),
+        ForAll(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
+      ))
+    )
   }
 
   test("Unknown command") {

@@ -19,15 +19,15 @@ object ArraysEx {
 
   object Select {
     
-    def apply(t1: Term, t2: Term): Term = 
-      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("select"))), Seq(t1, t2))
+    def apply(array: Term, index: Term): Term = 
+      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("select"))), Seq(array, index))
 
     def unapply(term: Term): Option[(Term, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
           Identifier(SSymbol("select"), Seq()),
           None
-        ), Seq(t1, t2)) => Some((t1, t2))
+        ), Seq(array, index)) => Some((array, index))
       case _ => None
     }
 
@@ -35,15 +35,15 @@ object ArraysEx {
 
   object Store {
     
-    def apply(t1: Term, t2: Term, t3: Term): Term = 
-      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("store"))), Seq(t1, t2, t3))
+    def apply(array: Term, index: Term, value: Term): Term = 
+      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("store"))), Seq(array, index, value))
 
     def unapply(term: Term): Option[(Term, Term, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
           Identifier(SSymbol("term"), Seq()),
           None
-        ), Seq(t1, t2, t3)) => Some((t1, t2, t3))
+        ), Seq(array, index, value)) => Some((array, index, value))
       case _ => None
     }
 

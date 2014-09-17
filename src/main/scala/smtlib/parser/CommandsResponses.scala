@@ -91,7 +91,7 @@ object CommandsResponses {
   sealed trait NonStandardResponse extends CommandResponse
 
   //Z3 get-model
-  case class GetModelResponse(model: List[DefineFun]) extends NonStandardResponse
+  case class GetModelResponse(model: List[SExpr]) extends NonStandardResponse
 
 
 }

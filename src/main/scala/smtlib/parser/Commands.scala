@@ -6,7 +6,7 @@ import common._
 
 object Commands {
 
-  sealed abstract class Command extends Positioned {
+  sealed abstract class Command extends Positioned with SExpr {
     override def toString: String = printer.PrettyPrinter.toString(this)
   }
 
