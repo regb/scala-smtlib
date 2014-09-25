@@ -160,8 +160,9 @@ object PrettyPrinter {
         writer.write(name.name)
         constructors.foreach{ 
           case Constructor(sym, Seq()) => {
-            writer.write(" ")
+            writer.write(" (")
             writer.write(sym.name)
+            writer.write(")")
           }
           case Constructor(sym, fields) => {
             writer.write(" (")
