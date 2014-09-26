@@ -43,6 +43,8 @@ class Hexadecimal private(val rep: String) {
 
   override def hashCode: Int = rep.hashCode
 
+  //TODO: take subpart of hexa (trunc from 32 bits to 8 bits for example)
+
 }
 
 object Hexadecimal {
@@ -63,6 +65,7 @@ object Hexadecimal {
   /*
    * return a 32-bits hexadecimal integer
    */
+  //TODO: negative n as well, just mapping 32 bits to hexadecimal
   def fromInt(n: Int): Option[Hexadecimal] = {
     if(n < 0) None else {
 

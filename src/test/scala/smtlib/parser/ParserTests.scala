@@ -29,13 +29,15 @@ class ParserTests extends FunSuite with Timeouts {
     cmd
   }
 
-  //private def parseResponse(str: String): CommandResponse = {
-  //  val reader = new StringReader(str)
-  //  val lexer = new Lexer(reader)
-  //  val parser = new Parser(lexer)
-  //  parser.parseResponse
-  //}
-  
+
+  def parseTerm(str: String): Term = {
+    val reader = new StringReader(str)
+    val lexer = new Lexer(reader)
+    val parser = new Parser(lexer)
+    val term = parser.parseTerm
+    term
+  }
+
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
   private implicit def strToKeyword(str: String): SKeyword = SKeyword(str)
@@ -114,14 +116,6 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseId("(_ a sym)") === ExtendedIdentifier("a", SSymbol("sym")))
     assert(parseId("(_ map f)") === ExtendedIdentifier("map", SSymbol("f")))
 
-  }
-
-  def parseTerm(str: String): Term = {
-    val reader = new StringReader(str)
-    val lexer = new Lexer(reader)
-    val parser = new Parser(lexer)
-    val term = parser.parseTerm
-    term
   }
 
   test("Parsing simple Terms") {

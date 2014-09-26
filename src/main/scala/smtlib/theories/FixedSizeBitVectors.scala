@@ -27,6 +27,7 @@ object FixedSizeBitVectors {
 
     def apply(content: Hexadecimal): Term = SHexadecimal(content)
     
+    //TODO: going from List[Boolean] to Integer
     def unapply(term: Term): Option[List[Boolean]] = term match {
       case SBinary(content) => Some(content)
       case SHexadecimal(hexa) => Some(hexa.toBinary)
