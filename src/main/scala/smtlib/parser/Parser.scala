@@ -567,6 +567,7 @@ class Parser(lexer: Lexer) {
     eat(Tokens.As())
     val id = parseIdentifier
     val sort = parseSort
+    eat(Tokens.CParen())
     QualifiedIdentifier(id, Some(sort))
   }
 

@@ -26,15 +26,17 @@ class ParserTests extends FunSuite with Timeouts {
     val lexer = new Lexer(reader)
     val parser = new Parser(lexer)
     val cmd = parser.parseCommand
+    assert(lexer.nextToken == null)
     cmd
   }
 
 
-  def parseTerm(str: String): Term = {
+  def parseUniqueTerm(str: String): Term = {
     val reader = new StringReader(str)
     val lexer = new Lexer(reader)
     val parser = new Parser(lexer)
     val term = parser.parseTerm
+    assert(lexer.nextToken == null)
     term
   }
 
@@ -120,40 +122,40 @@ class ParserTests extends FunSuite with Timeouts {
 
   test("Parsing simple Terms") {
 
-    assert(parseTerm("42") === SNumeral(42))
-    assert(parseTerm("42.12") === SDecimal(42.12))
-    assert(parseTerm("#xF") === SHexadecimal(Hexadecimal.fromString("F").get))
-    assert(parseTerm("#b1") === SBinary(List(true)))
-    assert(parseTerm("abc") === QualifiedIdentifier("abc"))
-    assert(parseTerm("(as abc A)") === QualifiedIdentifier("abc", Some(Sort("A"))))
-    assert(parseTerm("(_ abc 42)") === QualifiedIdentifier(Identifier("abc", Seq(42))))
-    assert(parseTerm("(as (_ abc 42) A)") === QualifiedIdentifier(Identifier("abc", Seq(42)), Some(Sort("A"))))
-    assert(parseTerm("(f a b)") === 
+    assert(parseUniqueTerm("42") === SNumeral(42))
+    assert(parseUniqueTerm("42.12") === SDecimal(42.12))
+    assert(parseUniqueTerm("#xF") === SHexadecimal(Hexadecimal.fromString("F").get))
+    assert(parseUniqueTerm("#b1") === SBinary(List(true)))
+    assert(parseUniqueTerm("abc") === QualifiedIdentifier("abc"))
+    assert(parseUniqueTerm("(as abc A)") === QualifiedIdentifier("abc", Some(Sort("A"))))
+    assert(parseUniqueTerm("(_ abc 42)") === QualifiedIdentifier(Identifier("abc", Seq(42))))
+    assert(parseUniqueTerm("(as (_ abc 42) A)") === QualifiedIdentifier(Identifier("abc", Seq(42)), Some(Sort("A"))))
+    assert(parseUniqueTerm("(f a b)") === 
            FunctionApplication(
             QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
-    assert(parseTerm("(let ((a x)) a)") ===
+    assert(parseUniqueTerm("(let ((a x)) a)") ===
            Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))
 
-    assert(parseTerm("(forall ((a A)) a)") ===
+    assert(parseUniqueTerm("(forall ((a A)) a)") ===
            ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
           )
-    assert(parseTerm("(exists ((a A)) a)") ===
+    assert(parseUniqueTerm("(exists ((a A)) a)") ===
            Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
           )
-    assert(parseTerm("(! a :note abcd)") ===
+    assert(parseUniqueTerm("(! a :note abcd)") ===
            AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq())
           )
 
   }
 
   test("Parsing complicated terms") {
-    assert(parseTerm("((_ f 1) a b)") === 
+    assert(parseUniqueTerm("((_ f 1) a b)") === 
            FunctionApplication(
             QualifiedIdentifier(Identifier("f", Seq(1))),
             Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
 
     assert(
-      parseTerm("(let ((x 42)) (f x a))") ===
+      parseUniqueTerm("(let ((x 42)) (f x a))") ===
       Let(VarBinding("x", SNumeral(42)),
           Seq(),
           FunctionApplication(
@@ -161,7 +163,7 @@ class ParserTests extends FunSuite with Timeouts {
             Seq(QualifiedIdentifier("x"), QualifiedIdentifier("a")))))
 
     assert(
-      parseTerm("(=> b (= e (as emptyset (Set Int))))") ===
+      parseUniqueTerm("(=> b (= e (as emptyset (Set Int))))") ===
       FunctionApplication(QualifiedIdentifier("=>"), Seq(
         QualifiedIdentifier("b"),
         FunctionApplication(QualifiedIdentifier("="), Seq(
