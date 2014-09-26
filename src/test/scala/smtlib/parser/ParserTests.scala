@@ -165,6 +165,17 @@ class ParserTests extends FunSuite with Timeouts {
           FunctionApplication(
             QualifiedIdentifier("f"), 
             Seq(QualifiedIdentifier("x"), QualifiedIdentifier("a")))))
+
+    assert(
+      parseTerm("(=> b (= e (as emptyset (Set Int))))") ===
+      FunctionApplication(QualifiedIdentifier("=>"), Seq(
+        QualifiedIdentifier("b"),
+        FunctionApplication(QualifiedIdentifier("="), Seq(
+          QualifiedIdentifier("e"),
+          QualifiedIdentifier("emptyset", Some(Sort("Set", Seq(Sort("Int")))))
+        ))
+      ))
+    )
   }
 
   test("Parsing single commands") {
