@@ -316,6 +316,7 @@ deF"""))
     assert(lexUniqueToken("set-logic") === SetLogic())
     assert(lexUniqueToken("set-info") === SetInfo())
     assert(lexUniqueToken("set-option") === SetOption())
+    assert(lexUniqueToken("declare-datatypes") === DeclareDatatypes())
   }
 
   test("Parentheses ending token") {

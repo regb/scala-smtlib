@@ -198,6 +198,18 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(get-info :authors)") === GetInfo(AuthorsInfoFlag))
 
     assert(parseUniqueCmd("(exit)") === Exit())
+
+    assert(parseUniqueCmd(
+      "(declare-datatypes () ( (A (A1 (a1 Int) (a2 A)) (A2)) ))") ===
+      DeclareDatatypes(Seq(
+        (SSymbol("A"), Seq(Constructor("A1", 
+                            Seq((SSymbol("a1"), Sort("Int")), (SSymbol("a2"), Sort("A")))),
+                           Constructor("A2", Seq())
+                          ))
+      ))
+    )
+                        
+
   }
 
   test("Parsing set-option command") {

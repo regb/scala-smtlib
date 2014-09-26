@@ -270,6 +270,8 @@ class Lexer(reader: java.io.Reader) {
     case "set-info" => Some(SetInfo())
     case "set-option" => Some(SetOption())
 
+    case "declare-datatypes" => Some(DeclareDatatypes())
+
     case _ => None
   }
 

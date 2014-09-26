@@ -66,10 +66,6 @@ class Parser(lexer: Lexer) {
   }
 
 
-  def parse: Script = {
-    ???
-  }
-
   def parseCommand: Command = {
     val head = nextToken
     check(head, Tokens.OParen())
@@ -165,6 +161,15 @@ class Parser(lexer: Lexer) {
 
       case Tokens.Exit() => Exit()
 
+      case Tokens.DeclareDatatypes() => {
+        eat(Tokens.OParen())
+        eat(Tokens.CParen())
+
+        val datatypes = parseMany(parseDatatypes _)
+
+        DeclareDatatypes(datatypes)
+      }
+
       case t => {
         throw new UnknownCommandException(t)
       }
@@ -172,6 +177,34 @@ class Parser(lexer: Lexer) {
     eat(Tokens.CParen())
 
     cmd.setPos(head)
+  }
+
+  def parseDatatypes: (SSymbol, Seq[Constructor]) = {
+    eat(Tokens.OParen())
+    val name = parseSymbol
+    var constructors = new ListBuffer[Constructor]
+    while(peekToken != Tokens.CParen()) {
+      constructors.append(parseConstructor)
+    }
+    eat(Tokens.CParen())
+    (name, constructors)
+  }
+
+  def parseConstructor: Constructor = {
+    eat(Tokens.OParen())
+    val name = parseSymbol
+
+    var fields = new ListBuffer[(SSymbol, Sort)]
+    while(peekToken != Tokens.CParen()) {
+      eat(Tokens.OParen())
+      val fieldName = parseSymbol
+      val fieldSort = parseSort
+      eat(Tokens.CParen())
+      fields.append((fieldName, fieldSort))
+    }
+    eat(Tokens.CParen())
+
+    Constructor(name, fields.toList)
   }
 
   def parseGenResponse: GenResponse = {
