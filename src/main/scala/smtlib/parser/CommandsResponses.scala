@@ -21,55 +21,29 @@ object CommandsResponses {
   case object UnknownStatus extends Status
 
   sealed trait ErrorBehaviour
-  case object ImmediateExitErrorBehaviour extends ErrorBehaviour {
-    override def toString = "immediate-exit"
-  }
-  case object ContinueExecutionErrorBehaviour extends ErrorBehaviour {
-    override def toString = "continue-execution"
-  }
+  case object ImmediateExitErrorBehaviour extends ErrorBehaviour
+  case object ContinueExecutionErrorBehaviour extends ErrorBehaviour
 
   sealed trait ReasonUnknown
-  case object TimeoutReasonUnknown extends ReasonUnknown {
-    override def toString = "timeout"
-  }
-  case object MemoutReasonUnknown extends ReasonUnknown {
-    override def toString = "memout"
-  }
-  case object IncompleteReasonUnknown extends ReasonUnknown {
-    override def toString = "incomplete"
-  }
+  case object TimeoutReasonUnknown extends ReasonUnknown
+  case object MemoutReasonUnknown extends ReasonUnknown
+  case object IncompleteReasonUnknown extends ReasonUnknown
 
 
-  case class CheckSatResponse(status: Status) extends CommandResponse {
-    override def toString = status.toString
-  }
+  case class CheckSatResponse(status: Status) extends CommandResponse
 
-  case class GetInfoResponse(info: InfoResponse, infos: Seq[InfoResponse]) extends CommandResponse {
-    override def toString = (info +: infos).mkString("(", " ", ")")
-  }
+  case class GetInfoResponse(info: InfoResponse, infos: Seq[InfoResponse]) extends CommandResponse
   sealed trait InfoResponse
-  case class ErrorBehaviourInfoResponse(errorBehaviour: ErrorBehaviour) extends InfoResponse {
-    override def toString = ":error-behaviour " + errorBehaviour.toString
-  }
-  case class NameInfoResponse(name: String) extends InfoResponse {
-    override def toString = ":name \"%s\"".format(name)
-  }
-  case class AuthorsInfoResponse(authors: String) extends InfoResponse {
-    override def toString = ":authors \"%s\"".format(authors)
-  }
-  case class VersionInfoResponse(version: String) extends InfoResponse {
-    override def toString = ":version \"%s\"".format(version)
-  }
-  case class ReasonUnkownionInfoResponse(reason: ReasonUnknown) extends InfoResponse {
-    override def toString = ":reason-unknown " + reason.toString
-  }
+  case class ErrorBehaviourInfoResponse(errorBehaviour: ErrorBehaviour) extends InfoResponse
+  case class NameInfoResponse(name: String) extends InfoResponse
+  case class AuthorsInfoResponse(authors: String) extends InfoResponse
+  case class VersionInfoResponse(version: String) extends InfoResponse
+  case class ReasonUnkownionInfoResponse(reason: ReasonUnknown) extends InfoResponse
   //as far as I can tell, that one is not in the specification, although there is a corresponding get-info
   //case class StatusInfoResponse(status: Status) extends InfoResponse {
   //  override def toString = ":status " + status.toString
   //}
-  case class AttributeInfoResponse(attribute: Attribute) extends InfoResponse {
-    override def toString = attribute.toString
-  }
+  case class AttributeInfoResponse(attribute: Attribute) extends InfoResponse
 
   //TODO: attributeValue trait more precise than SExpr
   case class GetOptionResponse(attributeValue: SExpr) extends CommandResponse

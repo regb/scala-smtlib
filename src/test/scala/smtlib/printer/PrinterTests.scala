@@ -4,6 +4,7 @@ package printer
 import lexer.Lexer
 import parser.Terms._
 import parser.Commands._
+import parser.CommandsResponses._
 import parser.Parser
 
 import common._
@@ -59,6 +60,18 @@ class PrinterTests extends FunSuite {
     assert(directPrint === printAgain)
     assert(cmd === parsedAgain)
   }
+
+  private def check[A](res: A, printer: (A) => String, parser: (String) => A): Unit = {
+
+    val directPrint: String = printer(res)
+
+    val parsedAgain: A = parser(directPrint)
+    val printAgain: String = printer(parsedAgain)
+
+    assert(directPrint === printAgain)
+    assert(res === parsedAgain)
+  }
+
 
 
   test("Printing simple Terms") {
@@ -119,6 +132,37 @@ class PrinterTests extends FunSuite {
     checkCommand(GetInfo(AuthorsInfoFlag))
 
     checkCommand(Exit())
+  }
+
+
+  test("Printing Commands Reponses") {
+
+    def printGenRes(res: GenResponse): String = PrettyPrinter.toString(res) 
+    def parseGenRes(in: String): GenResponse = Parser.fromString(in).parseGenResponse
+    check(Success, printGenRes, parseGenRes)
+    check(Unsupported, printGenRes, parseGenRes)
+    check(Error("symbol missing"), printGenRes, parseGenRes)
+
+    def printGetAssignRes(res: GetAssignmentResponse): String = PrettyPrinter.toString(res)
+    def parseGetAssignRes(in: String): GetAssignmentResponse = Parser.fromString(in).parseGetAssignmentResponse
+    //TODO: some tests with get-assignment
+
+    def printCheckSat(res: CheckSatResponse): String = PrettyPrinter.toString(res) 
+    def parseCheckSat(in: String): CheckSatResponse = Parser.fromString(in).parseCheckSatResponse
+    check(CheckSatResponse(SatStatus), printCheckSat, parseCheckSat)
+    check(CheckSatResponse(UnsatStatus), printCheckSat, parseCheckSat)
+    check(CheckSatResponse(UnknownStatus), printCheckSat, parseCheckSat)
+
+    def printGetValue(res: GetValueResponse): String = PrettyPrinter.toString(res)
+    def parseGetValue(in: String): GetValueResponse = Parser.fromString(in).parseGetValueResponse
+
+    check(GetValueResponse(Seq( 
+           (SSymbol("a"), SNumeral(42)) 
+          )), printGetValue, parseGetValue)
+    check(GetValueResponse(Seq( 
+           (SSymbol("a"), SNumeral(42)), 
+           (SSymbol("b"), SNumeral(12)) 
+         )), printGetValue, parseGetValue)
   }
 
 

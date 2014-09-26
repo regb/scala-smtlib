@@ -390,7 +390,9 @@ object PrettyPrinter {
       writer.write("unsupported\n")
     case Error(msg) =>
       writer.write("(error ")
+      writer.write('"')
       writer.write(msg)
+      writer.write('"')
       writer.write(")\n")
     case CheckSatResponse(SatStatus) =>
       writer.write("sat\n")
@@ -398,6 +400,16 @@ object PrettyPrinter {
       writer.write("unsat\n")
     case CheckSatResponse(UnknownStatus) =>
       writer.write("unknown\n")
+
+    case GetValueResponse(valuationPairs) =>
+      def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
+        writer.write('(')
+        printTerm(pair._1, writer)
+        writer.write(' ')
+        printTerm(pair._2, writer)
+        writer.write(')')
+      }
+      printNary(writer, valuationPairs, printValuationPair, "(", " ", ")")
     case _ => ???
   }
 
