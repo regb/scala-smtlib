@@ -66,7 +66,7 @@ class Parser(lexer: Lexer) {
   }
 
 
-  def parseCommand: Command = {
+  def parseCommand: Command = if(peekToken == null) null else {
     val head = nextToken
     check(head, Tokens.OParen())
 
