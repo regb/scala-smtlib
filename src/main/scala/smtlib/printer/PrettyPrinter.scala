@@ -205,9 +205,13 @@ object PrettyPrinter {
       printTerm(t, writer)
       writer.write(")")
     case FunctionApplication(fun, ts) =>
-      writer.write("(")
-      printQualifiedId(fun, writer)
-      printNary(writer, ts, printTerm _, " ", " ", ")")
+      if (ts.nonEmpty) {
+        writer.write("(")
+        printQualifiedId(fun, writer)
+        printNary(writer, ts, printTerm _, " ", " ", ")")
+      } else {
+        printQualifiedId(fun, writer)
+      }
     case AnnotatedTerm(term, attr, attrs) => {
       writer.write("(! ")
       printTerm(term, writer)
