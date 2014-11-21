@@ -623,9 +623,15 @@ class Parser(lexer: Lexer) {
           val id = parseQualifiedIdentifier 
 
           val terms = new ListBuffer[Term]
+
+          if(peekToken == Tokens.CParen()) {
+            throw new UnexpectedTokenException(null, peekToken)
+          }
+
           while(peekToken != Tokens.CParen())
             terms.append(parseTerm)
           eat(Tokens.CParen())
+
           FunctionApplication(id, terms.toList)
       }
     } else {

@@ -174,6 +174,16 @@ class ParserTests extends FunSuite with Timeouts {
     )
   }
 
+  test("Parsing illegal terms") {
+    //function application with no argument is illegal
+    intercept[UnexpectedTokenException] {
+      parseUniqueTerm("(f)")
+    }
+    intercept[UnexpectedTokenException] {
+      parseUniqueTerm("(abcd)")
+    }
+  }
+
   test("Parsing single commands") {
 
     assert(parseUniqueCmd("(set-logic QF_UF)") === SetLogic(QF_UF))

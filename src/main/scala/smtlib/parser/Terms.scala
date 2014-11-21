@@ -85,7 +85,11 @@ object Terms {
   }
 
   case class AnnotatedTerm(term: Term, attribute: Attribute, attributes: Seq[Attribute]) extends Term
-  case class FunctionApplication(fun: QualifiedIdentifier, terms: Seq[Term]) extends Term //TODO: should terms be at leat of length 1 ?
+  case class FunctionApplication(fun: QualifiedIdentifier, terms: Seq[Term]) extends Term {
+    //a function application with no argument is a qualified identifier
+    require(!terms.isEmpty)
+  }
+
 
   trait Constant extends Term
 
