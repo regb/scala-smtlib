@@ -51,7 +51,12 @@ object PrettyPrinter {
     output.toString
   }
 
-  def printScript(script: Script, writer: Writer): Unit = ???
+  def printScript(script: Script, writer: Writer): Unit = {
+    script.commands.foreach(cmd => {
+      printCommand(cmd, writer)
+      writer.write("\n")
+    })
+  }
 
   def printCommand(command: Command, writer: Writer): Unit = command match {
     case SetLogic(logic) => {
@@ -230,7 +235,7 @@ object PrettyPrinter {
     case SDecimal(value) => writer.write(value.toString)
     case SString(value) =>
       writer.write("\"")
-      writer.write(value) //TODO: insert \"
+      writer.write(value.flatMap(c => if(c == '"') "\\\"" else List(c)))
       writer.write("\"")
   }
 

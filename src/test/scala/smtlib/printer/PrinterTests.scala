@@ -82,6 +82,8 @@ class PrinterTests extends FunSuite {
     checkTerm(SHexadecimal(Hexadecimal.fromString("123abcDeF").get))
     checkTerm(SBinary(List(true)))
     checkTerm(SBinary(List(true, false, true)))
+    checkTerm(SString("abcd"))
+    checkTerm(SString("hello-world"))
     checkTerm(QualifiedIdentifier("abc"))
     checkTerm(FunctionApplication(
             QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
@@ -91,6 +93,11 @@ class PrinterTests extends FunSuite {
     checkTerm(Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
     checkTerm(AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq()))
 
+  }
+
+  test("Printing tricky terms") {
+    checkTerm(SString("abc\"def"))
+    checkTerm(SString("hello \"World\""))
   }
 
   test("Printing composed Terms") {
