@@ -31,13 +31,13 @@ You may want to use Scala SMT-LIB if:
 * You need to output a complex SMT-LIB encoding of some mathematical problems. We got
   you covered: You can programatically build a set of expressions using the
   Scala SMT-LIB abstract syntax tree, and use the printer components to get
-  a valid SMT-LIB representation.
-* You need to query an external black-box SMT solver, but the task of setting up a proper
-  communication with this strange beast seems a bit too daunting? Scala SMT-LIB offers
-  an interpreter module that abstracts SMT-Solvers as interpreters for a sequence of
-  SMT-LIB commands. You can program your tool against this simple high-level API. Scala SMT-LIB
-  provides integration with Z3 and CVC4 out of the box, and you can add any other solver
-  by implementation a relatively thin interface.
+  a valid SMT-LIB representation to pass along to another tool.
+* You need to query an external black-box SMT solver, but the task of setting
+  up a proper communication with this strange beast seems a bit too daunting? 
+  Scala SMT-LIB offers a module that abstracts SMTLIB-compliant solvers. You can 
+  program your tool against this simple high-level API. Scala SMT-LIB provides 
+  integration with Z3 and CVC4 out of the box, and you can add support for 
+  any other solver by implementing a relatively thin interface.
    
 
 Setup
@@ -57,19 +57,16 @@ official documentation.
 Examples
 --------
 
-The parser can be constructed with a java.io.Reader, you could for example do
-the following:
+To get a parser instance, you need to provide a java.io.Reader and a lexer:
 
     val is = new java.io.FileReader(inputFile)
-    val parser = new smtlib.Parser(is)
+    val lexer = new smtlib.lexer.Lexer(is)
+    val parser = new smtlib.parser.Parser(lexer)
 
-The parser implements the `Iterator[Command]` and can thus be used in any
-interface that expects a `TraversableOnce` element. In particular, assuming an
-implicit solver that implements the Interpreter interface is in scope, you can
-do the following:
+The parser then provides a `parseCommand` functions that will consume the input
+until the end of the next command. It returns `null` when the end of file is
+reached.
 
-    import smtlib.Commands.Script
-    smtlib.Interpreter(Script(parser))
 
 API
 ---
@@ -77,13 +74,20 @@ API
 Please refer to the code ;) However, you could start with the Examples section
 above.
 
+Important files are /src/main/scala/smtlib/parser/Commands.scala and
+/src/main/scala/smtlib/parser/Terms.scala for the abstract syntax tree of SMT-LIB.
+The lexer directory provides low level parsing of tokens, then the parser provides
+the extraction of commands. The printer helps with printing out SMT-LIB standard.
+Finally the theories module provides tree builders to create theory-specific formulas.
+
+
 Development
 -----------
 
-The project is still evolving and the API will likely go through quite a few
+The project is still under development and the API will likely go through quite a few
 changes. It was originally part of [CafeSat](https://github.com/regb/scabolic)
 and has been made standalone in order for the
-[Leon](https://github.com/epfl-lara/leon) project to rely on it as well.
+[Leon](https://github.com/epfl-lara/leon) project to rely on it.
 Hopefully, it can be useful to other people as well.
 
 Road Map
