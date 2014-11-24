@@ -14,6 +14,7 @@ import java.io.StringReader
 import org.scalatest.FunSuite
 
 import scala.language.implicitConversions
+import scala.annotation.tailrec
 
 class PrinterTests extends FunSuite {
 
@@ -170,6 +171,20 @@ class PrinterTests extends FunSuite {
            (SSymbol("a"), SNumeral(42)), 
            (SSymbol("b"), SNumeral(12)) 
          )), printGetValue, parseGetValue)
+  }
+
+  test("Printing deep trees") {
+    @tailrec
+    def mkDeepTerm(n: Int, t: Term): Term = 
+      if(n == 0) t
+      else mkDeepTerm(n-1, Let(VarBinding("x", SString("some value")), Seq(), t))
+
+    val t1 = mkDeepTerm(1000, SString("base case"))
+    checkTerm(t1)
+
+    val t2 = mkDeepTerm(10000, SString("base case"))
+    checkTerm(t2)
+
   }
 
 
