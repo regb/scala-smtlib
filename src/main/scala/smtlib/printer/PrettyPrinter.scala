@@ -11,6 +11,11 @@ import java.io.BufferedWriter
 
 object PrettyPrinter {
 
+  private type Action = () => Unit
+
+  import scala.collection.mutable.ListBuffer
+  private var actions: ListBuffer[Action] = new ListBuffer
+
   def toString(script: Script): String = {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
@@ -28,9 +33,11 @@ object PrettyPrinter {
   }
 
   def toString(term: Term): String = {
+    actions = new ListBuffer[Action]
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printTerm(term, sWriter)
+    flushActions()
     sWriter.flush
     output.toString
   }
@@ -50,6 +57,16 @@ object PrettyPrinter {
     sWriter.flush
     output.toString
   }
+
+
+  def flushActions(): Unit = {
+    while(!actions.isEmpty) {
+      val l = actions.toList
+      actions = new ListBuffer[Action]
+      l.foreach(action => action())
+    }
+  }
+
 
   def printScript(script: Script, writer: Writer): Unit = {
     script.commands.foreach(cmd => {
@@ -192,40 +209,45 @@ object PrettyPrinter {
 
   def printTerm(term: Term, writer: Writer): Unit = term match {
     case Let(vb, vbs, t) =>
-      writer.write("(let (")
-      printVarBinding(vb, writer)
-      printNary(writer, vbs, printVarBinding _, "", " ", ") ")
-      printTerm(t, writer)
-      writer.write(")")
+      actions.append(() => writer.write("(let ("))
+      actions.append(() => printVarBinding(vb, writer))
+      actions.append(() => printNary(writer, vbs, printVarBinding _, "", " ", ") "))
+      actions.append(() => printTerm(t, writer))
+      actions.append(() => writer.write(")"))
+      
     case ForAll(sortedVar, sortedVars, t) =>
-      writer.write("(forall (")
-      printSortedVar(sortedVar, writer)
-      printNary(writer, sortedVars, printSortedVar _, "", " ", ") ")
-      printTerm(t, writer)
-      writer.write(")")
+      actions.append(() => writer.write("(forall ("))
+      actions.append(() => printSortedVar(sortedVar, writer))
+      actions.append(() => printNary(writer, sortedVars, printSortedVar _, "", " ", ") "))
+      actions.append(() => printTerm(t, writer))
+      actions.append(() => writer.write(")"))
+
     case Exists(sortedVar, sortedVars, t) =>
-      writer.write("(exists (")
-      printSortedVar(sortedVar, writer)
-      printNary(writer, sortedVars, printSortedVar _, "", " ", ") ")
-      printTerm(t, writer)
-      writer.write(")")
+      actions.append(() => writer.write("(exists ("))
+      actions.append(() => printSortedVar(sortedVar, writer))
+      actions.append(() => printNary(writer, sortedVars, printSortedVar _, "", " ", ") "))
+      actions.append(() => printTerm(t, writer))
+      actions.append(() => writer.write(")"))
+
     case FunctionApplication(fun, ts) =>
       if (ts.nonEmpty) {
-        writer.write("(")
-        printQualifiedId(fun, writer)
-        printNary(writer, ts, printTerm _, " ", " ", ")")
+        actions.append(() => writer.write("("))
+        actions.append(() => printQualifiedId(fun, writer))
+        actions.append(() => printNary(writer, ts, printTerm _, " ", " ", ")"))
       } else {
-        printQualifiedId(fun, writer)
+        actions.append(() => printQualifiedId(fun, writer))
       }
+
     case AnnotatedTerm(term, attr, attrs) => {
-      writer.write("(! ")
-      printTerm(term, writer)
-      printNary(writer, attr +: attrs, printAttribute _, " ", " ", ")")
+      actions.append(() => writer.write("(! "))
+      actions.append(() => printTerm(term, writer))
+      actions.append(() => printNary(writer, attr +: attrs, printAttribute _, " ", " ", ")"))
     }
     case id@QualifiedIdentifier(_, _) => 
-      printQualifiedId(id, writer)
+      actions.append(() => printQualifiedId(id, writer))
 
-    case (c: Constant) => printConstant(c, writer)
+    case (c: Constant) => 
+      actions.append(() => printConstant(c, writer))
   }
 
   def printConstant(c: Constant, writer: Writer): Unit = c match {
@@ -265,11 +287,11 @@ object PrettyPrinter {
   }
 
   def printVarBinding(vb: VarBinding, writer: Writer): Unit = {
-    writer.write('(')
-    writer.write(vb.name.name)
-    writer.write(' ')
-    printTerm(vb.term, writer)
-    writer.write(')')
+    actions.append(() => writer.write('('))
+    actions.append(() => writer.write(vb.name.name))
+    actions.append(() => writer.write(' '))
+    actions.append(() => printTerm(vb.term, writer))
+    actions.append(() => writer.write(')'))
   }
 
   def printSortedVar(sv: SortedVar, writer: Writer): Unit = {

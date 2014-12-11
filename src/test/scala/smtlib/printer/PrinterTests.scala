@@ -179,11 +179,17 @@ class PrinterTests extends FunSuite {
       if(n == 0) t
       else mkDeepTerm(n-1, Let(VarBinding("x", SString("some value")), Seq(), t))
 
-    val t1 = mkDeepTerm(1000, SString("base case"))
-    checkTerm(t1)
+    val t0 = mkDeepTerm(5, SString("base case"))
+    println(PrettyPrinter.toString(t0))
 
-    val t2 = mkDeepTerm(10000, SString("base case"))
-    checkTerm(t2)
+    //val t1 = mkDeepTerm(1000, SString("base case"))
+    //checkTerm(t1)
+
+    //val t2 = mkDeepTerm(5000, SString("base case"))
+    //checkTerm(t2)
+
+    val t3 = mkDeepTerm(10000, SString("base case"))
+    checkTerm(t3)
 
   }
 
