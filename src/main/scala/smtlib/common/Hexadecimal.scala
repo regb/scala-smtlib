@@ -1,20 +1,28 @@
 package smtlib
 package common
 
-class Hexadecimal private(val rep: String) {
+class Hexadecimal private(val repr: String) {
   //should be normalized to upper cases
-  require(rep.forall(c =>
+  require(repr.forall(c =>
     (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')
   ))
 
+  /* 
+   * Returns the Int value represented by this hexadecimal number.
+   * Assumes the hexadecimal represents 32 bits, by padding 0 in
+   * front if necessary. It can return negative numbers.
+   */
   def toInt: Int = {
-    rep.foldLeft(0)((acc, c) => {
+    val padding = repr.reverse.drop(16)
+    require(padding.forall(c => c == '0'))
+
+    repr.foldLeft(0)((acc, c) => {
       acc*16 + c.asDigit//asDigit works for 'A', 'F', ...
     })
   }
 
   def toBinary: List[Boolean] = {
-    rep.flatMap{
+    repr.flatMap{
       case '0' => List(false, false, false, false)
       case '1' => List(false, false, false, true )
       case '2' => List(false, false, true , false)
@@ -34,14 +42,14 @@ class Hexadecimal private(val rep: String) {
     }.toList
   }
 
-  override def toString: String = "#x" + rep
+  override def toString: String = "#x" + repr
 
   override def equals(that: Any): Boolean = (that != null) && (that match {
-    case (h: Hexadecimal) => rep == h.rep
+    case (h: Hexadecimal) => repr == h.repr
     case _ => false
   })
 
-  override def hashCode: Int = rep.hashCode
+  override def hashCode: Int = repr.hashCode
 
   //TODO: take subpart of hexa (trunc from 32 bits to 8 bits for example)
 
@@ -51,7 +59,7 @@ object Hexadecimal {
 
   def fromString(str: String): Option[Hexadecimal] = {
     var error = false
-    val rep = str.map(c => {
+    val repr = str.map(c => {
       if(isDigit(c)) 
         c.toUpper
       else {
@@ -59,7 +67,7 @@ object Hexadecimal {
         c
       }
     })
-    if(error) None else Some(new Hexadecimal(rep))
+    if(error) None else Some(new Hexadecimal(repr))
   }
 
   /*
@@ -71,16 +79,16 @@ object Hexadecimal {
 
       var i = 0
       var rest = n
-      var rep = ""
+      var repr = ""
 
       while(i < 8) {
         val end = rest & 15
         rest = rest >> 4
-        rep = toDigit(end) + rep
+        repr = toDigit(end) + repr
         i += 1
       }
 
-      fromString(rep)
+      fromString(repr)
     }
   }
 
