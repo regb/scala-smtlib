@@ -2,7 +2,7 @@ Scala SMT-LIB
 =============
 
 Scala SMT-LIB is a lightweight abstraction over the
-[SMT-LIB](http://www.smtlib.org/) standard.  It enables you to use a typesafe
+[SMT-LIB](http://www.smtlib.org/) standard.  It lets you to use a typesafe
 API in Scala to build SMT-LIB 2.0 scripts and execute them via any solver that
 supports the SMT-LIB standard.
 
