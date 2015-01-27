@@ -18,47 +18,57 @@ import scala.annotation.tailrec
 
 class PrinterTests extends FunSuite {
 
-  override def suiteName = "Basic Printer suite"
+  override def suiteName = "Printer correctness suite"
 
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
   private implicit def strToKeyword(str: String): SKeyword = SKeyword(str)
   private implicit def symToTerm(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(sym.name)
 
+  def mkTests(implicit printer: Printer): Unit = {
+    val printerName = printer.getClass.getName
+    test(printerName + ": printing simple Terms") { testSimpleTerms }
+    test(printerName + ": Printing tricky Terms") { testTrickyTerms }
+    test(printerName + ": Printing composed Terms") { testComposedTerm }
+    test(printerName + ": Printing Sorts") { testSorts }
+    test(printerName + ": Printing single Commands") { testSingleCommands }
+    test(printerName + ": Printing Commands Responses") { testCommandsResponses }
+  }
 
-  private def checkSort(sort: Sort): Unit = {
+  mkTests(RecursivePrinter)
+  mkTests(TailPrinter)
 
-    val directPrint: String = RecursivePrinter.toString(sort)
-    println(directPrint)
+  private def checkSort(sort: Sort)(implicit printer: Printer): Unit = {
+
+    val directPrint: String = printer.toString(sort)
 
     val parser = Parser.fromString(directPrint)
     val parsedAgain: Sort = parser.parseSort
-    val printAgain: String = RecursivePrinter.toString(parsedAgain)
+    val printAgain: String = printer.toString(parsedAgain)
 
     assert(directPrint === printAgain)
     assert(sort === parsedAgain)
   }
 
-  private def checkTerm(term: Term): Unit = {
+  private def checkTerm(term: Term)(implicit printer: Printer): Unit = {
 
-    val directPrint: String = RecursivePrinter.toString(term)
-    println(directPrint)
+    val directPrint: String = printer.toString(term)
 
     val parser = Parser.fromString(directPrint)
     val parsedAgain: Term = parser.parseTerm
-    val printAgain: String = RecursivePrinter.toString(parsedAgain)
+    val printAgain: String = printer.toString(parsedAgain)
 
     assert(directPrint === printAgain)
     assert(term === parsedAgain)
   }
 
-  private def checkCommand(cmd: Command): Unit = {
+  private def checkCommand(cmd: Command)(implicit printer: Printer): Unit = {
 
-    val directPrint: String = RecursivePrinter.toString(cmd)
+    val directPrint: String = printer.toString(cmd)
 
     val parser = Parser.fromString(directPrint)
     val parsedAgain: Command = parser.parseCommand
-    val printAgain: String = RecursivePrinter.toString(parsedAgain)
+    val printAgain: String = printer.toString(parsedAgain)
 
     assert(directPrint === printAgain)
     assert(cmd === parsedAgain)
@@ -76,9 +86,7 @@ class PrinterTests extends FunSuite {
   }
 
 
-
-  test("Printing simple Terms") {
-
+  def testSimpleTerms(implicit printer: Printer): Unit = {
     checkTerm(SNumeral(0))
     checkTerm(SNumeral(42))
     checkTerm(SHexadecimal(Hexadecimal.fromString("FF").get))
@@ -98,12 +106,12 @@ class PrinterTests extends FunSuite {
 
   }
 
-  test("Printing tricky terms") {
+  def testTrickyTerms(implicit printer: Printer): Unit = {
     checkTerm(SString("abc\"def"))
     checkTerm(SString("hello \"World\""))
   }
 
-  test("Printing composed Terms") {
+  def testComposedTerm(implicit printer: Printer): Unit = {
     checkTerm(
       FunctionApplication(
         QualifiedIdentifier("f"), 
@@ -119,7 +127,7 @@ class PrinterTests extends FunSuite {
     )
   }
 
-  test("Printing Sorts") {
+  def testSorts(implicit printer: Printer): Unit = {
     checkSort(Sort(Identifier(SSymbol("A"))))
     checkSort(Sort(Identifier(SSymbol("A"), Seq(42))))
     checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
@@ -128,8 +136,7 @@ class PrinterTests extends FunSuite {
     checkSort(Sort(Identifier(SSymbol("A"), Seq(27)), Seq(Sort("B"), Sort("C"))))
   }
 
-  test("Printing single commands") {
-
+  def testSingleCommands(implicit printer: Printer): Unit = {
     checkCommand(SetLogic(QF_UF))
 
     checkCommand(DeclareSort("A", 0))
@@ -158,7 +165,7 @@ class PrinterTests extends FunSuite {
   }
 
 
-  test("Printing Commands Reponses") {
+  def testCommandsResponses(implicit printer: Printer): Unit = {
 
     def printGenRes(res: GenResponse): String = RecursivePrinter.toString(res) 
     def parseGenRes(in: String): GenResponse = Parser.fromString(in).parseGenResponse
@@ -188,26 +195,26 @@ class PrinterTests extends FunSuite {
          )), printGetValue, parseGetValue)
   }
 
-  test("Printing deep trees") {
-    @tailrec
-    def mkDeepTerm(n: Int, t: Term): Term = 
-      if(n == 0) t
-      else mkDeepTerm(n-1, Let(VarBinding("x", SString("some value")), Seq(), t))
+  //test("Printing deep trees") {
+  //  @tailrec
+  //  def mkDeepTerm(n: Int, t: Term): Term = 
+  //    if(n == 0) t
+  //    else mkDeepTerm(n-1, Let(VarBinding("x", SString("some value")), Seq(), t))
 
-    val t0 = mkDeepTerm(5, SString("base case"))
-    println(RecursivePrinter.toString(t0))
+  //  val t0 = mkDeepTerm(5, SString("base case"))
+  //  println(RecursivePrinter.toString(t0))
 
-    //val t1 = mkDeepTerm(1000, SString("base case"))
-    //checkTerm(t1)
+  //  //val t1 = mkDeepTerm(1000, SString("base case"))
+  //  //checkTerm(t1)
 
-    //val t2 = mkDeepTerm(5000, SString("base case"))
-    //checkTerm(t2)
+  //  //val t2 = mkDeepTerm(5000, SString("base case"))
+  //  //checkTerm(t2)
 
-    val t3 = mkDeepTerm(10000, SString("base case"))
-    //checkTerm(t3)
-    //println(RecursivePrinter.toString(t3))
+  //  val t3 = mkDeepTerm(10000, SString("base case"))
+  //  //checkTerm(t3)
+  //  //println(RecursivePrinter.toString(t3))
 
-  }
+  //}
 
 
 }

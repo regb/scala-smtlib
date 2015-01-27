@@ -11,64 +11,23 @@ import java.io.Writer
 import java.io.StringWriter
 import java.io.BufferedWriter
 
-object TailPrinter {
+object TailPrinter extends Printer with TerminalTreesPrinter {
 
   private type Action = () => Unit
 
-  def toString(script: Script): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printScript(script, sWriter)
-    sWriter.flush
-    output.toString
-  }
-
-  def toString(command: Command): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printCommand(command, sWriter)
-    sWriter.flush
-    output.toString
-  }
-
-  def toString(term: Term): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printTerm(term, sWriter)
-    sWriter.flush
-    output.toString
-  }
-
-  def toString(sort: Sort): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printSort(sort, sWriter)
-    sWriter.flush
-    output.toString
-  }
-
-  def toString(response: CommandResponse): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printCommandResponse(response, sWriter)
-    sWriter.flush
-    output.toString
-  }
-
-
-  def printScript(script: Script, writer: Writer): Unit = {
+  override def printScript(script: Script, writer: Writer): Unit = {
     script.commands.foreach(cmd => {
       printCommand(cmd, writer)
       writer.write("\n")
     })
   }
 
-  def printCommand(command: Command, writer: Writer): Unit = {
+  override def printCommand(command: Command, writer: Writer): Unit = {
     val actionsBuffer = new LinkedList[Action]
     printCommand(command, writer, actionsBuffer)
     doActions(actionsBuffer)
   }
-  def printCommand(command: Command, writer: Writer, actions: LinkedList[Action]): Unit = command match {
+  private def printCommand(command: Command, writer: Writer, actions: LinkedList[Action]): Unit = command match {
     case SetLogic(logic) => {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => printLogic(logic, writer))
@@ -200,21 +159,63 @@ object TailPrinter {
     }
   }
 
+  override def printCommandResponse(response: CommandResponse, writer: Writer): Unit = {
+    val actionsBuffer = new LinkedList[Action]
+    printCommandResponse(response, writer, actionsBuffer)
+    doActions(actionsBuffer)
+  }
+  private def printCommandResponse(response: CommandResponse, writer: Writer, actions: LinkedList[Action]): Unit = response match {
+    case Success => 
+      actions.prepend(() => writer.write("success\n"))
+    case Unsupported =>
+      actions.prepend(() => writer.write("unsupported\n"))
+    case Error(msg) =>
+      actions.prepend(() => writer.write(")\n"))
+      actions.prepend(() => writer.write('"'))
+      actions.prepend(() => writer.write(msg))
+      actions.prepend(() => writer.write('"'))
+      actions.prepend(() => writer.write("(error "))
+    case CheckSatResponse(SatStatus) =>
+      actions.prepend(() => writer.write("sat\n"))
+    case CheckSatResponse(UnsatStatus) =>
+      actions.prepend(() => writer.write("unsat\n"))
+    case CheckSatResponse(UnknownStatus) =>
+      actions.prepend(() => writer.write("unknown\n"))
 
-  private def doActions(actions: LinkedList[Action]): Unit = {
-    while(!actions.isEmpty) {
-      val action = actions.pop()
-      action()
+    case GetValueResponse(valuationPairs) =>
+      def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
+        actions.prepend(() => writer.write(')'))
+        actions.prepend(() => printTerm(pair._2, writer, actions))
+        actions.prepend(() => writer.write(' '))
+        actions.prepend(() => printTerm(pair._1, writer, actions))
+        actions.prepend(() => writer.write('('))
+      }
+      printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
+    case _ => ???
+  }
+
+  override def printSort(sort: Sort, writer: Writer): Unit = {
+    val actionsBuffer = new LinkedList[Action]
+    printSort(sort, writer, actionsBuffer)
+    doActions(actionsBuffer)
+  }
+  private def printSort(sort: Sort, writer: Writer, actions: LinkedList[Action]): Unit = {
+    val id = sort.id
+    if(sort.subSorts.isEmpty)
+      actions.prepend(() => printId(id, writer))
+    else {
+      actions.prepend(() => printNary(writer, sort.subSorts, (s: Sort, w: Writer) => printSort(s, w, actions), " ", " ", ")", actions))
+      actions.prepend(() => printId(id, writer))
+      actions.prepend(() => writer.write("("))
     }
   }
 
-  def printTerm(term: Term, writer: Writer): Unit = {
+  override def printTerm(term: Term, writer: Writer): Unit = {
     val actionsBuffer = new LinkedList[Action]
     printTerm(term, writer, actionsBuffer)
     doActions(actionsBuffer)
   }
-
-  def printTerm(term: Term, writer: Writer, actions: LinkedList[Action]): Unit = term match {
+  private def printTerm(term: Term, writer: Writer, actions: LinkedList[Action]): Unit = term match {
     case Let(vb, vbs, t) =>
       actions.prepend(() => writer.write(")"))
       actions.prepend(() => printTerm(t, writer, actions))
@@ -257,17 +258,6 @@ object TailPrinter {
       actions.prepend(() => printConstant(c, writer))
   }
 
-  def printConstant(c: Constant, writer: Writer): Unit = c match {
-    case SNumeral(value) => writer.write(value.toString)
-    case SHexadecimal(value) => writer.write(value.toString)
-    case SBinary(value) => writer.write("#b" + value.map(if(_) "1" else "0").mkString)
-    case SDecimal(value) => writer.write(value.toString)
-    case SString(value) =>
-      writer.write("\"")
-      writer.write(value.flatMap(c => if(c == '"') "\\\"" else List(c)))
-      writer.write("\"")
-  }
-
   private def printQualifiedId(qi: QualifiedIdentifier, writer: Writer, actions: LinkedList[Action]): Unit = qi.sort match {
     case None =>
       actions.prepend(() => printId(qi.id, writer))
@@ -277,20 +267,6 @@ object TailPrinter {
       actions.prepend(() => writer.write(" "))
       actions.prepend(() => printId(qi.id, writer))
       actions.prepend(() => writer.write("(as "))
-  }
-
-
-  def printId(id: Identifier, writer: Writer): Unit = {
-    if(id.indices.isEmpty)
-      writer.write(id.symbol.name)
-    else {
-      writer.write("(_ ")
-      writer.write(id.symbol.name)
-      writer.write(' ')
-      writer.write(id.indices.head.toString)
-      id.indices.tail.foreach(n => writer.write(" " + n.toString))
-      writer.write(")")
-    }
   }
 
   private def printVarBinding(vb: VarBinding, writer: Writer, actions: LinkedList[Action]): Unit = {
@@ -309,33 +285,6 @@ object TailPrinter {
     actions.prepend(() => writer.write('('))
   }
 
-  def printSort(sort: Sort, writer: Writer): Unit = {
-    val actionsBuffer = new LinkedList[Action]
-    printSort(sort, writer, actionsBuffer)
-    doActions(actionsBuffer)
-  }
-  private def printSort(sort: Sort, writer: Writer, actions: LinkedList[Action]): Unit = {
-    val id = sort.id
-    if(sort.subSorts.isEmpty)
-      actions.prepend(() => printId(id, writer))
-    else {
-      actions.prepend(() => printNary(writer, sort.subSorts, (s: Sort, w: Writer) => printSort(s, w, actions), " ", " ", ")", actions))
-      actions.prepend(() => printId(id, writer))
-      actions.prepend(() => writer.write("("))
-    }
-  }
-
-  private def printLogic(logic: Logic, writer: Writer): Unit = logic match {
-    case QF_UF => 
-      writer.write("QF_UF")
-    case QF_LRA => 
-      writer.write("QF_LRA")
-    case QF_AX => 
-      writer.write("QF_AX")
-    case QF_A => 
-      writer.write("QF_A")
-    case Undef => ???
-  }
 
   def printAttribute(attribute: Attribute, writer: Writer): Unit = {
     printKeyword(attribute.keyword, writer)
@@ -345,11 +294,6 @@ object TailPrinter {
         printSExpr(sexpr, writer)
       case None => ()
     }
-  }
-
-  def printKeyword(keyword: SKeyword, writer: Writer): Unit = {
-    writer.write(":")
-    writer.write(keyword.name)
   }
 
 
@@ -412,62 +356,6 @@ object TailPrinter {
       printAttribute(attribute, writer)
   }
 
-  def printInfoFlag(flag: InfoFlag, writer: Writer): Unit = flag match {
-    case ErrorBehaviourInfoFlag => 
-      writer.write(":error-behaviour")
-    case NameInfoFlag => 
-      writer.write(":name")
-    case AuthorsInfoFlag => 
-      writer.write(":authors")
-    case VersionInfoFlag => 
-      writer.write(":version")
-    case StatusInfoFlag => 
-      writer.write(":status")
-    case ReasonUnknownInfoFlag => 
-      writer.write(":reason-unknonwn")
-    case AllStatisticsInfoFlag => 
-      writer.write(":all-statistics")
-    case KeywordInfoFlag(keyword) =>
-      writer.write(':')
-      writer.write(keyword)
-  }
-
-  
-  def printCommandResponse(response: CommandResponse, writer: Writer): Unit = {
-    val actionsBuffer = new LinkedList[Action]
-    printCommandResponse(response, writer, actionsBuffer)
-    doActions(actionsBuffer)
-  }
-  def printCommandResponse(response: CommandResponse, writer: Writer, actions: LinkedList[Action]): Unit = response match {
-    case Success => 
-      actions.prepend(() => writer.write("success\n"))
-    case Unsupported =>
-      actions.prepend(() => writer.write("unsupported\n"))
-    case Error(msg) =>
-      actions.prepend(() => writer.write(")\n"))
-      actions.prepend(() => writer.write('"'))
-      actions.prepend(() => writer.write(msg))
-      actions.prepend(() => writer.write('"'))
-      actions.prepend(() => writer.write("(error "))
-    case CheckSatResponse(SatStatus) =>
-      actions.prepend(() => writer.write("sat\n"))
-    case CheckSatResponse(UnsatStatus) =>
-      actions.prepend(() => writer.write("unsat\n"))
-    case CheckSatResponse(UnknownStatus) =>
-      actions.prepend(() => writer.write("unknown\n"))
-
-    case GetValueResponse(valuationPairs) =>
-      def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
-        actions.prepend(() => writer.write(')'))
-        actions.prepend(() => printTerm(pair._2, writer, actions))
-        actions.prepend(() => writer.write(' '))
-        actions.prepend(() => printTerm(pair._1, writer, actions))
-        actions.prepend(() => writer.write('('))
-      }
-      printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
-    case _ => ???
-  }
-
   private def printNary[A](
     writer: Writer, as: Seq[A], printer: (A, Writer) => Unit,
     pre: String, op: String, post: String, actions: LinkedList[Action]): Unit = {
@@ -490,6 +378,13 @@ object TailPrinter {
     newActions.toList.reverse.foreach(action =>
       actions.prepend(action)
     )
+  }
+
+  private def doActions(actions: LinkedList[Action]): Unit = {
+    while(!actions.isEmpty) {
+      val action = actions.pop()
+      action()
+    }
   }
 
 }
