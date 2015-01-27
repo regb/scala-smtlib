@@ -5,7 +5,7 @@ import lexer.Lexer
 import parser.Parser
 import parser.Commands._
 import parser.CommandsResponses._
-import printer.PrettyPrinter
+import printer._
 
 import java.io._
 
@@ -19,7 +19,7 @@ abstract class ProcessInterpreter extends Interpreter {
   lazy val parser = new Parser(new Lexer(out))
 
   override def eval(cmd: Command): CommandResponse = {
-    PrettyPrinter.printCommand(cmd, in)
+    RecursivePrinter.printCommand(cmd, in)
     in.write("\n")
     in.flush
     cmd match {
@@ -40,7 +40,7 @@ abstract class ProcessInterpreter extends Interpreter {
   }
 
   override def free(): Unit = {
-    PrettyPrinter.printCommand(Exit(), in)
+    RecursivePrinter.printCommand(Exit(), in)
     in.write("\n")
     in.flush
 

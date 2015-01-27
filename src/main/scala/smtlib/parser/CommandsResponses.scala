@@ -7,7 +7,7 @@ import Terms._
 object CommandsResponses {
 
   sealed abstract class CommandResponse {
-    override def toString: String = printer.PrettyPrinter.toString(this)
+    override def toString: String = printer.RecursivePrinter.toString(this)
   }
 
   sealed trait GenResponse extends CommandResponse

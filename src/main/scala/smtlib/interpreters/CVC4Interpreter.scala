@@ -5,7 +5,7 @@ import lexer.Lexer
 import parser.Parser
 import parser.Commands._
 import parser.CommandsResponses._
-import printer.PrettyPrinter
+import printer._
 
 //import scala.sys.process._
 import java.io._
@@ -27,7 +27,7 @@ class CVC4Interpreter extends Interpreter {
   val parser = new Parser(new Lexer(cvc4Out))
 
   override def eval(cmd: Command): CommandResponse = {
-    PrettyPrinter.printCommand(cmd, cvc4In)
+    RecursivePrinter.printCommand(cmd, cvc4In)
     cvc4In.write("\n")
     cvc4In.flush
     cmd match {
@@ -48,7 +48,7 @@ class CVC4Interpreter extends Interpreter {
   }
 
   override def free(): Unit = {
-    PrettyPrinter.printCommand(Exit(), cvc4In)
+    RecursivePrinter.printCommand(Exit(), cvc4In)
     cvc4In.write("\n")
     cvc4In.flush
 

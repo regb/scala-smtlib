@@ -18,7 +18,7 @@ import scala.annotation.tailrec
 
 class PrinterTests extends FunSuite {
 
-  override def suiteName = "Printer suite"
+  override def suiteName = "Basic Printer suite"
 
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
@@ -28,11 +28,12 @@ class PrinterTests extends FunSuite {
 
   private def checkSort(sort: Sort): Unit = {
 
-    val directPrint: String = PrettyPrinter.toString(sort)
+    val directPrint: String = RecursivePrinter.toString(sort)
+    println(directPrint)
 
     val parser = Parser.fromString(directPrint)
     val parsedAgain: Sort = parser.parseSort
-    val printAgain: String = PrettyPrinter.toString(parsedAgain)
+    val printAgain: String = RecursivePrinter.toString(parsedAgain)
 
     assert(directPrint === printAgain)
     assert(sort === parsedAgain)
@@ -40,11 +41,12 @@ class PrinterTests extends FunSuite {
 
   private def checkTerm(term: Term): Unit = {
 
-    val directPrint: String = PrettyPrinter.toString(term)
+    val directPrint: String = RecursivePrinter.toString(term)
+    println(directPrint)
 
     val parser = Parser.fromString(directPrint)
     val parsedAgain: Term = parser.parseTerm
-    val printAgain: String = PrettyPrinter.toString(parsedAgain)
+    val printAgain: String = RecursivePrinter.toString(parsedAgain)
 
     assert(directPrint === printAgain)
     assert(term === parsedAgain)
@@ -52,11 +54,11 @@ class PrinterTests extends FunSuite {
 
   private def checkCommand(cmd: Command): Unit = {
 
-    val directPrint: String = PrettyPrinter.toString(cmd)
+    val directPrint: String = RecursivePrinter.toString(cmd)
 
     val parser = Parser.fromString(directPrint)
     val parsedAgain: Command = parser.parseCommand
-    val printAgain: String = PrettyPrinter.toString(parsedAgain)
+    val printAgain: String = RecursivePrinter.toString(parsedAgain)
 
     assert(directPrint === printAgain)
     assert(cmd === parsedAgain)
@@ -102,15 +104,28 @@ class PrinterTests extends FunSuite {
   }
 
   test("Printing composed Terms") {
-
+    checkTerm(
+      FunctionApplication(
+        QualifiedIdentifier("f"), 
+        Seq(
+          FunctionApplication(
+            QualifiedIdentifier("g"), 
+            Seq(QualifiedIdentifier("aaa"), 
+                QualifiedIdentifier("bb"))
+          ),
+          QualifiedIdentifier("c")
+        )
+      )
+    )
   }
 
   test("Printing Sorts") {
     checkSort(Sort(Identifier(SSymbol("A"))))
     checkSort(Sort(Identifier(SSymbol("A"), Seq(42))))
     checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
-    checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 23))))
+    checkSort(Sort(Identifier(SSymbol("A"), Seq(42, 12, 23))))
     checkSort(Sort(Identifier(SSymbol("A")), Seq(Sort("B"), Sort("C"))))
+    checkSort(Sort(Identifier(SSymbol("A"), Seq(27)), Seq(Sort("B"), Sort("C"))))
   }
 
   test("Printing single commands") {
@@ -145,23 +160,23 @@ class PrinterTests extends FunSuite {
 
   test("Printing Commands Reponses") {
 
-    def printGenRes(res: GenResponse): String = PrettyPrinter.toString(res) 
+    def printGenRes(res: GenResponse): String = RecursivePrinter.toString(res) 
     def parseGenRes(in: String): GenResponse = Parser.fromString(in).parseGenResponse
     check(Success, printGenRes, parseGenRes)
     check(Unsupported, printGenRes, parseGenRes)
     check(Error("symbol missing"), printGenRes, parseGenRes)
 
-    def printGetAssignRes(res: GetAssignmentResponse): String = PrettyPrinter.toString(res)
+    def printGetAssignRes(res: GetAssignmentResponse): String = RecursivePrinter.toString(res)
     def parseGetAssignRes(in: String): GetAssignmentResponse = Parser.fromString(in).parseGetAssignmentResponse
     //TODO: some tests with get-assignment
 
-    def printCheckSat(res: CheckSatResponse): String = PrettyPrinter.toString(res) 
+    def printCheckSat(res: CheckSatResponse): String = RecursivePrinter.toString(res) 
     def parseCheckSat(in: String): CheckSatResponse = Parser.fromString(in).parseCheckSatResponse
     check(CheckSatResponse(SatStatus), printCheckSat, parseCheckSat)
     check(CheckSatResponse(UnsatStatus), printCheckSat, parseCheckSat)
     check(CheckSatResponse(UnknownStatus), printCheckSat, parseCheckSat)
 
-    def printGetValue(res: GetValueResponse): String = PrettyPrinter.toString(res)
+    def printGetValue(res: GetValueResponse): String = RecursivePrinter.toString(res)
     def parseGetValue(in: String): GetValueResponse = Parser.fromString(in).parseGetValueResponse
 
     check(GetValueResponse(Seq( 
@@ -180,7 +195,7 @@ class PrinterTests extends FunSuite {
       else mkDeepTerm(n-1, Let(VarBinding("x", SString("some value")), Seq(), t))
 
     val t0 = mkDeepTerm(5, SString("base case"))
-    println(PrettyPrinter.toString(t0))
+    println(RecursivePrinter.toString(t0))
 
     //val t1 = mkDeepTerm(1000, SString("base case"))
     //checkTerm(t1)
@@ -189,7 +204,8 @@ class PrinterTests extends FunSuite {
     //checkTerm(t2)
 
     val t3 = mkDeepTerm(10000, SString("base case"))
-    checkTerm(t3)
+    //checkTerm(t3)
+    //println(RecursivePrinter.toString(t3))
 
   }
 

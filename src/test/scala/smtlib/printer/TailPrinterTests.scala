@@ -77,7 +77,6 @@ class TailPrinterTests extends FunSuite {
   }
 
 
-
   test("Printing simple Terms") {
 
     checkTerm(SNumeral(0))

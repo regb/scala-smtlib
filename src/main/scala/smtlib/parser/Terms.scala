@@ -44,7 +44,7 @@ object Terms {
   }
 
   case class Sort(id: Identifier, subSorts: Seq[Sort]) {
-    override def toString: String = printer.PrettyPrinter.toString(this)
+    override def toString: String = printer.RecursivePrinter.toString(this)
   }
   object Sort {
     def apply(id: Identifier): Sort = Sort(id, Seq())
@@ -72,7 +72,7 @@ object Terms {
   case class SComment(s: String) extends SExpr 
 
   sealed abstract class Term extends Positioned with SExpr {
-    override def toString: String = printer.PrettyPrinter.toString(this)
+    override def toString: String = printer.RecursivePrinter.toString(this)
   }
 
   case class Let(binding: VarBinding, bindings: Seq[VarBinding], term: Term) extends Term
