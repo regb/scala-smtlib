@@ -29,9 +29,11 @@ class PrinterTests extends FunSuite {
     val printerName = printer.getClass.getName
     test(printerName + ": printing simple Terms") { testSimpleTerms }
     test(printerName + ": Printing tricky Terms") { testTrickyTerms }
+    test(printerName + ": Printing Symbols with weird names") { testWeirdSymbolNames }
     test(printerName + ": Printing composed Terms") { testComposedTerm }
     test(printerName + ": Printing Sorts") { testSorts }
     test(printerName + ": Printing single Commands") { testSingleCommands }
+    test(printerName + ": Printing declare-datatypes commands") { testDeclareDatatypes }
     test(printerName + ": Printing Commands Responses") { testCommandsResponses }
   }
 
@@ -93,6 +95,7 @@ class PrinterTests extends FunSuite {
     checkTerm(SHexadecimal(Hexadecimal.fromString("123abcDeF").get))
     checkTerm(SBinary(List(true)))
     checkTerm(SBinary(List(true, false, true)))
+    checkTerm(SBinary(List(false, false, true)))
     checkTerm(SString("abcd"))
     checkTerm(SString("hello-world"))
     checkTerm(QualifiedIdentifier("abc"))
@@ -111,17 +114,46 @@ class PrinterTests extends FunSuite {
     checkTerm(SString("hello \"World\""))
   }
 
+  def testWeirdSymbolNames(implicit printer: Printer): Unit = {
+    checkTerm(QualifiedIdentifier("+-/"))
+    checkTerm(QualifiedIdentifier("^^^"))
+    checkTerm(QualifiedIdentifier("+-/*=%?!.$_~&^<>@"))
+    checkTerm(QualifiedIdentifier("$12%"))
+  }
+
   def testComposedTerm(implicit printer: Printer): Unit = {
     checkTerm(
       FunctionApplication(
-        QualifiedIdentifier("f"), 
+        QualifiedIdentifier("f"),
         Seq(
           FunctionApplication(
-            QualifiedIdentifier("g"), 
-            Seq(QualifiedIdentifier("aaa"), 
+            QualifiedIdentifier("g"),
+            Seq(QualifiedIdentifier("aaa"),
                 QualifiedIdentifier("bb"))
           ),
           QualifiedIdentifier("c")
+        )
+      )
+    )
+
+    checkTerm(
+      FunctionApplication(
+        QualifiedIdentifier("f"),
+        Seq(
+          FunctionApplication(
+            QualifiedIdentifier("g"),
+            Seq(QualifiedIdentifier("aaa"),
+                QualifiedIdentifier("bb"))
+          ),
+          QualifiedIdentifier("c"),
+          FunctionApplication(
+            QualifiedIdentifier("g"),
+            Seq(QualifiedIdentifier("abcd"),
+                FunctionApplication(
+                  QualifiedIdentifier("h"),
+                  Seq(QualifiedIdentifier("x"))
+                ))
+          )
         )
       )
     )
@@ -164,6 +196,15 @@ class PrinterTests extends FunSuite {
     checkCommand(Exit())
   }
 
+  def testDeclareDatatypes(implicit printer: Printer): Unit = {
+    checkCommand(DeclareDatatypes(Seq(
+      SSymbol("A") -> Seq(Constructor(SSymbol("A1"), 
+                                      Seq(SSymbol("a1a") -> Sort("A"), SSymbol("a1b") -> Sort("A"))),
+                          Constructor(SSymbol("A2"), 
+                                      Seq(SSymbol("a2a") -> Sort("A"), SSymbol("a2b") -> Sort("A"))))
+    )))
+  }
+
 
   def testCommandsResponses(implicit printer: Printer): Unit = {
 
@@ -195,26 +236,23 @@ class PrinterTests extends FunSuite {
          )), printGetValue, parseGetValue)
   }
 
-  //test("Printing deep trees") {
-  //  @tailrec
-  //  def mkDeepTerm(n: Int, t: Term): Term = 
-  //    if(n == 0) t
-  //    else mkDeepTerm(n-1, Let(VarBinding("x", SString("some value")), Seq(), t))
+  test("Printing deep trees with tail printer") {
+    @tailrec
+    def mkDeepTerm(n: Int, t: Term): Term = 
+      if(n == 0) t
+      else mkDeepTerm(n-1, Let(VarBinding("x", SString("some value")), Seq(), t))
 
-  //  val t0 = mkDeepTerm(5, SString("base case"))
-  //  println(RecursivePrinter.toString(t0))
+    val t1 = mkDeepTerm(10000, SString("base case"))
 
-  //  //val t1 = mkDeepTerm(1000, SString("base case"))
-  //  //checkTerm(t1)
+    //will overflow with RecursivePrinter if stack is not too big
+    //RecursivePrinter.toString(t1)
 
-  //  //val t2 = mkDeepTerm(5000, SString("base case"))
-  //  //checkTerm(t2)
+    //should not generate exception
+    TailPrinter.toString(t1)
 
-  //  val t3 = mkDeepTerm(10000, SString("base case"))
-  //  //checkTerm(t3)
-  //  //println(RecursivePrinter.toString(t3))
-
-  //}
+    //val t2 = mkDeepTerm(100000, SString("base case"))
+    //TailPrinter.toString(t2)
+  }
 
 
 }

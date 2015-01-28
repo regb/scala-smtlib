@@ -239,7 +239,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
 
     case FunctionApplication(fun, ts) =>
       if (ts.nonEmpty) {
-        actions.prepend(() => printNary(writer, ts, printTerm _, " ", " ", ")", actions))
+        actions.prepend(() => printNary(writer, ts, (t: Term, w: Writer) => printTerm(t, w, actions), " ", " ", ")", actions))
         actions.prepend(() => printQualifiedId(fun, writer, actions))
         actions.prepend(() => writer.write("("))
       } else {
