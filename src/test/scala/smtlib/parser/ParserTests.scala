@@ -294,19 +294,17 @@ class ParserTests extends FunSuite with Timeouts {
   }
 
   test("simple benchmark") {
-    val reader1 = new StringReader("""
+    val benchmark = """
       (set-logic QF_UF)
       (declare-fun f (Int) Int)
       (declare-fun a () Int)
       (assert (= (f a) a))
       (check-sat)
-    """)
-    val lexer1 = new Lexer(reader1)
-    val parser1 = new Parser(lexer1)
-    assert(parser1.parseCommand === SetLogic(QF_UF))
-    assert(parser1.parseCommand === DeclareFun("f", Seq(Sort("Int")), Sort("Int")))
-    assert(parser1.parseCommand === DeclareFun("a", Seq(), Sort("Int")))
-    assert(parser1.parseCommand === 
+    """
+    val cmd1 = SetLogic(QF_UF)
+    val cmd2 = DeclareFun("f", Seq(Sort("Int")), Sort("Int"))
+    val cmd3 = DeclareFun("a", Seq(), Sort("Int"))
+    val cmd4 =
            Assert(FunctionApplication(
                     QualifiedIdentifier("="),
                     Seq(
@@ -317,9 +315,21 @@ class ParserTests extends FunSuite with Timeouts {
                       QualifiedIdentifier("a")
                     )
                   ))
-           )
-    assert(parser1.parseCommand === CheckSat())
+    val cmd5 = CheckSat()
 
+    val reader1 = new StringReader(benchmark)
+    val lexer1 = new Lexer(reader1)
+    val parser1 = new Parser(lexer1)
+    assert(parser1.parseCommand === cmd1)
+    assert(parser1.parseCommand === cmd2)
+    assert(parser1.parseCommand === cmd3)
+    assert(parser1.parseCommand === cmd4)
+    assert(parser1.parseCommand === cmd5)
+
+    val reader2 = new StringReader(benchmark)
+    val lexer2 = new Lexer(reader2)
+    val parser2 = new Parser(lexer2)
+    assert(parser2.parseScript === Script(List(cmd1, cmd2, cmd3, cmd4, cmd5)))
   }
 
   test("interactive parser") {

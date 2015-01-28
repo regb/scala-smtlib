@@ -65,6 +65,16 @@ class Parser(lexer: Lexer) {
     }
   }
 
+  def parseScript: Script = {
+
+    var cmds = new ListBuffer[Command]()
+    var cmd = parseCommand
+    while(cmd != null) {
+      cmds.append(cmd)
+      cmd = parseCommand
+    }
+    Script(cmds.toList)
+  }
 
   def parseCommand: Command = if(peekToken == null) null else {
     val head = nextToken

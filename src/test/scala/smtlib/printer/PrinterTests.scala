@@ -34,6 +34,7 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing Sorts") { testSorts }
     test(printerName + ": Printing single Commands") { testSingleCommands }
     test(printerName + ": Printing declare-datatypes commands") { testDeclareDatatypes }
+    test(printerName + ": Printing simple script") { testSimpleScript }
     test(printerName + ": Printing Commands Responses") { testCommandsResponses }
   }
 
@@ -74,6 +75,18 @@ class PrinterTests extends FunSuite {
 
     assert(directPrint === printAgain)
     assert(cmd === parsedAgain)
+  }
+
+  private def checkScript(script: Script)(implicit printer: Printer): Unit = {
+
+    val directPrint: String = printer.toString(script)
+
+    val parser = Parser.fromString(directPrint)
+    val parsedAgain: Script = parser.parseScript
+    val printAgain: String = printer.toString(parsedAgain)
+
+    assert(directPrint === printAgain)
+    assert(script === parsedAgain)
   }
 
   private def check[A](res: A, printer: (A) => String, parser: (String) => A): Unit = {
@@ -203,6 +216,17 @@ class PrinterTests extends FunSuite {
                           Constructor(SSymbol("A2"), 
                                       Seq(SSymbol("a2a") -> Sort("A"), SSymbol("a2b") -> Sort("A"))))
     )))
+  }
+
+  def testSimpleScript(implicit printer: Printer): Unit = {
+    val script = Script(List(
+      SetLogic(QF_UF),
+      DeclareSort("MySort", 0),
+      Push(1),
+      Assert(FunctionApplication(QualifiedIdentifier("<"), Seq(SNumeral(3), SNumeral(1)))),
+      CheckSat()
+    ))
+    checkScript(script)
   }
 
 
