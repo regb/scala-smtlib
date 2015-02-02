@@ -50,10 +50,11 @@ object Terms {
     def apply(id: Identifier): Sort = Sort(id, Seq())
   }
 
-  case class Attribute(keyword: SKeyword, v: Option[SExpr])
+  case class Attribute(keyword: SKeyword, value: Option[AttributeValue])
   object Attribute {
     def apply(key: SKeyword): Attribute = Attribute(key, None)
   }
+  sealed trait AttributeValue extends SExpr
 
   case class SortedVar(name: SSymbol, sort: Sort)
   case class VarBinding(name: SSymbol, term: Term)
@@ -61,12 +62,12 @@ object Terms {
 
   trait SExpr extends Positioned
 
-  case class SList(sexprs: List[SExpr]) extends SExpr
+  case class SList(sexprs: List[SExpr]) extends SExpr with AttributeValue
   object SList {
     def apply(sexprs: SExpr*): SList = SList(List(sexprs:_*))
   }
   case class SKeyword(name: String) extends SExpr
-  case class SSymbol(name: String) extends SExpr
+  case class SSymbol(name: String) extends SExpr with AttributeValue
 
   /* SComment is never parsed, only used for pretty printing */
   case class SComment(s: String) extends SExpr 
@@ -91,9 +92,9 @@ object Terms {
   }
 
 
-  trait Constant extends Term
+  sealed trait Constant extends Term
 
-  trait Literal[T] extends Constant {
+  sealed trait Literal[T] extends Constant with AttributeValue {
     val value: T
   }
 

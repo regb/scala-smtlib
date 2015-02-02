@@ -288,10 +288,10 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
 
   def printAttribute(attribute: Attribute, writer: Writer): Unit = {
     printKeyword(attribute.keyword, writer)
-    attribute.v match {
-      case Some(sexpr) => 
+    attribute.value match {
+      case Some(value) => 
         writer.write(" ")
-        printSExpr(sexpr, writer)
+        printSExpr(value, writer)
       case None => ()
     }
   }

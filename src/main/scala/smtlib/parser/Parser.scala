@@ -380,7 +380,7 @@ class Parser(lexer: Lexer) {
     Attribute(keyword, attributeValue)
   }
 
-  def tryParseAttributeValue: Option[SExpr] = {
+  def tryParseAttributeValue: Option[AttributeValue] = {
     peekToken match {
       case Tokens.NumeralLit(_) => Some(parseNumeral)
       case Tokens.BinaryLit(_) => Some(parseBinary)
@@ -591,7 +591,7 @@ class Parser(lexer: Lexer) {
     }
   }
 
-  def parseTerm: Term = { 
+  def parseTerm: Term = {
     if(peekToken == Tokens.OParen()) {
       eat(Tokens.OParen())
 

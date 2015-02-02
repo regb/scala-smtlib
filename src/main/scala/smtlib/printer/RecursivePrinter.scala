@@ -274,10 +274,10 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
   private def printAttribute(attribute: Attribute, writer: Writer): Unit = {
     printKeyword(attribute.keyword, writer)
-    attribute.v match {
-      case Some(sexpr) =>
+    attribute.value match {
+      case Some(value) =>
         writer.write(" ")
-        printSExpr(sexpr, writer)
+        printSExpr(value, writer) //all attribute values are s-exprs
       case None => ()
     }
   }

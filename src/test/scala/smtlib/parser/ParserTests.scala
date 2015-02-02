@@ -225,7 +225,6 @@ class ParserTests extends FunSuite with Timeouts {
                           ))
       ))
     )
-                        
 
   }
 
