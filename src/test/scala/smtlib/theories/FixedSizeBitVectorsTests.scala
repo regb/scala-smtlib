@@ -2,6 +2,7 @@ package smtlib
 package theories
 
 import FixedSizeBitVectors._
+import parser.Parser
 
 import org.scalatest.FunSuite
 
@@ -36,9 +37,28 @@ class FixedSizeBitVectorsTests extends FunSuite {
 
   }
 
+  test("smtlib bv constant notation") {
+    Parser.fromString("(_ bv13 32)").parseTerm match {
+      case BitVectorConstant(x, 32) if x == 12 => assert(false)
+      case BitVectorConstant(x, 31) if x == 13 => assert(false)
+      case BitVectorConstant(x, 32) if x == 13 => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(_ bv11 17)").parseTerm match {
+      case BitVectorConstant(x, 17) if x == 12 => assert(false)
+      case BitVectorConstant(x, 32) if x == 11 => assert(false)
+      case BitVectorConstant(x, 17) if x == 11 => assert(true)
+      case _ => assert(false)
+    }
 
-  test("smtlib format") {
-    import parser.Parser
+    val cst = BitVectorConstant(13, 32)
+    cst match {
+      case BitVectorConstant(x, 32) if x == 13 => assert(true)
+      case _ => assert(false)
+    }
+  }
+
+  test("smtlib is correctly parsed with bv literals") {
 
     Parser.fromString("#b101").parseTerm match {
       case BitVectorLit(List(true, false, true)) => assert(true)
@@ -48,6 +68,10 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case BitVectorLit(List(true, true, true, true, false, false, false, false)) => assert(true)
       case _ => assert(false)
     }
+
+  }
+
+  test("smtlib is correctly parsed with bv manipulation operations") {
 
     Parser.fromString("(concat #b101 #b01)").parseTerm match {
       case Concat(
@@ -60,7 +84,35 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case Extract(1, 2, BitVectorLit(List(true, false, true))) => assert(true)
       case _ => assert(false)
     }
+    Parser.fromString("((_ repeat 5) #b101)").parseTerm match {
+      case Repeat(5, BitVectorLit(List(true, false, true))) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("((_ zero_extend 3) #b101)").parseTerm match {
+      case ZeroExtend(3, BitVectorLit(List(true, false, true))) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("((_ sign_extend 3) #b101)").parseTerm match {
+      case SignExtend(3, BitVectorLit(List(true, false, true))) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("((_ rotate_left 3) #b101)").parseTerm match {
+      case RotateLeft(3, BitVectorLit(List(true, false, true))) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("((_ rotate_right 3) #b101)").parseTerm match {
+      case RotateRight(3, BitVectorLit(List(true, false, true))) => assert(true)
+      case _ => assert(false)
+    }
+  }
 
+  test("smtlib is correctly parsed with bv logical operations") {
+    Parser.fromString("(bvnot #b101)").parseTerm match {
+      case Not(
+            BitVectorLit(List(true, false, true))
+          ) => assert(true)
+      case _ => assert(false)
+    }
     Parser.fromString("(bvand #b101 #b011)").parseTerm match {
       case And(
             BitVectorLit(List(true, false, true)),
@@ -68,7 +120,6 @@ class FixedSizeBitVectorsTests extends FunSuite {
            ) => assert(true)
       case _ => assert(false)
     }
-
     Parser.fromString("(bvor #b101 #b011)").parseTerm match {
       case Or(
             BitVectorLit(List(true, false, true)),
@@ -76,7 +127,50 @@ class FixedSizeBitVectorsTests extends FunSuite {
            ) => assert(true)
       case _ => assert(false)
     }
+    Parser.fromString("(bvnand #b101 #b011)").parseTerm match {
+      case NAnd(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvnor #b101 #b011)").parseTerm match {
+      case NOr(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvxor #b101 #b011)").parseTerm match {
+      case XOr(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvxnor #b101 #b011)").parseTerm match {
+      case XNOr(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvcomp #b101 #b011)").parseTerm match {
+      case Comp(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+  }
 
+  test("smtlib is correctly parsed with bv arithmetic operations") {
+    Parser.fromString("(bvneg #b101)").parseTerm match {
+      case Neg(
+            BitVectorLit(List(true, false, true))
+          ) => assert(true)
+      case _ => assert(false)
+    }
     Parser.fromString("(bvadd #b101 #b011)").parseTerm match {
       case Add(
             BitVectorLit(List(true, false, true)),
@@ -84,7 +178,13 @@ class FixedSizeBitVectorsTests extends FunSuite {
            ) => assert(true)
       case _ => assert(false)
     }
-
+    Parser.fromString("(bvsub #b101 #b011)").parseTerm match {
+      case Sub(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
     Parser.fromString("(bvmul #b101 #b011)").parseTerm match {
       case Mul(
             BitVectorLit(List(true, false, true)),
@@ -92,6 +192,125 @@ class FixedSizeBitVectorsTests extends FunSuite {
            ) => assert(true)
       case _ => assert(false)
     }
+    Parser.fromString("(bvudiv #b101 #b011)").parseTerm match {
+      case UDiv(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvsdiv #b101 #b011)").parseTerm match {
+      case SDiv(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvurem #b101 #b011)").parseTerm match {
+      case URem(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvsrem #b101 #b011)").parseTerm match {
+      case SRem(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvsmod #b101 #b011)").parseTerm match {
+      case SMod(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+  }
 
+  test("smtlib is correctly parsed with bv shifting operations") {
+    Parser.fromString("(bvshl #b101 #b011)").parseTerm match {
+      case ShiftLeft(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvlshr #b101 #b011)").parseTerm match {
+      case LShiftRight(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvashr #b101 #b011)").parseTerm match {
+      case AShiftRight(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+
+  }
+
+
+  test("smtlib is correctly parsed with bv arithmetic comparisons operations") {
+    Parser.fromString("(bvult #b101 #b011)").parseTerm match {
+      case ULessThan(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvslt #b101 #b011)").parseTerm match {
+      case SLessThan(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvule #b101 #b011)").parseTerm match {
+      case ULessEquals(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvsle #b101 #b011)").parseTerm match {
+      case SLessEquals(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvugt #b101 #b011)").parseTerm match {
+      case UGreaterThan(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvsgt #b101 #b011)").parseTerm match {
+      case SGreaterThan(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvuge #b101 #b011)").parseTerm match {
+      case UGreaterEquals(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(bvsge #b101 #b011)").parseTerm match {
+      case SGreaterEquals(
+            BitVectorLit(List(true, false, true)),
+            BitVectorLit(List(false, true, true))
+           ) => assert(true)
+      case _ => assert(false)
+    }
   }
 }
