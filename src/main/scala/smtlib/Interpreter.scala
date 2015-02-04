@@ -25,6 +25,7 @@ trait Interpreter {
   //note that free can be used even if the solver is currently solving, and act as a sort of interrupt
   def free(): Unit
 
+  def interrupt(): Unit
 }
 
 object Interpreter {
