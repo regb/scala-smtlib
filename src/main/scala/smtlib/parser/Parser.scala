@@ -733,33 +733,14 @@ object Parser {
   class UnknownCommandException(val commandName: TokenKind) extends Exception("Unknown command name token: " + commandName)
 
   class UnexpectedTokenException(found: Token, expected: Seq[TokenKind])
-    extends Exception("Unexpected token at position: " + found.getPos + ". Expected: " + expected + ". Found: " + found)
+    extends Exception("Unexpected token at position: " + found.getPos + ". Expected: " + expected.mkString("[",",","]") + ". Found: " + found)
 
   class UnexpectedEOFException(expected: Seq[TokenKind])
-    extends Exception("Unexpected end of file. Expected: " + expected)
+    extends Exception("Unexpected end of file. Expected: " + expected.mkString("[",",","]"))
 
   def fromString(str: String): Parser = {
     val lexer = new Lexer(new java.io.StringReader(str))
     new Parser(lexer)
   }
 
-
-//  class EOFBeforeMatchingParenthesisException(startPos: Position) extends
-//    Exception("Opened parenthesis at position: " + startPos + " has no matching closing parenthesis")
-//  class UnexpectedTokenException(token: Token, pos: Position) extends
-//    Exception("Unexpected token: " + token + " at position: " + pos)
-//
-//  def fromReader(reader: java.io.Reader): Parser = {
-//    val lexer = new Lexer(reader)
-//    new Parser(lexer)
-//  }
-//
-//  /*
-//   * Parse a string and return the next SExpr in the string, ignore the rest
-//   */
-//  def exprFromString(str: String): SExpr = {
-//    val lexer = new Lexer(new java.io.StringReader(str))
-//    val parser = new Parser(lexer)
-//    parser.next
-//  }
 }

@@ -39,9 +39,9 @@ abstract class ProcessInterpreter extends Interpreter {
         case _ => parser.parseGenResponse
       }
     } catch {
-      case (io: IOException) => {
+      case (ex: Exception) => {
         if(cmd == CheckSat()) CheckSatResponse(UnknownStatus)
-        else Error("Solver encountered exception: " + io)
+        else Error("Solver encountered exception: " + ex)
       }
     }
   }
