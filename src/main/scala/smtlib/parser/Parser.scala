@@ -2,7 +2,7 @@ package smtlib
 package parser
 
 import lexer.Tokens
-import Tokens.Token
+import Tokens.{Token, TokenKind}
 import lexer.Lexer
 
 import Terms._
@@ -54,14 +54,14 @@ class Parser(lexer: Lexer) {
   /*
    * Make sure the next token corresponds to t and read
    */
-  private def eat(expected: Token): Unit = {
+  private def eat(expected: TokenKind): Unit = {
     val token = nextToken
     check(token, expected)
   }
 
-  private def check(current: Token, exp: Token): Unit = {
-    if(current != exp) {
-      expected(exp, current)
+  private def check(current: Token, exp: TokenKind): Unit = {
+    if(current.kind != exp) {
+      expected(current, exp)
     }
   }
 
@@ -78,51 +78,52 @@ class Parser(lexer: Lexer) {
 
   def parseCommand: Command = if(peekToken == null) null else {
     val head = nextToken
-    check(head, Tokens.OParen())
+    check(head, Tokens.OParen)
 
-    val cmd = nextToken match {
-      case Tokens.SetLogic() => {
+    val cmdNameToken = nextToken
+    val cmd = cmdNameToken.kind match {
+      case Tokens.SetLogic => {
         val logicSymbol: SSymbol = parseSymbol
         val logic = Logic.fromString(logicSymbol.name)
         SetLogic(logic)
       }
-      case Tokens.SetOption() => {
+      case Tokens.SetOption => {
         SetOption(parseOption)
       }
-      case Tokens.SetInfo() => {
+      case Tokens.SetInfo => {
         SetInfo(parseAttribute)
       }
 
-      case Tokens.DeclareSort() => {
+      case Tokens.DeclareSort => {
         val sym = parseSymbol
         val arity = parseNumeral
         DeclareSort(sym, arity.value.toInt)
       }
-      case Tokens.DefineSort() => {
+      case Tokens.DefineSort => {
         val sym = parseSymbol
 
         val vars = new ListBuffer[SSymbol]
-        eat(Tokens.OParen())
-        while(peekToken != Tokens.CParen())
+        eat(Tokens.OParen)
+        while(peekToken.kind != Tokens.CParen)
           vars.append(parseSymbol)
-        eat(Tokens.CParen())
+        eat(Tokens.CParen)
 
         val sort = parseSort
         DefineSort(sym, vars.toList, sort)
       }
-      case Tokens.DeclareFun() => {
+      case Tokens.DeclareFun => {
         val sym = parseSymbol
 
         val params = new ListBuffer[Sort]
-        eat(Tokens.OParen())
-        while(peekToken != Tokens.CParen())
+        eat(Tokens.OParen)
+        while(peekToken.kind != Tokens.CParen)
           params.append(parseSort)
-        eat(Tokens.CParen())
+        eat(Tokens.CParen)
 
         val sort = parseSort
         DeclareFun(sym, params.toList, sort)
       }
-      case Tokens.DefineFun() => {
+      case Tokens.DefineFun => {
         val name = parseSymbol
 
         val sortedVars = parseMany(parseSortedVar _)
@@ -133,86 +134,86 @@ class Parser(lexer: Lexer) {
 
         DefineFun(name, sortedVars, sort, body)
       }
-      case Tokens.Push() => {
+      case Tokens.Push => {
         val n = parseNumeral
         Push(n.value.toInt)
       }
-      case Tokens.Pop() => {
+      case Tokens.Pop => {
         val n = parseNumeral
         Pop(n.value.toInt)
       }
 
-      case Tokens.Assert() => {
+      case Tokens.Assert => {
         Assert(parseTerm)
       }
 
-      case Tokens.CheckSat() => CheckSat()
-      case Tokens.GetAssertions() => GetAssertions()
-      case Tokens.GetProof() => GetProof()
-      case Tokens.GetUnsatCore() => GetUnsatCore()
-      case Tokens.GetValue() => {
-        eat(Tokens.OParen())
+      case Tokens.CheckSat => CheckSat()
+      case Tokens.GetAssertions => GetAssertions()
+      case Tokens.GetProof => GetProof()
+      case Tokens.GetUnsatCore => GetUnsatCore()
+      case Tokens.GetValue => {
+        eat(Tokens.OParen)
         val ts = new ListBuffer[Term]
-        while(peekToken != Tokens.CParen())
+        while(peekToken.kind != Tokens.CParen)
           ts.append(parseTerm)
-        eat(Tokens.CParen())
+        eat(Tokens.CParen)
         GetValue(ts.head, ts.tail.toList)
       }
-      case Tokens.GetAssignment() => GetAssignment()
+      case Tokens.GetAssignment => GetAssignment()
 
-      case Tokens.GetOption() => {
+      case Tokens.GetOption => {
         val keyword = parseKeyword
         GetOption(keyword)
       }
-      case Tokens.GetInfo() => {
+      case Tokens.GetInfo => {
         val infoFlag = parseInfoFlag
         GetInfo(infoFlag)
       }
 
-      case Tokens.Exit() => Exit()
+      case Tokens.Exit => Exit()
 
-      case Tokens.DeclareDatatypes() => {
-        eat(Tokens.OParen())
-        eat(Tokens.CParen())
+      case Tokens.DeclareDatatypes => {
+        eat(Tokens.OParen)
+        eat(Tokens.CParen)
 
         val datatypes = parseMany(parseDatatypes _)
 
         DeclareDatatypes(datatypes)
       }
 
-      case t => {
-        throw new UnknownCommandException(t)
+      case kind => {
+        throw new UnknownCommandException(kind)
       }
     }
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
 
     cmd.setPos(head)
   }
 
   def parseDatatypes: (SSymbol, Seq[Constructor]) = {
-    eat(Tokens.OParen())
+    eat(Tokens.OParen)
     val name = parseSymbol
     var constructors = new ListBuffer[Constructor]
-    while(peekToken != Tokens.CParen()) {
+    while(peekToken.kind != Tokens.CParen) {
       constructors.append(parseConstructor)
     }
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
     (name, constructors)
   }
 
   def parseConstructor: Constructor = {
-    eat(Tokens.OParen())
+    eat(Tokens.OParen)
     val name = parseSymbol
 
     var fields = new ListBuffer[(SSymbol, Sort)]
-    while(peekToken != Tokens.CParen()) {
-      eat(Tokens.OParen())
+    while(peekToken.kind != Tokens.CParen) {
+      eat(Tokens.OParen)
       val fieldName = parseSymbol
       val fieldSort = parseSort
-      eat(Tokens.CParen())
+      eat(Tokens.CParen)
       fields.append((fieldName, fieldSort))
     }
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
 
     Constructor(name, fields.toList)
   }
@@ -221,11 +222,11 @@ class Parser(lexer: Lexer) {
     nextToken match {
       case Tokens.SymbolLit("success") => Success
       case Tokens.SymbolLit("unsupported") => Unsupported
-      case Tokens.OParen() => {
+      case Tokens.Token(Tokens.OParen) => {
         nextToken match {
           case Tokens.SymbolLit("error") => {
             val msg = parseString.value
-            eat(Tokens.CParen())
+            eat(Tokens.CParen)
             Error(msg)
           }
           case _ => sys.error("TODO")
@@ -237,10 +238,10 @@ class Parser(lexer: Lexer) {
 
   def parseGetAssignmentResponse: GetAssignmentResponse = {
     def parsePair: (SSymbol, Boolean) = {
-      eat(Tokens.OParen())
+      eat(Tokens.OParen)
       val sym = parseSymbol
       val bool = parseBool
-      eat(Tokens.CParen())
+      eat(Tokens.CParen)
       (sym, bool)
     }
 
@@ -250,10 +251,10 @@ class Parser(lexer: Lexer) {
 
   def parseGetValueResponse: GetValueResponse = {
     def parsePair: (Term, Term) = {
-      eat(Tokens.OParen())
+      eat(Tokens.OParen)
       val t1 = parseTerm
       val t2 = parseTerm
-      eat(Tokens.CParen())
+      eat(Tokens.CParen)
       (t1, t2)
     }
 
@@ -270,19 +271,22 @@ class Parser(lexer: Lexer) {
   }
 
   def parseGetModelResponse: GetModelResponse = {
-    eat(Tokens.OParen())
-    eat(Tokens.SymbolLit("model"))
+    eat(Tokens.OParen)
+    nextToken match {
+      case Tokens.SymbolLit("model") => ()
+      case t => expected(t, Tokens.SymbolLitKind) //TODO: expected symbol of value "model"
+    }
     var exprs: ListBuffer[SExpr] = new ListBuffer
-    while(peekToken != Tokens.CParen()) {
+    while(peekToken.kind != Tokens.CParen) {
       try {
         exprs.append(parseCommand)
       } catch {
         case ex: UnknownCommandException => {
           ex.commandName match { //recover for exceptions case in get-model
-            case Tokens.ForAll() =>
+            case Tokens.ForAll =>
               val vars = parseMany(parseSortedVar _)
               val term = parseTerm
-              eat(Tokens.CParen())
+              eat(Tokens.CParen)
               exprs.append(ForAll(vars.head, vars.tail, term))
             case _ =>
               throw ex
@@ -290,16 +294,16 @@ class Parser(lexer: Lexer) {
         }
       }
     }
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
     GetModelResponse(exprs.toList)
   }
 
   def parseSExprResponse: SExprResponse = {
-    eat(Tokens.OParen())
+    eat(Tokens.OParen)
     var exprs = new ListBuffer[SExpr]
-    while(peekToken != Tokens.CParen())
+    while(peekToken.kind != Tokens.CParen)
       exprs.append(parseSExpr)
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
     SExprResponse(SList(exprs.toList))
   }
 
@@ -370,7 +374,7 @@ class Parser(lexer: Lexer) {
       case Tokens.Keyword("reason-unknown") => ReasonUnknownInfoFlag
       case Tokens.Keyword("all-statistics") => AllStatisticsInfoFlag
       case Tokens.Keyword(keyword) => KeywordInfoFlag(keyword)
-      case _ => sys.error("TODO")
+      case t => expected(t, Tokens.KeywordKind)
     }
   }
 
@@ -381,14 +385,14 @@ class Parser(lexer: Lexer) {
   }
 
   def tryParseAttributeValue: Option[AttributeValue] = {
-    peekToken match {
-      case Tokens.NumeralLit(_) => Some(parseNumeral)
-      case Tokens.BinaryLit(_) => Some(parseBinary)
-      case Tokens.HexadecimalLit(_) => Some(parseHexadecimal)
-      case Tokens.DecimalLit(_) => Some(parseDecimal)
-      case Tokens.StringLit(_) => Some(parseString)
-      case Tokens.SymbolLit(_) => Some(parseSymbol)
-      case Tokens.OParen() => Some(parseSList)
+    if(peekToken == null) None else peekToken.kind match {
+      case Tokens.NumeralLitKind => Some(parseNumeral)
+      case Tokens.BinaryLitKind => Some(parseBinary)
+      case Tokens.HexadecimalLitKind => Some(parseHexadecimal)
+      case Tokens.DecimalLitKind => Some(parseDecimal)
+      case Tokens.StringLitKind => Some(parseString)
+      case Tokens.SymbolLitKind => Some(parseSymbol)
+      case Tokens.OParen => Some(parseSList)
       case _ => None
     }
   }
@@ -437,7 +441,7 @@ class Parser(lexer: Lexer) {
     nextToken match {
       case Tokens.SymbolLit("true") => true
       case Tokens.SymbolLit("false") => false
-      case _ => sys.error("TODO")
+      case t => sys.error("TODO") //not sure how to tell we were expecting one of two specific symbols
     }
   }
 
@@ -447,7 +451,7 @@ class Parser(lexer: Lexer) {
         val str = SString(s)
         str.setPos(t)
       }
-      case _ => sys.error("TODO")
+      case t => expected(t, Tokens.StringLitKind)
     }
   }
   def parseSymbol: SSymbol = {
@@ -456,7 +460,7 @@ class Parser(lexer: Lexer) {
         val symbol = SSymbol(s)
         symbol.setPos(t)
       }
-      case t => expected(Tokens.SymbolLit("x"), t) //TODO: expected should be of token class
+      case t => expected(t, Tokens.SymbolLitKind)
     }
   }
 
@@ -466,7 +470,7 @@ class Parser(lexer: Lexer) {
         val num = SNumeral(n)
         num.setPos(t)
       }
-      case _ => sys.error("TODO")
+      case token => expected(token, Tokens.NumeralLitKind)
     }
   }
 
@@ -476,7 +480,7 @@ class Parser(lexer: Lexer) {
         val dec = SDecimal(n)
         dec.setPos(t)
       }
-      case _ => sys.error("TODO")
+      case token => expected(token, Tokens.DecimalLitKind)
     }
   }
 
@@ -486,7 +490,7 @@ class Parser(lexer: Lexer) {
         val keyword = SKeyword(k)
         keyword.setPos(t)
       }
-      case _ => sys.error("TODO")
+      case token => expected(token, Tokens.KeywordKind)
     }
   }
 
@@ -496,7 +500,7 @@ class Parser(lexer: Lexer) {
         val hexa = SHexadecimal(h)
         hexa.setPos(t)
       }
-      case _ => sys.error("TODO")
+      case token => expected(token, Tokens.HexadecimalLitKind)
     }
   }
 
@@ -506,15 +510,15 @@ class Parser(lexer: Lexer) {
         val bin = SBinary(b.toList)
         bin.setPos(t)
       }
-      case _ => sys.error("TODO")
+      case token => expected(token, Tokens.BinaryLitKind)
     }
   }
 
   def parseSort: Sort = {
-    if(peekToken == Tokens.OParen()) {
-      eat(Tokens.OParen())
+    if(peekToken.kind == Tokens.OParen) {
+      eat(Tokens.OParen)
 
-      if(peekToken == Tokens.Underscore()) {
+      if(peekToken.kind == Tokens.Underscore) {
         val id = parseUnderscoreIdentifier
         Sort(id)
       } else {
@@ -522,9 +526,9 @@ class Parser(lexer: Lexer) {
         val name = parseIdentifier
 
         var subSorts = new ListBuffer[Sort]
-        while(peekToken != Tokens.CParen())
+        while(peekToken.kind != Tokens.CParen)
           subSorts.append(parseSort)
-        eat(Tokens.CParen())
+        eat(Tokens.CParen)
 
         Sort(name, subSorts.toList)
       }
@@ -535,38 +539,38 @@ class Parser(lexer: Lexer) {
   }
 
   def parseUnderscoreIdentifier: Identifier = {
-    eat(Tokens.Underscore())
+    eat(Tokens.Underscore)
     val sym = parseSymbol
 
-    peekToken match {
-      case Tokens.SymbolLit(_) => {
+    peekToken.kind match {
+      case Tokens.SymbolLitKind => {
         val ext = parseSymbol
-        eat(Tokens.CParen())
+        eat(Tokens.CParen)
         ExtendedIdentifier(sym, ext)
       }
       case _ => {
         val firstIndex = parseNumeral.value.toInt
         var indices = new ListBuffer[Int]
-        while(peekToken != Tokens.CParen())
+        while(peekToken.kind != Tokens.CParen)
           indices.append(parseNumeral.value.toInt)
-        eat(Tokens.CParen())
+        eat(Tokens.CParen)
         Identifier(sym, firstIndex :: indices.toList)
       }
     }
   }
 
   def parseQualifiedIdentifier: QualifiedIdentifier = {
-    peekToken match {
-      case Tokens.OParen() => {
-        eat(Tokens.OParen())
-        peekToken match {
-          case Tokens.As() => {
+    peekToken.kind match {
+      case Tokens.OParen => {
+        eat(Tokens.OParen)
+        peekToken.kind match {
+          case Tokens.As => {
             parseAsIdentifier
           }
-          case Tokens.Underscore() => {
+          case Tokens.Underscore => {
             QualifiedIdentifier(parseUnderscoreIdentifier)
           }
-          case _ => sys.error("TODO")
+          case _ => expected(peekToken, Tokens.As, Tokens.Underscore)
         }
       }
       case _ => QualifiedIdentifier(parseIdentifier)
@@ -574,16 +578,16 @@ class Parser(lexer: Lexer) {
   }
 
   def parseAsIdentifier: QualifiedIdentifier = {
-    eat(Tokens.As())
+    eat(Tokens.As)
     val id = parseIdentifier
     val sort = parseSort
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
     QualifiedIdentifier(id, Some(sort))
   }
 
   def parseIdentifier: Identifier = {
-    if(peekToken == Tokens.OParen()) {
-      eat(Tokens.OParen())
+    if(peekToken.kind == Tokens.OParen) {
+      eat(Tokens.OParen)
       parseUnderscoreIdentifier
     } else {
       val sym = parseSymbol
@@ -592,41 +596,41 @@ class Parser(lexer: Lexer) {
   }
 
   def parseTerm: Term = {
-    if(peekToken == Tokens.OParen()) {
-      eat(Tokens.OParen())
+    if(peekToken.kind == Tokens.OParen) {
+      eat(Tokens.OParen)
 
-      peekToken match {
-        case Tokens.Let() =>
-          nextToken
+      peekToken.kind match {
+        case Tokens.Let =>
+          eat(Tokens.Let)
           val bindings = parseMany(parseVarBinding _)
           val term = parseTerm
-          eat(Tokens.CParen())
+          eat(Tokens.CParen)
           Let(bindings.head, bindings.tail, term)
-        case Tokens.ForAll() =>
-          nextToken
+        case Tokens.ForAll =>
+          eat(Tokens.ForAll)
           val vars = parseMany(parseSortedVar _)
           val term = parseTerm
-          eat(Tokens.CParen())
+          eat(Tokens.CParen)
           ForAll(vars.head, vars.tail, term)
-        case Tokens.Exists() =>
-          nextToken
+        case Tokens.Exists =>
+          eat(Tokens.Exists)
           val vars = parseMany(parseSortedVar _)
           val term = parseTerm
-          eat(Tokens.CParen())
+          eat(Tokens.CParen)
           Exists(vars.head, vars.tail, term)
 
-        case Tokens.ExclamationMark() =>
-          nextToken
+        case Tokens.ExclamationMark =>
+          eat(Tokens.ExclamationMark)
           val term = parseTerm
           val attrs = new ListBuffer[Attribute]
-          while(peekToken != Tokens.CParen())
+          while(peekToken.kind != Tokens.CParen)
             attrs.append(parseAttribute)
-          eat(Tokens.CParen())
+          eat(Tokens.CParen)
           AnnotatedTerm(term, attrs.head, attrs.tail)
 
-        case Tokens.As() =>
+        case Tokens.As =>
           parseAsIdentifier
-        case Tokens.Underscore() =>
+        case Tokens.Underscore =>
           QualifiedIdentifier(parseUnderscoreIdentifier)
 
         case _ => //should be function application
@@ -634,13 +638,13 @@ class Parser(lexer: Lexer) {
 
           val terms = new ListBuffer[Term]
 
-          if(peekToken == Tokens.CParen()) {
-            throw new UnexpectedTokenException(null, peekToken)
+          if(peekToken.kind == Tokens.CParen) {
+            expected(peekToken)
           }
 
-          while(peekToken != Tokens.CParen())
+          while(peekToken.kind != Tokens.CParen)
             terms.append(parseTerm)
-          eat(Tokens.CParen())
+          eat(Tokens.CParen)
 
           FunctionApplication(id, terms.toList)
       }
@@ -651,82 +655,88 @@ class Parser(lexer: Lexer) {
   }
 
   def parseVarBinding: VarBinding = {
-    eat(Tokens.OParen())
+    eat(Tokens.OParen)
     val sym = parseSymbol
     val term = parseTerm
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
     VarBinding(sym, term)
   }
   def parseSortedVar: SortedVar = {
-    eat(Tokens.OParen())
+    eat(Tokens.OParen)
     val sym = parseSymbol
     val sort = parseSort
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
     SortedVar(sym, sort)
   }
 
   /* Parse a sequence of A inside () */
   def parseMany[A](parseFun: () => A): Seq[A] = {
     val items = new ListBuffer[A]
-    eat(Tokens.OParen())
-    while(peekToken != Tokens.CParen())
+    eat(Tokens.OParen)
+    while(peekToken.kind != Tokens.CParen)
       items.append(parseFun())
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
     items.toList
   }
 
   def tryParseConstant: Option[Constant] = {
-    peekToken match {
-      case Tokens.NumeralLit(_) => Some(parseNumeral)
-      case Tokens.HexadecimalLit(_) => Some(parseHexadecimal)
-      case Tokens.BinaryLit(_) => Some(parseBinary)
-      case Tokens.DecimalLit(_) => Some(parseDecimal)
-      case Tokens.StringLit(_) => Some(parseString)
+    peekToken.kind match {
+      case Tokens.NumeralLitKind => Some(parseNumeral)
+      case Tokens.HexadecimalLitKind => Some(parseHexadecimal)
+      case Tokens.BinaryLitKind => Some(parseBinary)
+      case Tokens.DecimalLitKind => Some(parseDecimal)
+      case Tokens.StringLitKind => Some(parseString)
       case _ => None
     }
   }
 
   def parseSList: SList = {
-    eat(Tokens.OParen())
+    eat(Tokens.OParen)
     var exprs = new ListBuffer[SExpr]
-    while(peekToken != Tokens.CParen())
+    while(peekToken.kind != Tokens.CParen)
       exprs.append(parseSExpr)
-    eat(Tokens.CParen())
+    eat(Tokens.CParen)
     SList(exprs.toList)
   }
 
 
   def parseSExpr: SExpr = {
-    peekToken match {
-      case Tokens.SymbolLit(_) => parseSymbol
-      case Tokens.NumeralLit(_) => parseNumeral
-      case Tokens.BinaryLit(_) => parseBinary
-      case Tokens.HexadecimalLit(_) => parseHexadecimal
-      case Tokens.DecimalLit(_) => parseDecimal
-      case Tokens.StringLit(_) => parseString
-      case Tokens.Keyword(_) => parseKeyword
-      case Tokens.OParen() => parseSList
-      case _ => sys.error("TODO")
+    peekToken.kind match {
+      case Tokens.SymbolLitKind => parseSymbol
+      case Tokens.NumeralLitKind => parseNumeral
+      case Tokens.BinaryLitKind => parseBinary
+      case Tokens.HexadecimalLitKind => parseHexadecimal
+      case Tokens.DecimalLitKind => parseDecimal
+      case Tokens.StringLitKind => parseString
+      case Tokens.KeywordKind => parseKeyword
+      case Tokens.OParen => parseSList
+      case kind => 
+        expected(peekToken, 
+                 Tokens.SymbolLitKind, Tokens.NumeralLitKind, Tokens.BinaryLitKind,
+                 Tokens.HexadecimalLitKind, Tokens.DecimalLitKind, Tokens.StringLitKind,
+                 Tokens.KeywordKind, Tokens.OParen)
     }
   }
 
   //TODO: we need a token class/type, instead of precise token with content + position
-  def expected(expected: Token, found: Token): Nothing = {
-    throw new UnexpectedTokenException(expected, found)
+  def expected(found: Token, expected: TokenKind*): Nothing = {
+    throw new UnexpectedTokenException(found, expected)
   }
 
 }
 
 object Parser {
 
-  class UnknownCommandException(val commandName: Token) extends Exception("Unknown command name token: " + commandName)
-  class UnexpectedTokenException(expected: Token, found: Token) 
+  class UnknownCommandException(val commandName: TokenKind) extends Exception("Unknown command name token: " + commandName)
+
+  class UnexpectedTokenException(found: Token, expected: Seq[TokenKind])
     extends Exception("Unexpected token at position: " + found.getPos + ". Expected: " + expected + ". Found: " + found)
 
   def fromString(str: String): Parser = {
     val lexer = new Lexer(new java.io.StringReader(str))
     new Parser(lexer)
   }
+
 
 //  class EOFBeforeMatchingParenthesisException(startPos: Position) extends
 //    Exception("Opened parenthesis at position: " + startPos + " has no matching closing parenthesis")

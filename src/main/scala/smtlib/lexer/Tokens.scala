@@ -3,61 +3,68 @@ package lexer
 
 import common._
 
-
 object Tokens {
 
-  sealed abstract class Token extends Positioned
+  sealed class Token(val kind: TokenKind) extends Positioned
+  object Token {
+    def apply(kind: TokenKind): Token = new Token(kind)
+    def unapply(token: Token): Option[TokenKind] = Some(token.kind)
+  }
 
-  /*
-   * Need to be case class since each instance is different because of their positions
-   * Alternatively, we could create a Token wrapper class that would be Positioned and
-   * use the list of Tokens as a token information element.
-   */
-  case class OParen() extends Token /* ( */
-  case class CParen() extends Token /* ) */
+  case class StringLit(content: String) extends Token(StringLitKind)
+  case class SymbolLit(content: String) extends Token(SymbolLitKind)
+  case class Keyword(name: String) extends Token(KeywordKind)
 
-  case class StringLit(content: String) extends Token /* "hello" */
+  case class NumeralLit(n: BigInt) extends Token(NumeralLitKind)
+  case class DecimalLit(d: Double) extends Token(DecimalLitKind)
+  case class BinaryLit(content: Seq[Boolean]) extends Token(BinaryLitKind)
+  case class HexadecimalLit(content: Hexadecimal) extends Token(HexadecimalLitKind)
 
-  case class SymbolLit(content: String) extends Token /* hello */
-  case class Keyword(name: String) extends Token /* :bar */
+  sealed abstract class TokenKind
 
-  case class NumeralLit(n: BigInt) extends Token /* 42 */
-  case class DecimalLit(d: Double) extends Token /* 42.24 */ //TODO: infinite precision ?
-  case class BinaryLit(content: Seq[Boolean]) extends Token /* #b0101 */ 
-  case class HexadecimalLit(content: Hexadecimal) extends Token /* #xFF1D */
+  case object OParen extends TokenKind /* ( */
+  case object CParen extends TokenKind /* ) */
 
-  sealed trait ReservedWord extends Token
-  case class Par() extends ReservedWord
-  case class NUMERAL() extends ReservedWord
-  case class DECIMAL() extends ReservedWord
-  case class STRING() extends ReservedWord
-  case class Underscore() extends ReservedWord /* _ */
-  case class ExclamationMark() extends ReservedWord /* ! */
-  case class As() extends ReservedWord /* as */
-  case class Let() extends ReservedWord /* let */
-  case class ForAll() extends ReservedWord /* forall */
-  case class Exists() extends ReservedWord /* exists */
+  case object StringLitKind extends TokenKind /* "hello" */
+  case object SymbolLitKind extends TokenKind /* hello */
+  case object KeywordKind extends TokenKind /* :bar */
+  case object NumeralLitKind extends TokenKind /* 42 */
+  case object DecimalLitKind extends TokenKind /* 42.24 */
+  case object BinaryLitKind extends TokenKind /* #b0101 */ 
+  case object HexadecimalLitKind extends TokenKind /* #xFF1D */
 
-  case class Assert() extends ReservedWord
-  case class CheckSat() extends ReservedWord
-  case class DeclareSort() extends ReservedWord
-  case class DeclareFun() extends ReservedWord
-  case class DefineSort() extends ReservedWord
-  case class DefineFun() extends ReservedWord
-  case class Exit() extends ReservedWord
-  case class GetAssertions() extends ReservedWord
-  case class GetAssignment() extends ReservedWord
-  case class GetInfo() extends ReservedWord
-  case class GetOption() extends ReservedWord
-  case class GetProof() extends ReservedWord
-  case class GetUnsatCore() extends ReservedWord
-  case class GetValue() extends ReservedWord
-  case class Pop() extends ReservedWord
-  case class Push() extends ReservedWord
-  case class SetLogic() extends ReservedWord
-  case class SetInfo() extends ReservedWord
-  case class SetOption() extends ReservedWord
+  sealed trait ReservedWord extends TokenKind
+  case object Par extends ReservedWord
+  case object NUMERAL extends ReservedWord
+  case object DECIMAL extends ReservedWord
+  case object STRING extends ReservedWord
+  case object Underscore extends ReservedWord /* _ */
+  case object ExclamationMark extends ReservedWord /* ! */
+  case object As extends ReservedWord /* as */
+  case object Let extends ReservedWord /* let */
+  case object ForAll extends ReservedWord /* forall */
+  case object Exists extends ReservedWord /* exists */
 
-  case class DeclareDatatypes() extends ReservedWord
+  case object Assert extends ReservedWord
+  case object CheckSat extends ReservedWord
+  case object DeclareSort extends ReservedWord
+  case object DeclareFun extends ReservedWord
+  case object DefineSort extends ReservedWord
+  case object DefineFun extends ReservedWord
+  case object Exit extends ReservedWord
+  case object GetAssertions extends ReservedWord
+  case object GetAssignment extends ReservedWord
+  case object GetInfo extends ReservedWord
+  case object GetOption extends ReservedWord
+  case object GetProof extends ReservedWord
+  case object GetUnsatCore extends ReservedWord
+  case object GetValue extends ReservedWord
+  case object Pop extends ReservedWord
+  case object Push extends ReservedWord
+  case object SetLogic extends ReservedWord
+  case object SetInfo extends ReservedWord
+  case object SetOption extends ReservedWord
+
+  case object DeclareDatatypes extends ReservedWord
 
 }
