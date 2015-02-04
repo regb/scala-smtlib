@@ -226,6 +226,16 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
         writer.write(')')
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")")
+    case GetModelResponse(exprs) => {
+      def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
+        case (cmd: Command) => printCommand(cmd, writer)
+        case (term: Term) => printTerm(term, writer)
+        case _ => printSExpr(expr, writer)
+      }
+      writer.write("(model \n")
+      printNary(writer, exprs, printGetModelResponseEntry, "", "\n", "")
+      writer.write(')')
+    }
     case _ => ???
   }
 

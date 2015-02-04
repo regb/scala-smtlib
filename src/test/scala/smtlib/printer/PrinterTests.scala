@@ -25,7 +25,8 @@ class PrinterTests extends FunSuite {
   private implicit def strToKeyword(str: String): SKeyword = SKeyword(str)
   private implicit def symToTerm(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(sym.name)
 
-  def mkTests(implicit printer: Printer): Unit = {
+  def mkTests(printer: Printer): Unit = {
+    implicit val p = printer
     val printerName = printer.getClass.getName
     test(printerName + ": printing simple Terms") { testSimpleTerms }
     test(printerName + ": Printing tricky Terms") { testTrickyTerms }
@@ -36,6 +37,7 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing declare-datatypes commands") { testDeclareDatatypes }
     test(printerName + ": Printing simple script") { testSimpleScript }
     test(printerName + ": Printing Commands Responses") { testCommandsResponses }
+    test(printerName + ": Printing non-standard Commands Responses") { testNonStandardCommandsResponses }
   }
 
   mkTests(RecursivePrinter)
@@ -232,23 +234,23 @@ class PrinterTests extends FunSuite {
 
   def testCommandsResponses(implicit printer: Printer): Unit = {
 
-    def printGenRes(res: GenResponse): String = RecursivePrinter.toString(res) 
+    def printGenRes(res: GenResponse): String = printer.toString(res) 
     def parseGenRes(in: String): GenResponse = Parser.fromString(in).parseGenResponse
     check(Success, printGenRes, parseGenRes)
     check(Unsupported, printGenRes, parseGenRes)
     check(Error("symbol missing"), printGenRes, parseGenRes)
 
-    def printGetAssignRes(res: GetAssignmentResponse): String = RecursivePrinter.toString(res)
+    def printGetAssignRes(res: GetAssignmentResponse): String = printer.toString(res)
     def parseGetAssignRes(in: String): GetAssignmentResponse = Parser.fromString(in).parseGetAssignmentResponse
     //TODO: some tests with get-assignment
 
-    def printCheckSat(res: CheckSatResponse): String = RecursivePrinter.toString(res) 
+    def printCheckSat(res: CheckSatResponse): String = printer.toString(res) 
     def parseCheckSat(in: String): CheckSatResponse = Parser.fromString(in).parseCheckSatResponse
     check(CheckSatResponse(SatStatus), printCheckSat, parseCheckSat)
     check(CheckSatResponse(UnsatStatus), printCheckSat, parseCheckSat)
     check(CheckSatResponse(UnknownStatus), printCheckSat, parseCheckSat)
 
-    def printGetValue(res: GetValueResponse): String = RecursivePrinter.toString(res)
+    def printGetValue(res: GetValueResponse): String = printer.toString(res)
     def parseGetValue(in: String): GetValueResponse = Parser.fromString(in).parseGetValueResponse
 
     check(GetValueResponse(Seq( 
@@ -258,6 +260,25 @@ class PrinterTests extends FunSuite {
            (SSymbol("a"), SNumeral(42)), 
            (SSymbol("b"), SNumeral(12)) 
          )), printGetValue, parseGetValue)
+  }
+  def testNonStandardCommandsResponses(implicit printer: Printer): Unit = {
+    def printGetModel(res: GetModelResponse): String = printer.toString(res)
+    def parseGetModel(in: String): GetModelResponse = Parser.fromString(in).parseGetModelResponse
+    check(
+      GetModelResponse(List(DefineFun("z", Seq(), Sort("Int"), SNumeral(0)))),
+      printGetModel,
+      parseGetModel
+    )
+
+    check(
+      GetModelResponse(List(
+        DefineFun("z", Seq(), Sort("Int"), SNumeral(0)),
+        DeclareFun("a", Seq(), Sort("A")),
+        ForAll(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
+      )),
+      printGetModel,
+      parseGetModel
+    )
   }
 
   test("Printing deep trees with tail printer") {
@@ -277,6 +298,5 @@ class PrinterTests extends FunSuite {
     //val t2 = mkDeepTerm(100000, SString("base case"))
     //TailPrinter.toString(t2)
   }
-
 
 }

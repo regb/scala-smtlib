@@ -64,7 +64,11 @@ object CommandsResponses {
 
   sealed trait NonStandardResponse extends CommandResponse
 
-  //Z3 get-model
+  /*
+   * Z3 get-model. the model is a list of SExpr, but most S-Expr are actually well structured
+   * like define-fun commands. We use SExpr as there are some ForAll Term as well (which are
+   * not the same type as Command)
+   */
   case class GetModelResponse(model: List[SExpr]) extends NonStandardResponse
 
 

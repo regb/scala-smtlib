@@ -191,6 +191,16 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
         actions.prepend(() => writer.write('('))
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
+    case GetModelResponse(exprs) => {
+      def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
+        case (cmd: Command) => printCommand(cmd, writer, actions)
+        case (term: Term) => printTerm(term, writer, actions)
+        case _ => printSExpr(expr, writer, actions)
+      }
+      actions.prepend(() => writer.write(')'))
+      actions.prepend(() => printNary(writer, exprs, printGetModelResponseEntry, "", "\n", "", actions))
+      actions.prepend(() => writer.write("(model \n"))
+    }
     case _ => ???
   }
 
