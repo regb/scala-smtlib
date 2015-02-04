@@ -21,7 +21,7 @@ class Parser(lexer: Lexer) {
   /* lookAhead token is Some(null) if we reached eof */
   private var _lookAhead: Option[Token] = None
 
-  //return a next token or null if EOF
+  //return a next token or throw UnexpectedEOFException if the next token is null
   private def nextToken: Token = {
     _lookAhead match {
       case Some(t) => {
@@ -720,7 +720,10 @@ class Parser(lexer: Lexer) {
 
   //TODO: we need a token class/type, instead of precise token with content + position
   def expected(found: Token, expected: TokenKind*): Nothing = {
-    throw new UnexpectedTokenException(found, expected)
+    if(found == null)
+      throw new UnexpectedEOFException(expected)
+    else
+      throw new UnexpectedTokenException(found, expected)
   }
 
 }
@@ -731,6 +734,9 @@ object Parser {
 
   class UnexpectedTokenException(found: Token, expected: Seq[TokenKind])
     extends Exception("Unexpected token at position: " + found.getPos + ". Expected: " + expected + ". Found: " + found)
+
+  class UnexpectedEOFException(expected: Seq[TokenKind])
+    extends Exception("Unexpected end of file. Expected: " + expected)
 
   def fromString(str: String): Parser = {
     val lexer = new Lexer(new java.io.StringReader(str))
