@@ -95,9 +95,6 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseSort("((_ FixedSizeList 4) Real)") === 
                      Sort(Identifier("FixedSizeList", Seq(4)), Seq(Sort("Real"))))
     assert(parseSort("(Set (_ Bitvec 3))") === Sort(Identifier("Set"), Seq(Sort(Identifier("Bitvec", Seq(3))))))
-
-
-
   }
 
   test("Parsing Identifiers") {

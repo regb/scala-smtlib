@@ -229,10 +229,10 @@ class Parser(lexer: Lexer) {
             eat(Tokens.CParen)
             Error(msg)
           }
-          case _ => sys.error("TODO")
+          case t => expected(t)
         }
       }
-      case _ => sys.error("TODO")
+      case t => expected(t)
     }
   }
 
@@ -314,7 +314,7 @@ class Parser(lexer: Lexer) {
         val behaviour = nextToken match {
           case Tokens.SymbolLit("immediate-exit") => ImmediateExitErrorBehaviour
           case Tokens.SymbolLit("continued-execution") => ContinueExecutionErrorBehaviour
-          case _ => sys.error("TODO")
+          case t => expected(t) //TODO: precise error
         }
         ErrorBehaviourInfoResponse(behaviour)
       case Tokens.Keyword("name") =>
@@ -332,7 +332,7 @@ class Parser(lexer: Lexer) {
           case Tokens.SymbolLit("timeout") => TimeoutReasonUnknown
           case Tokens.SymbolLit("memout") => MemoutReasonUnknown
           case Tokens.SymbolLit("incomplete") => IncompleteReasonUnknown
-          case _ => sys.error("TODO")
+          case t => expected(t) //TODO: precise error
         }
         ReasonUnkownionInfoResponse(reason)
       case _ =>
@@ -350,7 +350,7 @@ class Parser(lexer: Lexer) {
       case Tokens.SymbolLit("sat") => CheckSatResponse(SatStatus)
       case Tokens.SymbolLit("unsat") => CheckSatResponse(UnsatStatus)
       case Tokens.SymbolLit("unknown") => CheckSatResponse(UnknownStatus)
-      case _ => sys.error("TODO")
+      case t => expected(t)
     }
   }
 
@@ -441,7 +441,7 @@ class Parser(lexer: Lexer) {
     nextToken match {
       case Tokens.SymbolLit("true") => true
       case Tokens.SymbolLit("false") => false
-      case t => sys.error("TODO") //not sure how to tell we were expecting one of two specific symbols
+      case t => expected(t) //TODO: not sure how to tell we were expecting one of two specific symbols
     }
   }
 
