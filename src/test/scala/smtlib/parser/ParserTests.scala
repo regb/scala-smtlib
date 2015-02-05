@@ -117,28 +117,65 @@ class ParserTests extends FunSuite with Timeouts {
 
   }
 
-  test("Parsing simple Terms") {
-
+  test("Literal/constant terms are parsed correctly") {
     assert(parseUniqueTerm("42") === SNumeral(42))
     assert(parseUniqueTerm("42.12") === SDecimal(42.12))
     assert(parseUniqueTerm("#xF") === SHexadecimal(Hexadecimal.fromString("F").get))
     assert(parseUniqueTerm("#b1") === SBinary(List(true)))
+  }
+
+  test("Correctly parsing identifier and qualfieid identifiers terms") {
     assert(parseUniqueTerm("abc") === QualifiedIdentifier("abc"))
+    assert(parseUniqueTerm("eee") === QualifiedIdentifier("eee"))
+
     assert(parseUniqueTerm("(as abc A)") === QualifiedIdentifier("abc", Some(Sort("A"))))
+    assert(parseUniqueTerm("(as aaaa AB)") === QualifiedIdentifier("aaaa", Some(Sort("AB"))))
+    assert(parseUniqueTerm("(as aaaa (A B C))") === QualifiedIdentifier("aaaa", Some(Sort("A", Seq(Sort("B"), Sort("C"))))))
+
     assert(parseUniqueTerm("(_ abc 42)") === QualifiedIdentifier(Identifier("abc", Seq(42))))
+    assert(parseUniqueTerm("(_ efg 12)") === QualifiedIdentifier(Identifier("efg", Seq(12))))
+  }
+
+  test("Test weird syntax combination of as/_ for identifier") {
     assert(parseUniqueTerm("(as (_ abc 42) A)") === QualifiedIdentifier(Identifier("abc", Seq(42)), Some(Sort("A"))))
+  }
+
+  test("Parsing function applications") {
     assert(parseUniqueTerm("(f a b)") === 
            FunctionApplication(
             QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
+
+    assert(parseUniqueTerm("(f (g a b) c)") === 
+           FunctionApplication(
+            QualifiedIdentifier("f"), Seq(
+              FunctionApplication(
+                QualifiedIdentifier("g"), 
+                Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))
+              ),
+              QualifiedIdentifier("c"))))
+  }
+
+  test("Parsing Let bindings terms") {
     assert(parseUniqueTerm("(let ((a x)) a)") ===
            Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))
 
+    assert(parseUniqueTerm("(let ((a x) (b y)) (f a b))") ===
+           Let(VarBinding("a", QualifiedIdentifier("x")), 
+               Seq(VarBinding("b", QualifiedIdentifier("y"))), 
+               FunctionApplication(QualifiedIdentifier("f"),
+                Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b")))))
+  }
+
+  test("Parsing quantified terms") {
     assert(parseUniqueTerm("(forall ((a A)) a)") ===
            ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
           )
     assert(parseUniqueTerm("(exists ((a A)) a)") ===
            Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
           )
+  }
+
+  test("Parsing annotated term") {
     assert(parseUniqueTerm("(! a :note abcd)") ===
            AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq())
           )
@@ -171,8 +208,7 @@ class ParserTests extends FunSuite with Timeouts {
     )
   }
 
-  test("Parsing illegal terms") {
-    //function application with no argument is illegal
+  test("Parsing FunctionApplication without argument should throws UnexpectedTokenException") {
     intercept[UnexpectedTokenException] {
       parseUniqueTerm("(f)")
     }
