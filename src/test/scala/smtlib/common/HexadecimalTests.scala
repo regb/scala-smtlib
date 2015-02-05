@@ -69,15 +69,17 @@ class HexadecimalTests extends FunSuite {
   }
 
   test("fromInt converts positive int to hexadecimal") {
-    assert(Hexadecimal.fromInt(0).get.repr === "00000000")
-    assert(Hexadecimal.fromInt(1).get.repr === "00000001")
-    assert(Hexadecimal.fromInt(15).get.repr === "0000000F")
-    assert(Hexadecimal.fromInt(30).get.repr === "0000001E")
+    assert(Hexadecimal.fromInt(0).repr === "00000000")
+    assert(Hexadecimal.fromInt(1).repr === "00000001")
+    assert(Hexadecimal.fromInt(15).repr === "0000000F")
+    assert(Hexadecimal.fromInt(30).repr === "0000001E")
   }
 
-  //TODO: current behavior is to refuse negative int, but we should be able to parse them into an hexadecimal
   test("fromInt converts negative int to hexadecimal") {
-    assert(Hexadecimal.fromInt(-30) === None)
+    assert(Hexadecimal.fromInt(-1).repr === "FFFFFFFF")
+    assert(Hexadecimal.fromInt(-2).repr === "FFFFFFFE")
+    assert(Hexadecimal.fromInt(-81).repr === "FFFFFFAF")
+    assert(Hexadecimal.fromInt(-2147483648).repr === "80000000")
   }
 
 }

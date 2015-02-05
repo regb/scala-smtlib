@@ -73,9 +73,15 @@ object Hexadecimal {
   /*
    * return a 32-bits hexadecimal integer
    */
-  //TODO: negative n as well, just mapping 32 bits to hexadecimal
-  def fromInt(n: Int): Option[Hexadecimal] = {
-    if(n < 0) None else {
+  def fromInt(n: Int): Hexadecimal = {
+    if(n < 0) {
+      var res = "00000000".toArray
+      for(i <- 0 until 8) {
+        val digit = (n >> (32 - 4*(i+1))) & 15
+        res(i) = toDigit(digit)
+      }
+      fromString(res.mkString).get
+    } else {
 
       var i = 0
       var rest = n
@@ -88,7 +94,7 @@ object Hexadecimal {
         i += 1
       }
 
-      fromString(repr)
+      fromString(repr).get
     }
   }
 
