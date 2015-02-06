@@ -60,6 +60,9 @@ class Parser(lexer: Lexer) {
   }
 
   private def check(current: Token, exp: TokenKind): Unit = {
+    if(current == null)
+      throw new UnexpectedEOFException(Seq(exp))
+
     if(current.kind != exp) {
       expected(current, exp)
     }
@@ -642,7 +645,7 @@ class Parser(lexer: Lexer) {
             expected(peekToken)
           }
 
-          while(peekToken.kind != Tokens.CParen)
+          while(peekToken != null && peekToken.kind != Tokens.CParen)
             terms.append(parseTerm)
           eat(Tokens.CParen)
 
@@ -673,7 +676,7 @@ class Parser(lexer: Lexer) {
   def parseMany[A](parseFun: () => A): Seq[A] = {
     val items = new ListBuffer[A]
     eat(Tokens.OParen)
-    while(peekToken.kind != Tokens.CParen)
+    while(peekToken != null && peekToken.kind != Tokens.CParen)
       items.append(parseFun())
     eat(Tokens.CParen)
     items.toList

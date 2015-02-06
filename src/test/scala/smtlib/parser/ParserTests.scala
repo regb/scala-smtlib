@@ -170,14 +170,30 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueTerm("(forall ((a A)) a)") ===
            ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
           )
+    assert(parseUniqueTerm("(forall ((a A) (b B) (c C)) (f a c))") ===
+           ForAll(SortedVar("a", Sort("A")), 
+                  Seq(SortedVar("b", Sort("B")), SortedVar("c", Sort("C"))),
+                  FunctionApplication(QualifiedIdentifier("f"),
+                    Seq(QualifiedIdentifier("a"), QualifiedIdentifier("c")))))
+
     assert(parseUniqueTerm("(exists ((a A)) a)") ===
            Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
           )
+    assert(parseUniqueTerm("(exists ((a A) (b B) (c C)) (f a c))") ===
+           Exists(SortedVar("a", Sort("A")), 
+                  Seq(SortedVar("b", Sort("B")), SortedVar("c", Sort("C"))),
+                  FunctionApplication(QualifiedIdentifier("f"),
+                    Seq(QualifiedIdentifier("a"), QualifiedIdentifier("c")))))
   }
 
   test("Parsing annotated term") {
     assert(parseUniqueTerm("(! a :note abcd)") ===
            AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq())
+          )
+    assert(parseUniqueTerm("(! (f a) :note abcd)") ===
+           AnnotatedTerm(
+            FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))), 
+            Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq())
           )
 
   }
@@ -208,7 +224,16 @@ class ParserTests extends FunSuite with Timeouts {
     )
   }
 
-  test("Parsing FunctionApplication without argument should throws UnexpectedTokenException") {
+  test("Parsing FunctionApplication without closing parentheses should throw UnexpectedEOFException") {
+    intercept[UnexpectedEOFException] {
+      parseUniqueTerm("(f a b")
+    }
+    intercept[UnexpectedEOFException] {
+      parseUniqueTerm("(f a (g b)") //more subtle
+    }
+  }
+
+  test("Parsing FunctionApplication without argument should throw UnexpectedTokenException") {
     intercept[UnexpectedTokenException] {
       parseUniqueTerm("(f)")
     }
