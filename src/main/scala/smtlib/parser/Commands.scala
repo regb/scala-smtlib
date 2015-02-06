@@ -85,6 +85,12 @@ object Commands {
   case class AttributeOption(attribute: Attribute) extends SMTOption
 
 
+  /*
+   * TODO: It would probably be more consistent to use a SSymbol as 
+   *       the logic in SetLogic command, and maybe provides a list of
+   *       extractor for standard logics instead of a separate type.
+   *       The reason being that the standard only requires a symbol here.
+   */
   sealed abstract class Logic
   case object QF_UF extends Logic
   case object QF_LRA extends Logic
