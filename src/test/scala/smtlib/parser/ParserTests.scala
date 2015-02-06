@@ -293,13 +293,37 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(set-option :expand-definitions false)") === SetOption(ExpandDefinitions(false)))
     assert(parseUniqueCmd("(set-option :interactive-mode true)") === SetOption(InteractiveMode(true)))
     assert(parseUniqueCmd("(set-option :interactive-mode false)") === SetOption(InteractiveMode(false)))
+
+    assert(parseUniqueCmd("(set-option :produce-proofs true)") === SetOption(ProduceProofs(true)))
+    assert(parseUniqueCmd("(set-option :produce-proofs false)") === SetOption(ProduceProofs(false)))
+    assert(parseUniqueCmd("(set-option :produce-unsat-cores true)") === SetOption(ProduceUnsatCores(true)))
+    assert(parseUniqueCmd("(set-option :produce-unsat-cores false)") === SetOption(ProduceUnsatCores(false)))
+    assert(parseUniqueCmd("(set-option :produce-models true)") === SetOption(ProduceModels(true)))
+    assert(parseUniqueCmd("(set-option :produce-models false)") === SetOption(ProduceModels(false)))
+    assert(parseUniqueCmd("(set-option :produce-assignments true)") === SetOption(ProduceAssignments(true)))
+    assert(parseUniqueCmd("(set-option :produce-assignments false)") === SetOption(ProduceAssignments(false)))
+
     assert(parseUniqueCmd("""(set-option :regular-output-channel "test")""") === 
                           SetOption(RegularOutputChannel("test")))
     assert(parseUniqueCmd("""(set-option :diagnostic-output-channel "toto")""") === 
                           SetOption(DiagnosticOutputChannel("toto")))
+
     assert(parseUniqueCmd("(set-option :random-seed 42)") === SetOption(RandomSeed(42)))
     assert(parseUniqueCmd("(set-option :verbosity 4)") === SetOption(Verbosity(4)))
 
+    assert(parseUniqueCmd("(set-option :custom 42)") === SetOption(AttributeOption(
+      Attribute(SKeyword("custom"), Some(SNumeral(42))))))
+    assert(parseUniqueCmd("(set-option :my-option)") === SetOption(AttributeOption(
+      Attribute(SKeyword("my-option"), None))))
+    assert(parseUniqueCmd("""(set-option :custom "abcd")""") === SetOption(AttributeOption(
+      Attribute(SKeyword("custom"), Some(SString("abcd"))))))
+  }
+
+  //no (set-option :attribute :value)
+  test("Attribute value cannot be a kewyord. Should throw UnexpectedTokenException") {
+    intercept[UnexpectedTokenException] {
+      parseUniqueCmd("""(set-option :custom :abcd)""")
+    }
   }
 
   test("Parsing set-info command") {
