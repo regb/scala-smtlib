@@ -300,7 +300,8 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       writer.write(key)
     case SSymbol(sym) =>
       writer.write(sym)
-    case _ => sys.error("TODO")
+    case (c: Constant) =>
+      printConstant(c, writer)
   }
 
 

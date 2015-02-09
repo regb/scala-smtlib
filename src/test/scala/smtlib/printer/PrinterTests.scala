@@ -35,6 +35,7 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing Sorts") { testSorts }
     test(printerName + ": Printing single Commands") { testSingleCommands }
     test(printerName + ": Printing declare-datatypes commands") { testDeclareDatatypes }
+    test(printerName + ": Printing set-option commands") { testSetOptionCommand }
     test(printerName + ": Printing simple script") { testSimpleScript }
     test(printerName + ": Printing Commands Responses") { testCommandsResponses }
     test(printerName + ": Printing non-standard Commands Responses") { testNonStandardCommandsResponses }
@@ -219,6 +220,30 @@ class PrinterTests extends FunSuite {
                                       Seq(SSymbol("a2a") -> Sort("A"), SSymbol("a2b") -> Sort("A"))))
     )))
   }
+
+  def testSetOptionCommand(implicit printer: Printer): Unit = {
+    checkCommand(SetOption(PrintSuccess(true)))
+    checkCommand(SetOption(PrintSuccess(false)))
+    checkCommand(SetOption(ExpandDefinitions(true)))
+    checkCommand(SetOption(ExpandDefinitions(false)))
+    checkCommand(SetOption(InteractiveMode(true)))
+    checkCommand(SetOption(InteractiveMode(false)))
+    checkCommand(SetOption(ProduceProofs(true)))
+    checkCommand(SetOption(ProduceProofs(false)))
+    checkCommand(SetOption(ProduceUnsatCores(true)))
+    checkCommand(SetOption(ProduceUnsatCores(false)))
+    checkCommand(SetOption(ProduceModels(true)))
+    checkCommand(SetOption(ProduceModels(false)))
+    checkCommand(SetOption(ProduceAssignments(true)))
+    checkCommand(SetOption(ProduceAssignments(false)))
+    checkCommand(SetOption(RegularOutputChannel("test")))
+    checkCommand(SetOption(DiagnosticOutputChannel("toto")))
+    checkCommand(SetOption(RandomSeed(42)))
+    checkCommand(SetOption(Verbosity(4)))
+    checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key")))))
+    checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key"), Some(SString("value"))))))
+  }
+
 
   def testSimpleScript(implicit printer: Printer): Unit = {
     val script = Script(List(
