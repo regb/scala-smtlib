@@ -40,6 +40,15 @@ class ParserTests extends FunSuite with Timeouts {
     term
   }
 
+  def parseUniqueSExpr(str: String): SExpr = {
+    val reader = new StringReader(str)
+    val lexer = new Lexer(reader)
+    val parser = new Parser(lexer)
+    val sexpr = parser.parseSExpr
+    assert(lexer.nextToken == null)
+    sexpr
+  }
+
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
   private implicit def strToKeyword(str: String): SKeyword = SKeyword(str)
@@ -240,6 +249,18 @@ class ParserTests extends FunSuite with Timeouts {
     intercept[UnexpectedTokenException] {
       parseUniqueTerm("(abcd)")
     }
+  }
+
+  test("Parsing s-expressions") {
+    assert(parseUniqueSExpr("42") === SNumeral(42))
+    assert(parseUniqueSExpr("12.38") === SDecimal(12.38))
+    assert(parseUniqueSExpr("#xa1f") === SHexadecimal(Hexadecimal.fromString("a1f").get))
+    assert(parseUniqueSExpr("#b1010") === SBinary(List(true, false, true, false)))
+    assert(parseUniqueSExpr(""" "hey there" """) === SString("hey there"))
+    assert(parseUniqueSExpr("abcd") === SSymbol("abcd"))
+    assert(parseUniqueSExpr(":abcd") === SKeyword("abcd"))
+    assert(parseUniqueSExpr("(abc def 42)") === 
+      SList(SSymbol("abc"), SSymbol("def"), SNumeral(42)))
   }
 
   test("Parsing single commands") {
