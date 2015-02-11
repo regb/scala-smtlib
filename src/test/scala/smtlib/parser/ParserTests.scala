@@ -165,6 +165,9 @@ class ParserTests extends FunSuite with Timeouts {
   }
 
   test("Parsing Let bindings terms") {
+    assert(parseUniqueTerm("(let ((a x)) 42)") ===
+           Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), SNumeral(42)))
+
     assert(parseUniqueTerm("(let ((a x)) a)") ===
            Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))
 
@@ -173,6 +176,12 @@ class ParserTests extends FunSuite with Timeouts {
                Seq(VarBinding("b", QualifiedIdentifier("y"))), 
                FunctionApplication(QualifiedIdentifier("f"),
                 Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b")))))
+  }
+
+  test("Let bindings with no binding throws unexpected token exception") {
+    intercept[UnexpectedTokenException] {
+      parseUniqueTerm("(let () 42)")
+    }
   }
 
   test("Parsing quantified terms") {
@@ -193,6 +202,15 @@ class ParserTests extends FunSuite with Timeouts {
                   Seq(SortedVar("b", Sort("B")), SortedVar("c", Sort("C"))),
                   FunctionApplication(QualifiedIdentifier("f"),
                     Seq(QualifiedIdentifier("a"), QualifiedIdentifier("c")))))
+  }
+
+  test("quantified terms with no binding throws unexpected token exception") {
+    intercept[UnexpectedTokenException] {
+      parseUniqueTerm("(forall () true)")
+    }
+    intercept[UnexpectedTokenException] {
+      parseUniqueTerm("(exists () true)")
+    }
   }
 
   test("Parsing annotated term") {

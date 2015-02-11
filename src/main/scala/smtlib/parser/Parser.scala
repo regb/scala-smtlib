@@ -605,22 +605,22 @@ class Parser(lexer: Lexer) {
       peekToken.kind match {
         case Tokens.Let =>
           eat(Tokens.Let)
-          val bindings = parseMany(parseVarBinding _)
+          val (head, bindings) = parseOneOrMore(parseVarBinding _)
           val term = parseTerm
           eat(Tokens.CParen)
-          Let(bindings.head, bindings.tail, term)
+          Let(head, bindings, term)
         case Tokens.ForAll =>
           eat(Tokens.ForAll)
-          val vars = parseMany(parseSortedVar _)
+          val (head, vars) = parseOneOrMore(parseSortedVar _)
           val term = parseTerm
           eat(Tokens.CParen)
-          ForAll(vars.head, vars.tail, term)
+          ForAll(head, vars, term)
         case Tokens.Exists =>
           eat(Tokens.Exists)
-          val vars = parseMany(parseSortedVar _)
+          val (head, vars) = parseOneOrMore(parseSortedVar _)
           val term = parseTerm
           eat(Tokens.CParen)
-          Exists(vars.head, vars.tail, term)
+          Exists(head, vars, term)
 
         case Tokens.ExclamationMark =>
           eat(Tokens.ExclamationMark)
@@ -673,6 +673,15 @@ class Parser(lexer: Lexer) {
   }
 
   /* Parse a sequence of A inside () */
+  def parseOneOrMore[A](parseFun: () => A): (A, Seq[A]) = {
+    val items = new ListBuffer[A]
+    eat(Tokens.OParen)
+    val head = parseFun()
+    while(peekToken != null && peekToken.kind != Tokens.CParen)
+      items.append(parseFun())
+    eat(Tokens.CParen)
+    (head, items.toList)
+  }
   def parseMany[A](parseFun: () => A): Seq[A] = {
     val items = new ListBuffer[A]
     eat(Tokens.OParen)
