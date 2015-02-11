@@ -640,17 +640,14 @@ class Parser(lexer: Lexer) {
         case _ => //should be function application
           val id = parseQualifiedIdentifier 
 
+          val head = parseTerm
+
           val terms = new ListBuffer[Term]
-
-          if(peekToken.kind == Tokens.CParen) {
-            expected(peekToken)
-          }
-
           while(peekToken != null && peekToken.kind != Tokens.CParen)
             terms.append(parseTerm)
           eat(Tokens.CParen)
 
-          FunctionApplication(id, terms.toList)
+          FunctionApplication(id, head::terms.toList)
       }
     } else {
       val cst = tryParseConstant
