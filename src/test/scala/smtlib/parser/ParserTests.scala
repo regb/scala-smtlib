@@ -184,6 +184,24 @@ class ParserTests extends FunSuite with Timeouts {
     }
   }
 
+  test("Let bindings with missing closing parenthesis in binding throws unexpected token exception") {
+    intercept[UnexpectedTokenException] {
+      parseUniqueTerm("(let ((a 2) a)")
+    }
+  }
+
+  test("Let with binding to complex term works as expected") {
+    assert(parseUniqueTerm("(let ((a (f x y))) 42)") ===
+           Let(
+            VarBinding("a", 
+              FunctionApplication(QualifiedIdentifier("f"),
+                                  Seq(QualifiedIdentifier("x"), 
+                                      QualifiedIdentifier("y")))),
+            Seq(),
+            SNumeral(42)))
+  }
+
+
   test("Parsing quantified terms") {
     assert(parseUniqueTerm("(forall ((a A)) a)") ===
            ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
