@@ -57,19 +57,19 @@ trait TerminalTreesPrinter {
   }
 
   protected def printInfoFlag(flag: InfoFlag, writer: Writer): Unit = flag match {
-    case ErrorBehaviorInfoFlag => 
+    case ErrorBehaviorInfoFlag =>
       writer.write(":error-behavior")
-    case NameInfoFlag => 
+    case NameInfoFlag =>
       writer.write(":name")
-    case AuthorsInfoFlag => 
+    case AuthorsInfoFlag =>
       writer.write(":authors")
-    case VersionInfoFlag => 
+    case VersionInfoFlag =>
       writer.write(":version")
-    case StatusInfoFlag => 
+    case StatusInfoFlag =>
       writer.write(":status")
-    case ReasonUnknownInfoFlag => 
-      writer.write(":reason-unknonwn")
-    case AllStatisticsInfoFlag => 
+    case ReasonUnknownInfoFlag =>
+      writer.write(":reason-unknown")
+    case AllStatisticsInfoFlag =>
       writer.write(":all-statistics")
     case KeywordInfoFlag(keyword) =>
       writer.write(':')

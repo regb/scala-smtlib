@@ -36,6 +36,7 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing single Commands") { testSingleCommands }
     test(printerName + ": Printing declare-datatypes commands") { testDeclareDatatypes }
     test(printerName + ": Printing set-option commands") { testSetOptionCommand }
+    test(printerName + ": Printing get-info commands") { testGetInfoCommand }
     test(printerName + ": Printing simple script") { testSimpleScript }
     test(printerName + ": Printing Commands Responses") { testCommandsResponses }
     test(printerName + ": Printing non-standard Commands Responses") { testNonStandardCommandsResponses }
@@ -244,6 +245,16 @@ class PrinterTests extends FunSuite {
     checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key"), Some(SString("value"))))))
   }
 
+  def testGetInfoCommand(implicit printer: Printer): Unit = {
+    checkCommand(GetInfo(ErrorBehaviorInfoFlag))
+    checkCommand(GetInfo(NameInfoFlag))
+    checkCommand(GetInfo(AuthorsInfoFlag))
+    checkCommand(GetInfo(VersionInfoFlag))
+    checkCommand(GetInfo(StatusInfoFlag))
+    checkCommand(GetInfo(ReasonUnknownInfoFlag))
+    checkCommand(GetInfo(AllStatisticsInfoFlag))
+    checkCommand(GetInfo(KeywordInfoFlag("custom")))
+  }
 
   def testSimpleScript(implicit printer: Printer): Unit = {
     val script = Script(List(
