@@ -56,7 +56,7 @@ object Commands {
    * KeywordInfoFlag
    */
   sealed abstract class InfoFlag
-  case object ErrorBehaviourInfoFlag extends InfoFlag
+  case object ErrorBehaviorInfoFlag extends InfoFlag
   case object NameInfoFlag extends InfoFlag
   case object AuthorsInfoFlag extends InfoFlag
   case object VersionInfoFlag extends InfoFlag

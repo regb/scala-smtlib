@@ -291,7 +291,6 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(get-assignment)") === GetAssignment())
 
     assert(parseUniqueCmd("(get-option :keyword)") === GetOption("keyword"))
-    assert(parseUniqueCmd("(get-info :authors)") === GetInfo(AuthorsInfoFlag))
 
     assert(parseUniqueCmd("(exit)") === Exit())
 
@@ -338,6 +337,17 @@ class ParserTests extends FunSuite with Timeouts {
       Attribute(SKeyword("my-option"), None))))
     assert(parseUniqueCmd("""(set-option :custom "abcd")""") === SetOption(AttributeOption(
       Attribute(SKeyword("custom"), Some(SString("abcd"))))))
+  }
+
+  test("Parsing get-info command") {
+    assert(parseUniqueCmd("(get-info :error-behavior)") === GetInfo(ErrorBehaviorInfoFlag))
+    assert(parseUniqueCmd("(get-info :name)") === GetInfo(NameInfoFlag))
+    assert(parseUniqueCmd("(get-info :authors)") === GetInfo(AuthorsInfoFlag))
+    assert(parseUniqueCmd("(get-info :version)") === GetInfo(VersionInfoFlag))
+    assert(parseUniqueCmd("(get-info :status)") === GetInfo(StatusInfoFlag))
+    assert(parseUniqueCmd("(get-info :reason-unknown)") === GetInfo(ReasonUnknownInfoFlag))
+    assert(parseUniqueCmd("(get-info :all-statistics)") === GetInfo(AllStatisticsInfoFlag))
+    assert(parseUniqueCmd("(get-info :custom)") === GetInfo(KeywordInfoFlag("custom")))
   }
 
   //no (set-option :attribute :value)

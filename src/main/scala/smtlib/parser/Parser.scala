@@ -369,7 +369,7 @@ class Parser(lexer: Lexer) {
 
   def parseInfoFlag: InfoFlag = {
     nextToken match {
-      case Tokens.Keyword("error-behaviour") => ErrorBehaviourInfoFlag
+      case Tokens.Keyword("error-behavior") => ErrorBehaviorInfoFlag
       case Tokens.Keyword("name") => NameInfoFlag
       case Tokens.Keyword("authors") => AuthorsInfoFlag
       case Tokens.Keyword("version") => VersionInfoFlag

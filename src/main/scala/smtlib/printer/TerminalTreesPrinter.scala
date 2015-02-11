@@ -57,8 +57,8 @@ trait TerminalTreesPrinter {
   }
 
   protected def printInfoFlag(flag: InfoFlag, writer: Writer): Unit = flag match {
-    case ErrorBehaviourInfoFlag => 
-      writer.write(":error-behaviour")
+    case ErrorBehaviorInfoFlag => 
+      writer.write(":error-behavior")
     case NameInfoFlag => 
       writer.write(":name")
     case AuthorsInfoFlag => 
