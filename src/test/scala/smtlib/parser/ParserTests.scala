@@ -225,6 +225,12 @@ class ParserTests extends FunSuite with Timeouts {
 
   }
 
+  test("Annotated terms with zero annotation throws unexpected token exception") {
+    intercept[UnexpectedTokenException] {
+      parseUniqueTerm("(! a)")
+    }
+  }
+
   test("Parsing complicated terms") {
     assert(parseUniqueTerm("((_ f 1) a b)") === 
            FunctionApplication(

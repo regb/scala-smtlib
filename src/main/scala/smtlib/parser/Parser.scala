@@ -625,11 +625,12 @@ class Parser(lexer: Lexer) {
         case Tokens.ExclamationMark =>
           eat(Tokens.ExclamationMark)
           val term = parseTerm
+          val head = parseAttribute
           val attrs = new ListBuffer[Attribute]
           while(peekToken.kind != Tokens.CParen)
             attrs.append(parseAttribute)
           eat(Tokens.CParen)
-          AnnotatedTerm(term, attrs.head, attrs.tail)
+          AnnotatedTerm(term, head, attrs)
 
         case Tokens.As =>
           parseAsIdentifier
