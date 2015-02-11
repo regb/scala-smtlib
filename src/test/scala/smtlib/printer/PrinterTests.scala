@@ -240,7 +240,9 @@ class PrinterTests extends FunSuite {
     checkCommand(SetOption(RegularOutputChannel("test")))
     checkCommand(SetOption(DiagnosticOutputChannel("toto")))
     checkCommand(SetOption(RandomSeed(42)))
+    checkCommand(SetOption(RandomSeed(12)))
     checkCommand(SetOption(Verbosity(4)))
+    checkCommand(SetOption(Verbosity(1)))
     checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key")))))
     checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key"), Some(SString("value"))))))
   }

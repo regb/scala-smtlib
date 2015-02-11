@@ -329,7 +329,9 @@ class ParserTests extends FunSuite with Timeouts {
                           SetOption(DiagnosticOutputChannel("toto")))
 
     assert(parseUniqueCmd("(set-option :random-seed 42)") === SetOption(RandomSeed(42)))
+    assert(parseUniqueCmd("(set-option :random-seed 12)") === SetOption(RandomSeed(12)))
     assert(parseUniqueCmd("(set-option :verbosity 4)") === SetOption(Verbosity(4)))
+    assert(parseUniqueCmd("(set-option :verbosity 1)") === SetOption(Verbosity(1)))
 
     assert(parseUniqueCmd("(set-option :custom 42)") === SetOption(AttributeOption(
       Attribute(SKeyword("custom"), Some(SNumeral(42))))))
