@@ -469,12 +469,26 @@ class ParserTests extends FunSuite with Timeouts {
     assert(Parser.fromString("sat").parseCheckSatResponse === CheckSatResponse(SatStatus))
     assert(Parser.fromString("unsat").parseCheckSatResponse === CheckSatResponse(UnsatStatus))
     assert(Parser.fromString("unknown").parseCheckSatResponse === CheckSatResponse(UnknownStatus))
+  }
 
+  test("Parsing get-assertions response") {
+    assert(Parser.fromString("(42 a)").parseGetAssertionsResponse === 
+           GetAssertionsResponse(Seq(SNumeral(42), QualifiedIdentifier("a"))))
+  }
+
+  test("Get-assertions can parse empty list of assertions") {
+    assert(Parser.fromString("()").parseGetAssertionsResponse === 
+           GetAssertionsResponse(Seq()))
+  }
+
+  test("Parsing get-value response") {
     assert(Parser.fromString("((a 1) (b 42))").parseGetValueResponse === GetValueResponse(Seq(
       (QualifiedIdentifier(Identifier("a")), SNumeral(1)), 
       (QualifiedIdentifier(Identifier("b")), SNumeral(42))
     )))
+  }
 
+  test("Parsing get-model response") {
     assert(Parser.fromString("(model (define-fun z () Int 0))").parseGetModelResponse === 
       GetModelResponse(List(
         DefineFun("z", Seq(), Sort("Int"), SNumeral(0))))
