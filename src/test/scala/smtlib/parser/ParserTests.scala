@@ -407,11 +407,65 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("""(set-info :test)""") === SetInfo(Attribute(SKeyword("test"), None)))
   }
 
-  test("basic responses") {
+  test("Parsing generic response") {
     assert(Parser.fromString("success").parseGenResponse === Success)
     assert(Parser.fromString("unsupported").parseGenResponse === Unsupported)
     assert(Parser.fromString("(error \"this is an error\")").parseGenResponse === Error("this is an error"))
+  }
 
+  test("Error response without a message should throw an unexpected token exception ") {
+    intercept[UnexpectedTokenException] {
+      Parser.fromString("(error)").parseGenResponse
+    }
+  }
+
+  test("Parsing get-info responses") {
+    assert(
+      Parser.fromString("""(:error-behavior immediate-exit)""").parseGetInfoResponse ===
+      GetInfoResponse(ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior), Seq())
+    )
+    assert(
+      Parser.fromString("""(:error-behavior continued-execution)""").parseGetInfoResponse ===
+      GetInfoResponse(ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior), Seq())
+    )
+    assert(
+      Parser.fromString("""(:authors "Regis Blanc")""").parseGetInfoResponse ===
+      GetInfoResponse(AuthorsInfoResponse("Regis Blanc"), Seq())
+    )
+
+    assert(
+      Parser.fromString("""(:name "CafeSat")""").parseGetInfoResponse ===
+      GetInfoResponse(NameInfoResponse("CafeSat"), Seq())
+    )
+
+    assert(
+      Parser.fromString("""(:version "2.0.1")""").parseGetInfoResponse ===
+      GetInfoResponse(VersionInfoResponse("2.0.1"), Seq())
+    )
+
+    assert(
+      Parser.fromString("""(:reason-unknown timeout)""").parseGetInfoResponse ===
+      GetInfoResponse(ReasonUnknownInfoResponse(TimeoutReasonUnknown), Seq())
+    )
+    assert(
+      Parser.fromString("""(:reason-unknown memout)""").parseGetInfoResponse ===
+      GetInfoResponse(ReasonUnknownInfoResponse(MemoutReasonUnknown), Seq())
+    )
+    assert(
+      Parser.fromString("""(:reason-unknown incomplete)""").parseGetInfoResponse ===
+      GetInfoResponse(ReasonUnknownInfoResponse(IncompleteReasonUnknown), Seq())
+    )
+
+    assert(
+      Parser.fromString("""(:custom "abcd")""").parseGetInfoResponse ===
+      GetInfoResponse(
+        AttributeInfoResponse(
+          Attribute(SKeyword("custom"), Some(SString("abcd")))),
+        Seq())
+    )
+  }
+
+  test("Parsing check-sat response") {
     assert(Parser.fromString("sat").parseCheckSatResponse === CheckSatResponse(SatStatus))
     assert(Parser.fromString("unsat").parseCheckSatResponse === CheckSatResponse(UnsatStatus))
     assert(Parser.fromString("unknown").parseCheckSatResponse === CheckSatResponse(UnknownStatus))

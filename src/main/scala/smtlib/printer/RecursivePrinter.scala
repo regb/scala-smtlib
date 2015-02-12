@@ -236,6 +236,9 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       printNary(writer, exprs, printGetModelResponseEntry, "", "\n", "")
       writer.write(')')
     }
+    case GetInfoResponse(response, responses) => {
+      printNary(writer, response +: responses, printInfoResponse, "(", " ", ")")
+    }
     case _ => ???
   }
 
@@ -279,6 +282,33 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       writer.write(":verbosity ")
       writer.write(num.toString)
     case AttributeOption(attribute) => 
+      printAttribute(attribute, writer)
+  }
+
+  private def printInfoResponse(infoResponse: InfoResponse, writer: Writer): Unit = infoResponse match {
+    case ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior) =>
+      writer.write(":error-behavior immediate-exit")
+    case ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior) =>
+      writer.write(":error-behavior continued-execution")
+    case NameInfoResponse(name) =>
+      writer.write(":name \"")
+      writer.write(name)
+      writer.write('"')
+    case AuthorsInfoResponse(authors) =>
+      writer.write(":authors \"")
+      writer.write(authors)
+      writer.write('"')
+    case VersionInfoResponse(version) =>
+      writer.write(":version \"")
+      writer.write(version)
+      writer.write('"')
+    case ReasonUnknownInfoResponse(TimeoutReasonUnknown) =>
+      writer.write(":reason-unknown timeout")
+    case ReasonUnknownInfoResponse(MemoutReasonUnknown) =>
+      writer.write(":reason-unknown memout")
+    case ReasonUnknownInfoResponse(IncompleteReasonUnknown) =>
+      writer.write(":reason-unknown incomplete")
+    case AttributeInfoResponse(attribute) =>
       printAttribute(attribute, writer)
   }
 

@@ -312,14 +312,14 @@ class Parser(lexer: Lexer) {
 
   def parseInfoResponse: InfoResponse = {
     peekToken match {
-      case Tokens.Keyword("error-behaviour") =>
+      case Tokens.Keyword("error-behavior") =>
         nextToken
         val behaviour = nextToken match {
-          case Tokens.SymbolLit("immediate-exit") => ImmediateExitErrorBehaviour
-          case Tokens.SymbolLit("continued-execution") => ContinueExecutionErrorBehaviour
+          case Tokens.SymbolLit("immediate-exit") => ImmediateExitErrorBehavior
+          case Tokens.SymbolLit("continued-execution") => ContinuedExecutionErrorBehavior
           case t => expected(t) //TODO: precise error
         }
-        ErrorBehaviourInfoResponse(behaviour)
+        ErrorBehaviorInfoResponse(behaviour)
       case Tokens.Keyword("name") =>
         nextToken
         NameInfoResponse(parseString.value)
@@ -337,7 +337,7 @@ class Parser(lexer: Lexer) {
           case Tokens.SymbolLit("incomplete") => IncompleteReasonUnknown
           case t => expected(t) //TODO: precise error
         }
-        ReasonUnkownionInfoResponse(reason)
+        ReasonUnknownInfoResponse(reason)
       case _ =>
         AttributeInfoResponse(parseAttribute)
     }
