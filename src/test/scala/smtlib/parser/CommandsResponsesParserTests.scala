@@ -101,6 +101,22 @@ class CommandsResponsesParserTests extends FunSuite {
     )))
   }
 
+  //the standard requires at least one value, currently we return empty list
+  ignore("get-value response must contains at least one valuation pair") {
+    intercept[UnexpectedTokenException] {
+      Parser.fromString("()").parseGetValueResponse
+    }
+  }
+
+  test("Parsing get-assignment response") {
+    assert(Parser.fromString("((a true))").parseGetAssignmentResponse ===
+      GetAssignmentResponse(Seq((SSymbol("a"), true))))
+    assert(Parser.fromString("((b false))").parseGetAssignmentResponse ===
+      GetAssignmentResponse(Seq((SSymbol("b"), false))))
+    assert(Parser.fromString("((c true) (d false))").parseGetAssignmentResponse ===
+      GetAssignmentResponse(Seq((SSymbol("c"), true), (SSymbol("d"), false))))
+  }
+
   test("Parsing get-model response") {
     assert(Parser.fromString("(model (define-fun z () Int 0))").parseGetModelResponse === 
       GetModelResponse(List(
