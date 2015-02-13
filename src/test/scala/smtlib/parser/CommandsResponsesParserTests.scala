@@ -117,6 +117,28 @@ class CommandsResponsesParserTests extends FunSuite {
       GetAssignmentResponse(Seq((SSymbol("c"), true), (SSymbol("d"), false))))
   }
 
+  test("Parsing get-option constant responses") {
+    assert(Parser.fromString("abcd").parseGetOptionResponse ===
+      GetOptionResponse(SSymbol("abcd")))
+    assert(Parser.fromString("42").parseGetOptionResponse ===
+      GetOptionResponse(SNumeral(42)))
+    assert(Parser.fromString("77.23").parseGetOptionResponse ===
+      GetOptionResponse(SDecimal(77.23)))
+    assert(Parser.fromString(""" "abcd" """).parseGetOptionResponse ===
+      GetOptionResponse(SString("abcd")))
+  }
+
+  test("Parsing get-option response list expressions") {
+    assert(Parser.fromString("(a 42)").parseGetOptionResponse ===
+      GetOptionResponse(SList(SSymbol("a"), SNumeral(42))))
+  }
+
+  test("get-option response should not be a keyword") {
+    intercept[UnexpectedTokenException] {
+      Parser.fromString(":custom").parseGetOptionResponse
+    }
+  }
+
   test("Parsing get-model response") {
     assert(Parser.fromString("(model (define-fun z () Int 0))").parseGetModelResponse === 
       GetModelResponse(List(

@@ -266,7 +266,7 @@ class Parser(lexer: Lexer) {
   }
 
   def parseGetOptionResponse: GetOptionResponse = {
-    GetOptionResponse(parseSExpr)
+    GetOptionResponse(parseAttributeValue)
   }
 
   def parseGetProofResponse: GetProofResponse = {
@@ -387,6 +387,23 @@ class Parser(lexer: Lexer) {
     Attribute(keyword, attributeValue)
   }
 
+  def parseAttributeValue: AttributeValue = {
+    val attributeValuesTokenKinds: Seq[Tokens.TokenKind] = Seq(
+      Tokens.NumeralLitKind, Tokens.BinaryLitKind, Tokens.HexadecimalLitKind, 
+      Tokens.DecimalLitKind, Tokens.StringLitKind, Tokens.SymbolLitKind, Tokens.OParen)
+    if(peekToken == null) 
+      throw new UnexpectedEOFException(attributeValuesTokenKinds)
+    else peekToken.kind match {
+      case Tokens.NumeralLitKind => parseNumeral
+      case Tokens.BinaryLitKind => parseBinary
+      case Tokens.HexadecimalLitKind => parseHexadecimal
+      case Tokens.DecimalLitKind => parseDecimal
+      case Tokens.StringLitKind => parseString
+      case Tokens.SymbolLitKind => parseSymbol
+      case Tokens.OParen => parseSList
+      case _ => expected(peekToken, attributeValuesTokenKinds:_*)
+    }
+  }
   def tryParseAttributeValue: Option[AttributeValue] = {
     if(peekToken == null) None else peekToken.kind match {
       case Tokens.NumeralLitKind => Some(parseNumeral)

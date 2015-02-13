@@ -46,7 +46,7 @@ object CommandsResponses {
   case class AttributeInfoResponse(attribute: Attribute) extends InfoResponse
 
   //TODO: attributeValue trait more precise than SExpr
-  case class GetOptionResponse(attributeValue: SExpr) extends CommandResponse
+  case class GetOptionResponse(attributeValue: AttributeValue) extends CommandResponse
 
 
   case class GetValueResponse(valuationPairs: Seq[(Term, Term)]) extends CommandResponse
