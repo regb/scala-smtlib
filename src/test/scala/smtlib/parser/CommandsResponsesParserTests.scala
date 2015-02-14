@@ -147,6 +147,17 @@ class CommandsResponsesParserTests extends FunSuite {
 
     assert(Parser.fromString(
 """(model 
+      (define-fun x () Int 
+          (- 1))
+      )
+""").parseGetModelResponse === 
+      GetModelResponse(List(
+        DefineFun("x", Seq(), Sort("Int"), 
+          FunctionApplication(QualifiedIdentifier("-"), Seq(SNumeral(1))))))
+    )
+
+    assert(Parser.fromString(
+"""(model 
   (define-fun z () Int 0)
   (declare-fun a () A)
   (forall ((x A)) x)
