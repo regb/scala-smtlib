@@ -12,8 +12,18 @@ import java.io._
 
 class Z3Interpreter extends ProcessInterpreter {
 
-
   protected override val process = new ProcessBuilder("z3", "-in", "-smt2").redirectErrorStream(true).start
+
+  RecursivePrinter.printCommand(SetOption(PrintSuccess(true)), in)
+  in.write("\n")
+  in.flush
+  parser.parseGenResponse
+
+}
+
+class Z3InterpreterV3 extends ProcessInterpreter {
+
+  protected override val process = new ProcessBuilder("z3", "-in", "-m", "-smt2").redirectErrorStream(true).start
 
   RecursivePrinter.printCommand(SetOption(PrintSuccess(true)), in)
   in.write("\n")
