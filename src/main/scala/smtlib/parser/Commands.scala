@@ -93,6 +93,7 @@ object Commands {
    */
   sealed abstract class Logic
   case object QF_UF extends Logic
+  case object QF_LIA extends Logic
   case object QF_LRA extends Logic
   case object QF_AX extends Logic
   case object QF_A extends Logic
@@ -101,6 +102,7 @@ object Commands {
   object Logic {
     def fromString(logic: String): Logic = logic match {
       case "QF_UF"  => QF_UF
+      case "QF_LIA" => QF_LIA
       case "QF_LRA" => QF_LRA
       case "QF_AX"  => QF_AX
       case "QF_A"   => QF_A

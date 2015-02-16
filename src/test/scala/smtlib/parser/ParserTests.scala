@@ -307,8 +307,6 @@ class ParserTests extends FunSuite with Timeouts {
 
   test("Parsing single commands") {
 
-    assert(parseUniqueCmd("(set-logic QF_UF)") === SetLogic(QF_UF))
-
     assert(parseUniqueCmd("(declare-sort A 0)") === DeclareSort("A", 0))
     assert(parseUniqueCmd("(define-sort A (B C) (Array B C))") ===
                           DefineSort("A", Seq("B", "C"), 
@@ -349,6 +347,14 @@ class ParserTests extends FunSuite with Timeouts {
       ))
     )
 
+  }
+
+  test("Parsing the different set-logic commands") {
+    assert(parseUniqueCmd("(set-logic QF_UF)")  === SetLogic(QF_UF))
+    assert(parseUniqueCmd("(set-logic QF_LIA)") === SetLogic(QF_LIA))
+    assert(parseUniqueCmd("(set-logic QF_LRA)") === SetLogic(QF_LRA))
+    assert(parseUniqueCmd("(set-logic QF_AX)")  === SetLogic(QF_AX))
+    assert(parseUniqueCmd("(set-logic QF_A)")   === SetLogic(QF_A))
   }
 
   test("Parsing set-option command") {

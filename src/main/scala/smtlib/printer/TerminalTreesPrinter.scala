@@ -42,6 +42,8 @@ trait TerminalTreesPrinter {
   protected def printLogic(logic: Logic, writer: Writer): Unit = logic match {
     case QF_UF => 
       writer.write("QF_UF")
+    case QF_LIA => 
+      writer.write("QF_LIA")
     case QF_LRA => 
       writer.write("QF_LRA")
     case QF_AX => 
