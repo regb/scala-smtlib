@@ -126,11 +126,21 @@ class ParserTests extends FunSuite with Timeouts {
 
   }
 
+  test("comments are ignored after a term") {
+    assert(parseUniqueTerm("42 ;I'm a comment") === SNumeral(42))
+    assert(parseUniqueTerm("42;I'm another comment") === SNumeral(42))
+  }
+
   test("Literal/constant terms are parsed correctly") {
     assert(parseUniqueTerm("42") === SNumeral(42))
     assert(parseUniqueTerm("42.12") === SDecimal(42.12))
     assert(parseUniqueTerm("#xF") === SHexadecimal(Hexadecimal.fromString("F").get))
     assert(parseUniqueTerm("#b1") === SBinary(List(true)))
+    assert(parseUniqueTerm(" \"Hey there\" ") === SString("Hey there"))
+  }
+
+  test("semicolon as part of string literal does not start a comment") {
+    assert(parseUniqueTerm(" \"Hey ;there\" ") === SString("Hey ;there"))
   }
 
   test("Correctly parsing identifier and qualfieid identifiers terms") {
