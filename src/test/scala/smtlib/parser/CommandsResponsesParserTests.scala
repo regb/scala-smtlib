@@ -78,6 +78,12 @@ class CommandsResponsesParserTests extends FunSuite {
     )
   }
 
+  test("get-info response can be multiple info-response") {
+    assert(
+      Parser.fromString("""(:authors "Regis Blanc" :name "CafeSat")""").parseGetInfoResponse ===
+      GetInfoResponse(AuthorsInfoResponse("Regis Blanc"), Seq(NameInfoResponse("CafeSat"))))
+  }
+
   test("Parsing check-sat response") {
     assert(Parser.fromString("sat").parseCheckSatResponse === CheckSatResponse(SatStatus))
     assert(Parser.fromString("unsat").parseCheckSatResponse === CheckSatResponse(UnsatStatus))
@@ -87,11 +93,35 @@ class CommandsResponsesParserTests extends FunSuite {
   test("Parsing get-assertions response") {
     assert(Parser.fromString("(42 a)").parseGetAssertionsResponse === 
            GetAssertionsResponse(Seq(SNumeral(42), QualifiedIdentifier("a"))))
+    assert(Parser.fromString("(11.1 abcd \"alpha\")").parseGetAssertionsResponse === 
+           GetAssertionsResponse(Seq(
+            SDecimal(11.1), QualifiedIdentifier("abcd"), SString("alpha"))))
   }
 
   test("Get-assertions can parse empty list of assertions") {
     assert(Parser.fromString("()").parseGetAssertionsResponse === 
            GetAssertionsResponse(Seq()))
+  }
+
+  test("get-proof response can be any s-expressions") {
+    assert(Parser.fromString("42").parseGetProofResponse ===
+           GetProofResponse(SNumeral(42)))
+    assert(Parser.fromString("12.38").parseGetProofResponse ===
+           GetProofResponse(SDecimal(12.38)))
+    assert(Parser.fromString(":abcd").parseGetProofResponse ===
+           GetProofResponse(SKeyword("abcd")))
+    assert(Parser.fromString("(abc def 42)").parseGetProofResponse ===
+           GetProofResponse(SList(SSymbol("abc"), SSymbol("def"), SNumeral(42))))
+  }
+
+  test("get-unsat-core response can be an empty list of symbols") {
+    assert(Parser.fromString("()").parseGetUnsatCoreResponse === 
+           GetUnsatCoreResponse(Seq()))
+  }
+  test("get-unsat-core response is a list of symbols") {
+    assert(Parser.fromString("(a b c d)").parseGetUnsatCoreResponse === 
+           GetUnsatCoreResponse(Seq(
+            SSymbol("a"), SSymbol("b"), SSymbol("c"), SSymbol("d"))))
   }
 
   test("Parsing get-value response") {
