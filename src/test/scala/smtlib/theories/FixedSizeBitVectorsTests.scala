@@ -58,6 +58,14 @@ class FixedSizeBitVectorsTests extends FunSuite {
     }
   }
 
+  test("smtlib bv constant with int overflow") {
+    val cst = BitVectorConstant(BigInt("2147483648"), 32)
+    cst match {
+      case BitVectorConstant(x, 32) if x.toInt == -2147483648 => assert(true)
+      case _ => assert(false)
+    }
+  }
+
   test("smtlib is correctly parsed with bv literals") {
 
     Parser.fromString("#b101").parseTerm match {

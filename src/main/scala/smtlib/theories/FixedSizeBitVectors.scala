@@ -46,7 +46,7 @@ object FixedSizeBitVectors {
       case QualifiedIdentifier(Identifier(SSymbol(name), Seq(n)), None) => {
         if(name.startsWith("bv")) {
           val value = name.substring(2)
-          scala.util.Try(BigInt(value.toInt)).toOption.map(v => (v, n))
+          scala.util.Try(BigInt(value).toInt).toOption.map(v => (v, n))
         } else None
       }
       case _ => None
