@@ -315,6 +315,10 @@ class ParserTests extends FunSuite with Timeouts {
       SList(SSymbol("abc"), SSymbol("def"), SNumeral(42)))
   }
 
+  test("s-expression list can be empty") {
+    assert(parseUniqueSExpr("()") === SList())
+  }
+
   test("Parsing single commands") {
 
     assert(parseUniqueCmd("(declare-sort A 0)") === DeclareSort("A", 0))
