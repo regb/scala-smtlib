@@ -42,6 +42,7 @@ object FixedSizeBitVectors {
     def apply(x: BigInt, n: Int): Term =
       QualifiedIdentifier(Identifier(SSymbol("bv" + x), Seq(n)))
     
+    //TODO: BigInt is not the best data representation for a bitvector, we should probably use a list of boolean kind of representation
     def unapply(term: Term): Option[(BigInt, Int)] = term match {
       case QualifiedIdentifier(Identifier(SSymbol(name), Seq(n)), None) => {
         if(name.startsWith("bv")) {
