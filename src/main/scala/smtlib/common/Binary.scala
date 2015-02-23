@@ -14,5 +14,9 @@ case class Binary(repr: List[Boolean]) {
   }
 
   //transform to a 32 bits integer, respecting 2 complements
-  def toInt: Int = ???
+  def toInt: Int = {
+    val allReversedBits: List[Boolean] = repr.take(32).reverse.padTo(32, repr.head)
+    allReversedBits.foldRight(0)((bit, bits) => ((bits<<1) | (if(bit) 1 else 0)))
+  }
+
 }

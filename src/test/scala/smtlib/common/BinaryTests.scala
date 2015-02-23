@@ -35,4 +35,16 @@ class BinaryTests extends FunSuite {
     assert(Binary(List(false, true, false, true)).toLongBits === 5)
   }
 
+  test("toInt works with one bit") {
+    assert(Binary(List(true)).toInt === -1)
+    assert(Binary(List(false)).toInt === 0)
+  }
+
+  test("toInt works with a few bits") {
+    assert(Binary(List(true, true)).toInt === -1)
+    assert(Binary(List(false, true, true)).toInt === 3)
+    assert(Binary(List(false, true, false, true)).toInt === 5)
+    assert(Binary(List(true, false, true)).toInt === -3)
+  }
+
 }
