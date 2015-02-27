@@ -20,6 +20,25 @@ class BinaryTests extends FunSuite {
     assert(Binary(List(false, true, false, true)).toIntBits === 5)
   }
 
+  test("toIntBits works with exactly 32 digits") {
+    val allOnes: List[Boolean] = List[Boolean]().padTo(32, true)
+    assert(Binary(allOnes).toIntBits === -1)
+  }
+
+  test("toIntBits ignores digits after 32") {
+    val allOnes: List[Boolean] = List[Boolean]().padTo(32, true)
+    assert(Binary(true :: allOnes).toIntBits === -1)
+    assert(Binary(false :: allOnes).toIntBits === -1)
+    assert(Binary(true :: false :: allOnes).toIntBits === -1)
+    assert(Binary(false :: true :: allOnes).toIntBits === -1)
+
+    val allZeros: List[Boolean] = List[Boolean]().padTo(32, false)
+    assert(Binary(true :: allZeros).toIntBits === 0)
+    assert(Binary(false :: allZeros).toIntBits === 0)
+    assert(Binary(true :: false :: allZeros).toIntBits === 0)
+    assert(Binary(false :: true :: allZeros).toIntBits === 0)
+  }
+
   test("toLongBits works with one bit") {
     assert(Binary(List(true)).toLongBits === 1)
     assert(Binary(List(false)).toLongBits === 0)
