@@ -10,10 +10,10 @@ import printer._
 //import scala.sys.process._
 import java.io._
 
-class CVC4Interpreter extends ProcessInterpreter {
+class CVC4Interpreter(executable: String = "cvc4") extends ProcessInterpreter {
 
   protected override val process = 
-    new ProcessBuilder("cvc4",
+    new ProcessBuilder(executable,
                           "-q",
                           "--produce-models",
                           "--no-incremental",
