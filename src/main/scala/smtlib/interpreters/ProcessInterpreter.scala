@@ -40,6 +40,7 @@ abstract class ProcessInterpreter extends Interpreter {
       }
     } catch {
       case (ex: Exception) => {
+        ex.printStackTrace
         if(cmd == CheckSat()) CheckSatResponse(UnknownStatus)
         else Error("Solver encountered exception: " + ex)
       }
@@ -59,10 +60,9 @@ abstract class ProcessInterpreter extends Interpreter {
         in.close()
       }
     } catch {
-      case (io: java.io.IOException) => {
-        process.destroy()
-        in.close()
-      }
+      case (io: java.io.IOException) => ()
+    } finally {
+      in.close()
     }
   }
 
