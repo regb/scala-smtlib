@@ -49,13 +49,20 @@ abstract class ProcessInterpreter extends Interpreter {
   private var isKilled = false
 
   override def free(): Unit = synchronized {
-    if(!isKilled) {
-      RecursivePrinter.printCommand(Exit(), in)
-      in.write("\n")
-      in.flush
+    try {
+      if(!isKilled) {
+        RecursivePrinter.printCommand(Exit(), in)
+        in.write("\n")
+        in.flush
 
-      process.destroy()
-      in.close()
+        process.destroy()
+        in.close()
+      }
+    } catch {
+      case (io: java.io.IOException) => {
+        process.destroy()
+        in.close()
+      }
     }
   }
 
