@@ -46,20 +46,26 @@ abstract class ProcessInterpreter extends Interpreter {
     }
   }
 
-  override def free(): Unit = {
-    RecursivePrinter.printCommand(Exit(), in)
-    in.write("\n")
-    in.flush
+  private var isKilled = false
 
-    process.destroy
-    in.close
+  override def free(): Unit = synchronized {
+    if(!isKilled) {
+      RecursivePrinter.printCommand(Exit(), in)
+      in.write("\n")
+      in.flush
+
+      process.destroy()
+      in.close()
+    }
   }
 
-  def kill(): Unit = {
+  def kill(): Unit = synchronized {
+    isKilled = true
     process.destroy()
+    in.close()
   }
 
-  override def interrupt(): Unit = {
+  override def interrupt(): Unit = synchronized {
     kill()
   }
 }

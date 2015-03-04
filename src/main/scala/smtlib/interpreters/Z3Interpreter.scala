@@ -12,7 +12,7 @@ import java.io._
 
 class Z3Interpreter(executable: String = "z3") extends ProcessInterpreter {
 
-  protected override val process = 
+  protected override val process =
     new ProcessBuilder(executable,
                         "-in",
                         "-smt2").redirectErrorStream(true).start
