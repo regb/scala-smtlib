@@ -221,22 +221,25 @@ class Parser(lexer: Lexer) {
     Constructor(name, fields.toList)
   }
 
-  def parseGenResponse: GenResponse = {
+  /*
+   * Parsing error response, assuming "(" has been parsed
+   */
+  private def parseErrorResponse: Error = {
     nextToken match {
-      case Tokens.SymbolLit("success") => Success
-      case Tokens.SymbolLit("unsupported") => Unsupported
-      case Tokens.Token(Tokens.OParen) => {
-        nextToken match {
-          case Tokens.SymbolLit("error") => {
-            val msg = parseString.value
-            eat(Tokens.CParen)
-            Error(msg)
-          }
-          case t => expected(t)
-        }
-      }
+      case Tokens.SymbolLit("error") =>
+        val msg = parseString.value
+        eat(Tokens.CParen)
+        Error(msg)
       case t => expected(t)
     }
+  }
+
+  def parseGenResponse: GenResponse = nextToken match {
+    case Tokens.SymbolLit("success") => Success
+    case Tokens.SymbolLit("unsupported") => Unsupported
+    case t =>
+      check(t, Tokens.OParen)
+      parseErrorResponse
   }
 
   def parseGetAssignmentResponse: GetAssignmentResponse = {
@@ -248,8 +251,19 @@ class Parser(lexer: Lexer) {
       (sym, bool)
     }
 
-    val pairs = parseMany(parsePair _)
-    GetAssignmentResponse(pairs)
+    nextToken match {
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        peekToken match {
+          case Tokens.SymbolLit("error") => parseErrorResponse
+          case t => {
+            val pairs = parseUntil(parsePair _, Tokens.CParen)
+            GetAssignmentResponseSuccess(pairs)
+          }
+        }
+      }
+    }
   }
 
   def parseGetValueResponse: GetValueResponse = {
@@ -261,44 +275,96 @@ class Parser(lexer: Lexer) {
       (t1, t2)
     }
 
-    val pairs = parseMany(parsePair _)
-    GetValueResponse(pairs)
-  }
-
-  def parseGetOptionResponse: GetOptionResponse = {
-    GetOptionResponse(parseAttributeValue)
-  }
-
-  def parseGetProofResponse: GetProofResponse = {
-    GetProofResponse(parseSExpr)
-  }
-
-  def parseGetModelResponse: GetModelResponse = {
-    eat(Tokens.OParen)
     nextToken match {
-      case Tokens.SymbolLit("model") => ()
-      case t => expected(t, Tokens.SymbolLitKind) //TODO: expected symbol of value "model"
-    }
-    var exprs: ListBuffer[SExpr] = new ListBuffer
-    while(peekToken.kind != Tokens.CParen) {
-      try {
-        exprs.append(parseCommand)
-      } catch {
-        case ex: UnknownCommandException => {
-          ex.commandName match { //recover for exceptions case in get-model
-            case Tokens.ForAll =>
-              val vars = parseMany(parseSortedVar _)
-              val term = parseTerm
-              eat(Tokens.CParen)
-              exprs.append(ForAll(vars.head, vars.tail, term))
-            case _ =>
-              throw ex
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        peekToken match {
+          case Tokens.SymbolLit("error") => parseErrorResponse
+          case t => {
+            val pairs = parseUntil(parsePair _, Tokens.CParen)
+            GetValueResponseSuccess(pairs)
           }
         }
       }
     }
-    eat(Tokens.CParen)
-    GetModelResponse(exprs.toList)
+  }
+
+  def parseGetOptionResponse: GetOptionResponse = {
+    tryParseConstant match {
+      case Some(cst) => GetOptionResponseSuccess(cst)
+      case None => {
+        nextToken match {
+          case Tokens.SymbolLit("unsupported") => Unsupported
+          case Tokens.SymbolLit(sym) => GetOptionResponseSuccess(SSymbol(sym))
+          case t => {
+            check(t, Tokens.OParen)
+            peekToken match {
+              case Tokens.SymbolLit("error") => parseErrorResponse
+              case _ => GetOptionResponseSuccess(parseSListContent)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  def parseGetProofResponse: GetProofResponse = {
+    tryParseConstant match {
+      case Some(cst) => GetProofResponseSuccess(cst)
+      case None => {
+        nextToken match {
+          case Tokens.SymbolLit("unsupported") => Unsupported
+          case Tokens.SymbolLit(sym) => GetProofResponseSuccess(SSymbol(sym))
+          case Tokens.Keyword(key) => GetProofResponseSuccess(SKeyword(key))
+          case t => {
+            check(t, Tokens.OParen)
+            peekToken match {
+              case Tokens.SymbolLit("error") => parseErrorResponse
+              case _ => GetProofResponseSuccess(parseSListContent)
+            }
+          }
+        }
+      }
+    }
+  }
+
+  def parseGetModelResponse: GetModelResponse = {
+    nextToken match {
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        peekToken match {
+          case Tokens.SymbolLit("error") => parseErrorResponse
+          case t => {
+            nextToken match {
+              case Tokens.SymbolLit("model") => ()
+              case t => expected(t, Tokens.SymbolLitKind) //TODO: expected symbol of value "model"
+            }
+            var exprs: ListBuffer[SExpr] = new ListBuffer
+            while(peekToken.kind != Tokens.CParen) {
+              try {
+                exprs.append(parseCommand)
+              } catch {
+                case ex: UnknownCommandException => {
+                  ex.commandName match { //recover for exceptions case in get-model
+                    case Tokens.ForAll =>
+                      val vars = parseMany(parseSortedVar _)
+                      val term = parseTerm
+                      eat(Tokens.CParen)
+                      exprs.append(ForAll(vars.head, vars.tail, term))
+                    case _ =>
+                      throw ex
+                  }
+                }
+              }
+            }
+            eat(Tokens.CParen)
+            GetModelResponseSuccess(exprs.toList)
+          }
+        }
+      }
+    }
   }
 
   def parseSExprResponse: SExprResponse = {
@@ -344,27 +410,64 @@ class Parser(lexer: Lexer) {
   }
 
   def parseGetInfoResponse: GetInfoResponse = {
-    val responses = parseMany(parseInfoResponse _)
-    GetInfoResponse(responses.head, responses.tail)
+    nextToken match {
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        peekToken match {
+          case Tokens.SymbolLit("error") => parseErrorResponse
+          case t => {
+            val responses = parseUntil(parseInfoResponse _, Tokens.CParen)
+            GetInfoResponseSuccess(responses.head, responses.tail)
+          }
+        }
+      }
+    }
   }
 
   def parseCheckSatResponse: CheckSatResponse = {
     nextToken match {
-      case Tokens.SymbolLit("sat") => CheckSatResponse(SatStatus)
-      case Tokens.SymbolLit("unsat") => CheckSatResponse(UnsatStatus)
-      case Tokens.SymbolLit("unknown") => CheckSatResponse(UnknownStatus)
-      case t => expected(t)
+      case Tokens.SymbolLit("sat") => CheckSatStatus(SatStatus)
+      case Tokens.SymbolLit("unsat") => CheckSatStatus(UnsatStatus)
+      case Tokens.SymbolLit("unknown") => CheckSatStatus(UnknownStatus)
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        parseErrorResponse
+      }
     }
   }
 
   def parseGetAssertionsResponse: GetAssertionsResponse = {
-    val terms = parseMany(parseTerm _)
-    GetAssertionsResponse(terms)
+    nextToken match {
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        peekToken match {
+          case Tokens.SymbolLit("error") => parseErrorResponse
+          case t => {
+            val terms = parseUntil(parseTerm _, Tokens.CParen)
+            GetAssertionsResponseSuccess(terms)
+          }
+        }
+      }
+    }
   }
 
   def parseGetUnsatCoreResponse: GetUnsatCoreResponse = {
-    val syms = parseMany(parseSymbol _)
-    GetUnsatCoreResponse(syms)
+    nextToken match {
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        peekToken match {
+          case Tokens.SymbolLit("error") => parseErrorResponse
+          case t => {
+            val syms = parseUntil(parseSymbol _, Tokens.CParen)
+            GetUnsatCoreResponseSuccess(syms)
+          }
+        }
+      }
+    }
   }
 
   def parseInfoFlag: InfoFlag = {
@@ -697,14 +800,6 @@ class Parser(lexer: Lexer) {
     eat(Tokens.CParen)
     (head, items.toList)
   }
-  def parseMany[A](parseFun: () => A): Seq[A] = {
-    val items = new ListBuffer[A]
-    eat(Tokens.OParen)
-    while(peekToken != null && peekToken.kind != Tokens.CParen)
-      items.append(parseFun())
-    eat(Tokens.CParen)
-    items.toList
-  }
 
   def tryParseConstant: Option[Constant] = {
     peekToken.kind match {
@@ -719,13 +814,17 @@ class Parser(lexer: Lexer) {
 
   def parseSList: SList = {
     eat(Tokens.OParen)
+    parseSListContent
+  }
+
+  //parse s-list assuming the parentheses has been parsed
+  private def parseSListContent: SList = {
     var exprs = new ListBuffer[SExpr]
     while(peekToken.kind != Tokens.CParen)
       exprs.append(parseSExpr)
     eat(Tokens.CParen)
     SList(exprs.toList)
   }
-
 
   def parseSExpr: SExpr = {
     peekToken.kind match {
@@ -743,6 +842,21 @@ class Parser(lexer: Lexer) {
                  Tokens.HexadecimalLitKind, Tokens.DecimalLitKind, Tokens.StringLitKind,
                  Tokens.KeywordKind, Tokens.OParen)
     }
+  }
+
+
+  private def parseUntil[A](parseFun: () => A, endKind: TokenKind): Seq[A] = {
+    val items = new ListBuffer[A]
+    while(peekToken != null && peekToken.kind != endKind)
+      items.append(parseFun())
+    eat(endKind)
+    items.toList
+  }
+
+  private def parseMany[A](parseFun: () => A): Seq[A] = {
+    val items = new ListBuffer[A]
+    eat(Tokens.OParen)
+    parseUntil(parseFun, Tokens.CParen)
   }
 
   //TODO: we need a token class/type, instead of precise token with content + position

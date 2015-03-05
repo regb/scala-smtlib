@@ -92,9 +92,9 @@ object Terms {
   }
 
 
-  sealed trait Constant extends Term
+  sealed trait Constant extends Term with AttributeValue
 
-  sealed trait Literal[T] extends Constant with AttributeValue {
+  sealed trait Literal[T] extends Constant {
     val value: T
   }
 

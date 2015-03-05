@@ -175,14 +175,14 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(msg))
       actions.prepend(() => writer.write('"'))
       actions.prepend(() => writer.write("(error "))
-    case CheckSatResponse(SatStatus) =>
+    case CheckSatStatus(SatStatus) =>
       actions.prepend(() => writer.write("sat\n"))
-    case CheckSatResponse(UnsatStatus) =>
+    case CheckSatStatus(UnsatStatus) =>
       actions.prepend(() => writer.write("unsat\n"))
-    case CheckSatResponse(UnknownStatus) =>
+    case CheckSatStatus(UnknownStatus) =>
       actions.prepend(() => writer.write("unknown\n"))
 
-    case GetValueResponse(valuationPairs) =>
+    case GetValueResponseSuccess(valuationPairs) =>
       def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
         actions.prepend(() => writer.write(')'))
         actions.prepend(() => printTerm(pair._2, writer, actions))
@@ -191,7 +191,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
         actions.prepend(() => writer.write('('))
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
-    case GetModelResponse(exprs) => {
+    case GetModelResponseSuccess(exprs) => {
       def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
         case (cmd: Command) => printCommand(cmd, writer, actions)
         case (term: Term) => printTerm(term, writer, actions)

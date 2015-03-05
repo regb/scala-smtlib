@@ -210,14 +210,14 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       writer.write(msg)
       writer.write('"')
       writer.write(")\n")
-    case CheckSatResponse(SatStatus) =>
+    case CheckSatStatus(SatStatus) =>
       writer.write("sat\n")
-    case CheckSatResponse(UnsatStatus) =>
+    case CheckSatStatus(UnsatStatus) =>
       writer.write("unsat\n")
-    case CheckSatResponse(UnknownStatus) =>
+    case CheckSatStatus(UnknownStatus) =>
       writer.write("unknown\n")
 
-    case GetValueResponse(valuationPairs) =>
+    case GetValueResponseSuccess(valuationPairs) =>
       def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
         writer.write('(')
         printTerm(pair._1, writer)
@@ -226,7 +226,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
         writer.write(')')
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")")
-    case GetModelResponse(exprs) => {
+    case GetModelResponseSuccess(exprs) => {
       def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
         case (cmd: Command) => printCommand(cmd, writer)
         case (term: Term) => printTerm(term, writer)
@@ -236,8 +236,17 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       printNary(writer, exprs, printGetModelResponseEntry, "", "\n", "")
       writer.write(')')
     }
-    case GetInfoResponse(response, responses) => {
+    case GetInfoResponseSuccess(response, responses) => {
       printNary(writer, response +: responses, printInfoResponse, "(", " ", ")")
+    }
+    case GetOptionResponseSuccess(av) => {
+      printSExpr(av, writer)
+    }
+    case GetProofResponseSuccess(proof) => {
+      printSExpr(proof, writer)
+    }
+    case GetUnsatCoreResponseSuccess(symbols) => {
+      printNary(writer, symbols, printSExpr, "(", " ", ")")
     }
     case _ => ???
   }

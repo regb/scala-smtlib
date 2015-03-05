@@ -18,6 +18,12 @@ import scala.annotation.tailrec
 
 class PrinterTests extends FunSuite {
 
+  /*
+   * TODO: test the requirement from the standard:
+           Any response whish is not double-quoted and not parenthesized
+           should be followed by a whitespace character (new line)
+   */
+
   override def suiteName = "Printer correctness suite"
 
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
@@ -288,17 +294,17 @@ class PrinterTests extends FunSuite {
 
     def printCheckSat(res: CheckSatResponse): String = printer.toString(res) 
     def parseCheckSat(in: String): CheckSatResponse = Parser.fromString(in).parseCheckSatResponse
-    check(CheckSatResponse(SatStatus), printCheckSat, parseCheckSat)
-    check(CheckSatResponse(UnsatStatus), printCheckSat, parseCheckSat)
-    check(CheckSatResponse(UnknownStatus), printCheckSat, parseCheckSat)
+    check(CheckSatStatus(SatStatus), printCheckSat, parseCheckSat)
+    check(CheckSatStatus(UnsatStatus), printCheckSat, parseCheckSat)
+    check(CheckSatStatus(UnknownStatus), printCheckSat, parseCheckSat)
 
     def printGetValue(res: GetValueResponse): String = printer.toString(res)
     def parseGetValue(in: String): GetValueResponse = Parser.fromString(in).parseGetValueResponse
 
-    check(GetValueResponse(Seq( 
+    check(GetValueResponseSuccess(Seq( 
            (SSymbol("a"), SNumeral(42)) 
           )), printGetValue, parseGetValue)
-    check(GetValueResponse(Seq( 
+    check(GetValueResponseSuccess(Seq( 
            (SSymbol("a"), SNumeral(42)), 
            (SSymbol("b"), SNumeral(12)) 
          )), printGetValue, parseGetValue)
@@ -307,13 +313,13 @@ class PrinterTests extends FunSuite {
     def printGetModel(res: GetModelResponse): String = printer.toString(res)
     def parseGetModel(in: String): GetModelResponse = Parser.fromString(in).parseGetModelResponse
     check(
-      GetModelResponse(List(DefineFun("z", Seq(), Sort("Int"), SNumeral(0)))),
+      GetModelResponseSuccess(List(DefineFun("z", Seq(), Sort("Int"), SNumeral(0)))),
       printGetModel,
       parseGetModel
     )
 
     check(
-      GetModelResponse(List(
+      GetModelResponseSuccess(List(
         DefineFun("z", Seq(), Sort("Int"), SNumeral(0)),
         DeclareFun("a", Seq(), Sort("A")),
         ForAll(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
