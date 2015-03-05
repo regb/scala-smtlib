@@ -79,10 +79,6 @@ object CommandsResponses {
   case class GetProofResponseSuccess(proof: SExpr) extends 
     GetProofResponse with SuccessfulResponse
 
-  
-  //TODO: do we still need this ?
-  case class SExprResponse(sexpr: SExpr) extends CommandResponse
-
 
   /*
    * Temporary solution to mark NonStandardResponse until

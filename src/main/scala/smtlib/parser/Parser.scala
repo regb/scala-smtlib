@@ -367,15 +367,6 @@ class Parser(lexer: Lexer) {
     }
   }
 
-  def parseSExprResponse: SExprResponse = {
-    eat(Tokens.OParen)
-    var exprs = new ListBuffer[SExpr]
-    while(peekToken.kind != Tokens.CParen)
-      exprs.append(parseSExpr)
-    eat(Tokens.CParen)
-    SExprResponse(SList(exprs.toList))
-  }
-
   def parseInfoResponse: InfoResponse = {
     peekToken match {
       case Tokens.Keyword("error-behavior") =>
