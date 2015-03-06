@@ -44,7 +44,8 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing set-option commands") { testSetOptionCommand }
     test(printerName + ": Printing get-info commands") { testGetInfoCommand }
     test(printerName + ": Printing simple script") { testSimpleScript }
-    test(printerName + ": Printing Commands Responses") { testCommandsResponses }
+    test(printerName + ": Printing basic commands responses") { testCommandsResponses }
+    test(printerName + ": Printing get-Info responses") { testGetInfoResponses }
     test(printerName + ": Printing non-standard Commands Responses") { testNonStandardCommandsResponses }
   }
 
@@ -308,7 +309,44 @@ class PrinterTests extends FunSuite {
            (SSymbol("a"), SNumeral(42)), 
            (SSymbol("b"), SNumeral(12)) 
          )), printGetValue, parseGetValue)
+
   }
+
+  def testGetInfoResponses(implicit printer: Printer): Unit = {
+    def printGetInfo(res: GetInfoResponse): String = printer.toString(res)
+    def parseGetInfo(in: String): GetInfoResponse = Parser.fromString(in).parseGetInfoResponse
+
+    check(GetInfoResponseSuccess(
+            ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior), Seq()),
+          printGetInfo,
+          parseGetInfo)
+    check(GetInfoResponseSuccess(
+            ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior), Seq()),
+          printGetInfo,
+          parseGetInfo)
+    check(GetInfoResponseSuccess(NameInfoResponse("Scala-SmtLib"), Seq()),
+          printGetInfo,
+          parseGetInfo)
+    check(GetInfoResponseSuccess(AuthorsInfoResponse("Regis Blanc"), Seq()),
+          printGetInfo,
+          parseGetInfo)
+    check(GetInfoResponseSuccess(VersionInfoResponse("2.13.7"), Seq()),
+          printGetInfo,
+          parseGetInfo)
+    check(GetInfoResponseSuccess(ReasonUnknownInfoResponse(TimeoutReasonUnknown), Seq()),
+          printGetInfo,
+          parseGetInfo)
+    check(GetInfoResponseSuccess(ReasonUnknownInfoResponse(MemoutReasonUnknown), Seq()),
+          printGetInfo,
+          parseGetInfo)
+    check(GetInfoResponseSuccess(ReasonUnknownInfoResponse(IncompleteReasonUnknown), Seq()),
+          printGetInfo,
+          parseGetInfo)
+    check(GetInfoResponseSuccess(AttributeInfoResponse(Attribute(SKeyword("key"))), Seq()),
+          printGetInfo,
+          parseGetInfo)
+  }
+
   def testNonStandardCommandsResponses(implicit printer: Printer): Unit = {
     def printGetModel(res: GetModelResponse): String = printer.toString(res)
     def parseGetModel(in: String): GetModelResponse = Parser.fromString(in).parseGetModelResponse

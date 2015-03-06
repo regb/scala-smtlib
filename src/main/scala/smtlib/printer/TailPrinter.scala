@@ -191,6 +191,11 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
         actions.prepend(() => writer.write('('))
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
+    case GetInfoResponseSuccess(response, responses) => {
+      printNary(writer, response +: responses, 
+                (ir: InfoResponse, w: Writer) => actions.prepend(() => printInfoResponse(ir, w, actions)),
+                "(", " ", ")", actions)
+    }
     case GetModelResponseSuccess(exprs) => {
       def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
         case (cmd: Command) => printCommand(cmd, writer, actions)
@@ -293,6 +298,34 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     actions.prepend(() => writer.write(' '))
     actions.prepend(() => writer.write(sv.name.name))
     actions.prepend(() => writer.write('('))
+  }
+
+
+  private def printInfoResponse(infoResponse: InfoResponse, writer: Writer, actions: LinkedList[Action]): Unit = infoResponse match {
+    case ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior) =>
+      actions.prepend(() => writer.write(":error-behavior immediate-exit"))
+    case ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior) =>
+      actions.prepend(() => writer.write(":error-behavior continued-execution"))
+    case NameInfoResponse(name) =>
+      actions.prepend(() => writer.write('"'))
+      actions.prepend(() => writer.write(name))
+      actions.prepend(() => writer.write(":name \""))
+    case AuthorsInfoResponse(authors) =>
+      actions.prepend(() => writer.write('"'))
+      actions.prepend(() => writer.write(authors))
+      actions.prepend(() => writer.write(":authors \""))
+    case VersionInfoResponse(version) =>
+      actions.prepend(() => writer.write('"'))
+      actions.prepend(() => writer.write(version))
+      actions.prepend(() => writer.write(":version \""))
+    case ReasonUnknownInfoResponse(TimeoutReasonUnknown) =>
+      actions.prepend(() => writer.write(":reason-unknown timeout"))
+    case ReasonUnknownInfoResponse(MemoutReasonUnknown) =>
+      actions.prepend(() => writer.write(":reason-unknown memout"))
+    case ReasonUnknownInfoResponse(IncompleteReasonUnknown) =>
+      actions.prepend(() => writer.write(":reason-unknown incomplete"))
+    case AttributeInfoResponse(attribute) =>
+      actions.prepend(() => printAttribute(attribute, writer))
   }
 
 
