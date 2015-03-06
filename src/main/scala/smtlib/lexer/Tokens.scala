@@ -13,14 +13,28 @@ object Tokens {
     def unapply(token: Token): Option[TokenKind] = Some(token.kind)
   }
 
-  case class StringLit(content: String) extends Token(StringLitKind)
-  case class SymbolLit(content: String) extends Token(SymbolLitKind)
-  case class Keyword(name: String) extends Token(KeywordKind)
+  case class StringLit(content: String) extends Token(StringLitKind) {
+    override def toString = "\"$content\""
+  }
+  case class SymbolLit(content: String) extends Token(SymbolLitKind) {
+    override def toString = "$content"
+  }
+  case class Keyword(name: String) extends Token(KeywordKind) {
+    override def toString = ":$name"
+  }
 
-  case class NumeralLit(n: BigInt) extends Token(NumeralLitKind)
-  case class DecimalLit(d: Double) extends Token(DecimalLitKind)
-  case class BinaryLit(content: Seq[Boolean]) extends Token(BinaryLitKind)
-  case class HexadecimalLit(content: Hexadecimal) extends Token(HexadecimalLitKind)
+  case class NumeralLit(n: BigInt) extends Token(NumeralLitKind) {
+    override def toString = n.toString
+  }
+  case class DecimalLit(d: Double) extends Token(DecimalLitKind) {
+    override def toString = d.toString
+  }
+  case class BinaryLit(content: Seq[Boolean]) extends Token(BinaryLitKind) {
+    override def toString = content.map(d => if(d) "1" else "0").mkString
+  }
+  case class HexadecimalLit(content: Hexadecimal) extends Token(HexadecimalLitKind) {
+    override def toString = content.toString
+  }
 
   sealed abstract class TokenKind
 
