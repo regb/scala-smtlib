@@ -33,7 +33,7 @@ class PrinterTests extends FunSuite {
 
   def mkTests(printer: Printer): Unit = {
     implicit val p = printer
-    val printerName = printer.getClass.getName
+    val printerName = printer.name
     test(printerName + ": printing simple Terms") { testSimpleTerms }
     test(printerName + ": Printing tricky Terms") { testTrickyTerms }
     test(printerName + ": Printing Symbols with weird names") { testWeirdSymbolNames }
@@ -298,6 +298,13 @@ class PrinterTests extends FunSuite {
     check(CheckSatStatus(SatStatus), printCheckSat, parseCheckSat)
     check(CheckSatStatus(UnsatStatus), printCheckSat, parseCheckSat)
     check(CheckSatStatus(UnknownStatus), printCheckSat, parseCheckSat)
+
+    def printGetAssertions(res: GetAssertionsResponse): String = printer.toString(res)
+    def parseGetAssertions(in: String): GetAssertionsResponse = Parser.fromString(in).parseGetAssertionsResponse
+
+    check(GetAssertionsResponseSuccess(Seq(
+           QualifiedIdentifier("a"), SNumeral(42)
+          )), printGetAssertions, parseGetAssertions)
 
     def printGetValue(res: GetValueResponse): String = printer.toString(res)
     def parseGetValue(in: String): GetValueResponse = Parser.fromString(in).parseGetValueResponse

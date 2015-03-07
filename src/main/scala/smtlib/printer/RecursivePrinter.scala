@@ -11,6 +11,8 @@ import java.io.BufferedWriter
 
 object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
+  override val name: String = "recursive-printer"
+
   override def printScript(script: Script, writer: Writer): Unit = {
     script.commands.foreach(cmd => {
       printCommand(cmd, writer)
@@ -216,6 +218,9 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       writer.write("unsat\n")
     case CheckSatStatus(UnknownStatus) =>
       writer.write("unknown\n")
+
+    case GetAssertionsResponseSuccess(assertions) =>
+      printNary(writer, assertions, printTerm, "(", " ", " )")
 
     case GetValueResponseSuccess(valuationPairs) =>
       def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {

@@ -13,6 +13,8 @@ import java.io.BufferedWriter
 
 object TailPrinter extends Printer with TerminalTreesPrinter {
 
+  override val name: String = "tail-printer"
+
   private type Action = () => Unit
 
   override def printScript(script: Script, writer: Writer): Unit = {
@@ -181,6 +183,9 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write("unsat\n"))
     case CheckSatStatus(UnknownStatus) =>
       actions.prepend(() => writer.write("unknown\n"))
+
+    case GetAssertionsResponseSuccess(assertions) =>
+      printNary(writer, assertions, printTerm, "(", " ", " )", actions)
 
     case GetValueResponseSuccess(valuationPairs) =>
       def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {

@@ -11,6 +11,8 @@ import java.io.BufferedWriter
 
 trait Printer {
 
+  val name: String
+
   def printScript(script: Script, writer: Writer): Unit
   def printCommand(command: Command, writer: Writer): Unit
   def printTerm(term: Term, writer: Writer): Unit
