@@ -299,6 +299,11 @@ class PrinterTests extends FunSuite {
     check(CheckSatStatus(UnsatStatus), printCheckSat, parseCheckSat)
     check(CheckSatStatus(UnknownStatus), printCheckSat, parseCheckSat)
 
+    def printGetOption(res: GetOptionResponse): String = printer.toString(res)
+    def parseGetOption(in: String): GetOptionResponse = Parser.fromString(in).parseGetOptionResponse
+
+    check(GetOptionResponseSuccess(SSymbol("test")), printGetOption, parseGetOption)
+
     def printGetAssertions(res: GetAssertionsResponse): String = printer.toString(res)
     def parseGetAssertions(in: String): GetAssertionsResponse = Parser.fromString(in).parseGetAssertionsResponse
 

@@ -201,6 +201,9 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
                 (ir: InfoResponse, w: Writer) => actions.prepend(() => printInfoResponse(ir, w, actions)),
                 "(", " ", ")", actions)
     }
+    case GetOptionResponseSuccess(av) => {
+      printSExpr(av, writer, actions)
+    }
     case GetModelResponseSuccess(exprs) => {
       def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
         case (cmd: Command) => printCommand(cmd, writer, actions)
