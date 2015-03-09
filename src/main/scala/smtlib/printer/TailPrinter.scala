@@ -214,6 +214,9 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => printNary(writer, exprs, printGetModelResponseEntry, "", "\n", "", actions))
       actions.prepend(() => writer.write("(model \n"))
     }
+    case GetUnsatCoreResponseSuccess(symbols) => {
+      printNary(writer, symbols, printSExpr, "(", " ", ")", actions)
+    }
     case _ => ???
   }
 

@@ -322,6 +322,12 @@ class PrinterTests extends FunSuite {
            (SSymbol("b"), SNumeral(12)) 
          )), printGetValue, parseGetValue)
 
+    def printGetUnsatCore(res: GetUnsatCoreResponse): String = printer.toString(res)
+    def parseGetUnsatCore(in: String): GetUnsatCoreResponse = Parser.fromString(in).parseGetUnsatCoreResponse
+
+    check(GetUnsatCoreResponseSuccess(Seq(SSymbol("a"))), printGetUnsatCore, parseGetUnsatCore)
+    check(GetUnsatCoreResponseSuccess(
+            Seq(SSymbol("a"), SSymbol("b"))), printGetUnsatCore, parseGetUnsatCore)
   }
 
   def testGetInfoResponses(implicit printer: Printer): Unit = {
