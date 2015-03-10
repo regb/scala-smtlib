@@ -14,13 +14,13 @@ object Tokens {
   }
 
   case class StringLit(content: String) extends Token(StringLitKind) {
-    override def toString = "\"$content\""
+    override def toString = "\"" + content + "\""
   }
   case class SymbolLit(content: String) extends Token(SymbolLitKind) {
-    override def toString = "$content"
+    override def toString = s"$content"
   }
   case class Keyword(name: String) extends Token(KeywordKind) {
-    override def toString = ":$name"
+    override def toString = s":$name"
   }
 
   case class NumeralLit(n: BigInt) extends Token(NumeralLitKind) {
