@@ -40,7 +40,6 @@ abstract class ProcessInterpreter extends Interpreter {
       }
     } catch {
       case (ex: Exception) => {
-        ex.printStackTrace
         if(cmd == CheckSat()) CheckSatStatus(UnknownStatus)
         else Error("Solver encountered exception: " + ex)
       }
