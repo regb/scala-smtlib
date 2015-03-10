@@ -187,7 +187,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     case GetAssertionsResponseSuccess(assertions) =>
       printNary(writer, assertions, printTerm, "(", " ", " )", actions)
 
-    case GetValueResponseSuccess(valuationPairs) =>
+    case GetValueResponseSuccess(valuationPairs) => {
       def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
         actions.prepend(() => writer.write(')'))
         actions.prepend(() => printTerm(pair._2, writer, actions))
@@ -196,6 +196,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
         actions.prepend(() => writer.write('('))
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
+    }
     case GetInfoResponseSuccess(response, responses) => {
       printNary(writer, response +: responses, 
                 (ir: InfoResponse, w: Writer) => actions.prepend(() => printInfoResponse(ir, w, actions)),
@@ -216,6 +217,16 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     }
     case GetUnsatCoreResponseSuccess(symbols) => {
       printNary(writer, symbols, printSExpr, "(", " ", ")", actions)
+    }
+    case GetAssignmentResponseSuccess(valuationPairs) => {
+      def printValuationPair(pair: (SSymbol, Boolean), writer: Writer): Unit = {
+        actions.prepend(() => writer.write(')'))
+        actions.prepend(() => writer.write(pair._2.toString))
+        actions.prepend(() => writer.write(' '))
+        actions.prepend(() => writer.write(pair._1.name))
+        actions.prepend(() => writer.write('('))
+      }
+      printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
     }
     case _ => ???
   }

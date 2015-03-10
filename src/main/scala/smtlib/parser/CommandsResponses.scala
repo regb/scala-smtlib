@@ -73,7 +73,7 @@ object CommandsResponses {
   case class GetUnsatCoreResponseSuccess(symbols: Seq[SSymbol]) extends 
     GetUnsatCoreResponse with SuccessfulResponse
 
-  case class GetAssignmentResponseSuccess(valuationPair: Seq[(SSymbol, Boolean)]) extends
+  case class GetAssignmentResponseSuccess(valuationPairs: Seq[(SSymbol, Boolean)]) extends
     GetAssignmentResponse with SuccessfulResponse
 
   case class GetProofResponseSuccess(proof: SExpr) extends 

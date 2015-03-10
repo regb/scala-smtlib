@@ -222,7 +222,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case GetAssertionsResponseSuccess(assertions) =>
       printNary(writer, assertions, printTerm, "(", " ", " )")
 
-    case GetValueResponseSuccess(valuationPairs) =>
+    case GetValueResponseSuccess(valuationPairs) => {
       def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
         writer.write('(')
         printTerm(pair._1, writer)
@@ -231,6 +231,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
         writer.write(')')
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")")
+    }
     case GetModelResponseSuccess(exprs) => {
       def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
         case (cmd: Command) => printCommand(cmd, writer)
@@ -252,6 +253,16 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     }
     case GetUnsatCoreResponseSuccess(symbols) => {
       printNary(writer, symbols, printSExpr, "(", " ", ")")
+    }
+    case GetAssignmentResponseSuccess(valuationPairs) => {
+      def printValuationPair(pair: (SSymbol, Boolean), writer: Writer): Unit = {
+        writer.write('(')
+        writer.write(pair._1.name)
+        writer.write(' ')
+        writer.write(pair._2.toString)
+        writer.write(')')
+      }
+      printNary(writer, valuationPairs, printValuationPair, "(", " ", ")")
     }
     case _ => ???
   }

@@ -289,10 +289,6 @@ class PrinterTests extends FunSuite {
     check(Unsupported, printGenRes, parseGenRes)
     check(Error("symbol missing"), printGenRes, parseGenRes)
 
-    def printGetAssignRes(res: GetAssignmentResponse): String = printer.toString(res)
-    def parseGetAssignRes(in: String): GetAssignmentResponse = Parser.fromString(in).parseGetAssignmentResponse
-    //TODO: some tests with get-assignment
-
     def printCheckSat(res: CheckSatResponse): String = printer.toString(res) 
     def parseCheckSat(in: String): CheckSatResponse = Parser.fromString(in).parseCheckSatResponse
     check(CheckSatStatus(SatStatus), printCheckSat, parseCheckSat)
@@ -328,6 +324,14 @@ class PrinterTests extends FunSuite {
     check(GetUnsatCoreResponseSuccess(Seq(SSymbol("a"))), printGetUnsatCore, parseGetUnsatCore)
     check(GetUnsatCoreResponseSuccess(
             Seq(SSymbol("a"), SSymbol("b"))), printGetUnsatCore, parseGetUnsatCore)
+
+    def printGetAssignment(res: GetAssignmentResponse): String = printer.toString(res)
+    def parseGetAssignment(in: String): GetAssignmentResponse = Parser.fromString(in).parseGetAssignmentResponse
+
+    check(GetAssignmentResponseSuccess(Seq(
+      (SSymbol("a"), true), (SSymbol("b"), false))),
+      printGetAssignment, 
+      parseGetAssignment)
   }
 
   def testGetInfoResponses(implicit printer: Printer): Unit = {
