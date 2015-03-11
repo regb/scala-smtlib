@@ -332,6 +332,13 @@ class PrinterTests extends FunSuite {
       (SSymbol("a"), true), (SSymbol("b"), false))),
       printGetAssignment, 
       parseGetAssignment)
+
+    def printGetProof(res: GetProofResponse): String = printer.toString(res)
+    def parseGetProof(in: String): GetProofResponse = Parser.fromString(in).parseGetProofResponse
+
+    check(GetProofResponseSuccess(SList(SSymbol("a"), SNumeral(42))),
+          printGetProof,
+          parseGetProof)
   }
 
   def testGetInfoResponses(implicit printer: Printer): Unit = {
