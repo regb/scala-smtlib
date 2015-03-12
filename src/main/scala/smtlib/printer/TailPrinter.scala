@@ -231,7 +231,6 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
     }
-    case _ => ???
   }
 
   override def printSort(sort: Sort, writer: Writer): Unit = {

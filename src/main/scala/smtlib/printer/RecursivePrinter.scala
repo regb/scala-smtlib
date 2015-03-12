@@ -264,7 +264,6 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")")
     }
-    case _ => ???
   }
 
 
