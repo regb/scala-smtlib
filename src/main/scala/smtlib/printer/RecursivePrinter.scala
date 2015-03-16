@@ -257,7 +257,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case GetAssignmentResponseSuccess(valuationPairs) => {
       def printValuationPair(pair: (SSymbol, Boolean), writer: Writer): Unit = {
         writer.write('(')
-        writer.write(pair._1.name)
+        printSymbol(pair._1, writer)
         writer.write(' ')
         writer.write(pair._2.toString)
         writer.write(')')
@@ -352,8 +352,8 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case SKeyword(key) =>
       writer.write(":")
       writer.write(key)
-    case SSymbol(sym) =>
-      writer.write(sym)
+    case s@SSymbol(_) =>
+      printSymbol(s, writer)
     case (c: Constant) =>
       printConstant(c, writer)
   }

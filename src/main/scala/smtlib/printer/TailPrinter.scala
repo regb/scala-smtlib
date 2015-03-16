@@ -226,7 +226,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
         actions.prepend(() => writer.write(')'))
         actions.prepend(() => writer.write(pair._2.toString))
         actions.prepend(() => writer.write(' '))
-        actions.prepend(() => writer.write(pair._1.name))
+        actions.prepend(() => printSymbol(pair._1, writer))
         actions.prepend(() => writer.write('('))
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
@@ -375,8 +375,8 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     case SKeyword(key) =>
       writer.write(":")
       writer.write(key)
-    case SSymbol(sym) =>
-      writer.write(sym)
+    case s@SSymbol(_) =>
+      printSymbol(s, writer)
     case (c: Constant) =>
       printConstant(c, writer)
   }

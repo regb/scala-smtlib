@@ -37,14 +37,17 @@ class PrinterTests extends FunSuite {
     test(printerName + ": printing simple Terms") { testSimpleTerms }
     test(printerName + ": Printing tricky Terms") { testTrickyTerms }
     test(printerName + ": Printing Symbols with weird names") { testWeirdSymbolNames }
+    test(printerName + ": Printing Symbols with quoted names") { testQuotedSymbols }
     test(printerName + ": Printing composed Terms") { testComposedTerm }
     test(printerName + ": Printing Sorts") { testSorts }
     test(printerName + ": Printing single Commands") { testSingleCommands }
     test(printerName + ": Printing declare-datatypes commands") { testDeclareDatatypes }
     test(printerName + ": Printing set-option commands") { testSetOptionCommand }
+    test(printerName + ": Printing set-info commands") { testSetInfoCommand }
     test(printerName + ": Printing get-info commands") { testGetInfoCommand }
     test(printerName + ": Printing simple script") { testSimpleScript }
     test(printerName + ": Printing basic commands responses") { testCommandsResponses }
+    test(printerName + ": Printing get-assignment response quoted symbols") { testGetAssignmentResponseQuotedSymbol }
     test(printerName + ": Printing get-Info responses") { testGetInfoResponses }
     test(printerName + ": Printing non-standard Commands Responses") { testNonStandardCommandsResponses }
   }
@@ -143,6 +146,13 @@ class PrinterTests extends FunSuite {
     checkTerm(QualifiedIdentifier("^^^"))
     checkTerm(QualifiedIdentifier("+-/*=%?!.$_~&^<>@"))
     checkTerm(QualifiedIdentifier("$12%"))
+  }
+
+  def testQuotedSymbols(implicit printer: Printer): Unit = {
+    checkTerm(QualifiedIdentifier("hey there"))
+    checkTerm(QualifiedIdentifier(
+"""hey there,
+What are you up to man?"""))
   }
 
   def testComposedTerm(implicit printer: Printer): Unit = {
@@ -258,6 +268,16 @@ class PrinterTests extends FunSuite {
     checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key"), Some(SString("value"))))))
   }
 
+  def testSetInfoCommand(implicit printer: Printer): Unit = {
+    checkCommand(SetInfo(Attribute("test")))
+    checkCommand(SetInfo(Attribute("data")))
+    checkCommand(SetInfo(Attribute("authors", Some(SString("Regis Blanc")))))
+    checkCommand(SetInfo(Attribute("sources", 
+Some(SSymbol(
+"""This is a long quoted symbol.
+It spans a couple lines""")))))
+  }
+
   def testGetInfoCommand(implicit printer: Printer): Unit = {
     checkCommand(GetInfo(ErrorBehaviorInfoFlag))
     checkCommand(GetInfo(NameInfoFlag))
@@ -339,6 +359,17 @@ class PrinterTests extends FunSuite {
     check(GetProofResponseSuccess(SList(SSymbol("a"), SNumeral(42))),
           printGetProof,
           parseGetProof)
+  }
+
+  def testGetAssignmentResponseQuotedSymbol(implicit printer: Printer): Unit = {
+    def printGetAssignment(res: GetAssignmentResponse): String = printer.toString(res)
+    def parseGetAssignment(in: String): GetAssignmentResponse = Parser.fromString(in).parseGetAssignmentResponse
+
+    check(GetAssignmentResponseSuccess(Seq(
+      (SSymbol("quoted symbol"), true), (SSymbol("non-quoted-symbol"), false))),
+      printGetAssignment, 
+      parseGetAssignment)
+
   }
 
   def testGetInfoResponses(implicit printer: Printer): Unit = {

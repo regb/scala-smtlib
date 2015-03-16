@@ -25,13 +25,23 @@ trait TerminalTreesPrinter {
       writer.write("\"")
   }
 
+  protected def printSymbol(s: SSymbol, writer: Writer): Unit = {
+    val name = s.name
+    if(name.exists(c => !lexer.Lexer.isSymbolChar(c))) {
+      writer.write('|')
+      writer.write(name)
+      writer.write('|')
+    } else {
+      writer.write(name)
+    }
+  }
 
   protected def printId(id: Identifier, writer: Writer): Unit = {
     if(id.indices.isEmpty)
-      writer.write(id.symbol.name)
+      printSymbol(id.symbol, writer)
     else {
       writer.write("(_ ")
-      writer.write(id.symbol.name)
+      printSymbol(id.symbol, writer)
       writer.write(' ')
       writer.write(id.indices.head.toString)
       id.indices.tail.foreach(n => writer.write(" " + n.toString))

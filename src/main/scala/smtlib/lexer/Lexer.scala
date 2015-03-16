@@ -217,26 +217,6 @@ class Lexer(reader: java.io.Reader) {
     Hexadecimal.fromString(res).get
   }
 
-  private var extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&', '_', 
-                                     '!', '?', '[', ']', '{', '}', '=', '<', '>', '~', '.')
-  private def isSymbolChar(c: Char): Boolean =
-    c.isDigit || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || extraSymbolChars.contains(c)
-
-  private def isHexa(c: Char): Boolean =
-    c.isDigit || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
-
-
-  /* if c is digit in radix r (1 < r <= 36) */
-  private def isDigit(c: Char, r: Int): Boolean = {
-    require(r > 1 && r <= 36)
-    val d = (c - '0').toInt
-    if(d < 10 && d >= 0)
-      d < r
-    else {
-      val ld = (c.toLower - 'a').toInt
-      ld >= 0 && ld < r - 10
-    }
-  }
 
   private def toReserved(s: String): Option[Token] = {
     val str2tok: PartialFunction[String, Token] = {
@@ -285,4 +265,25 @@ object Lexer {
 
   class UnexpectedEOFException(val position: Position) extends Exception
 
+  private var extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&', '_', 
+                                     '!', '?', '[', ']', '{', '}', '=', '<', '>', '~', '.')
+
+  def isSymbolChar(c: Char): Boolean =
+    c.isDigit || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || extraSymbolChars.contains(c)
+
+  def isHexa(c: Char): Boolean =
+    c.isDigit || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
+
+
+  /* if c is digit in radix r (1 < r <= 36) */
+  def isDigit(c: Char, r: Int): Boolean = {
+    require(r > 1 && r <= 36)
+    val d = (c - '0').toInt
+    if(d < 10 && d >= 0)
+      d < r
+    else {
+      val ld = (c.toLower - 'a').toInt
+      ld >= 0 && ld < r - 10
+    }
+  }
 }

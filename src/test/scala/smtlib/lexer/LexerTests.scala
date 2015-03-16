@@ -131,6 +131,15 @@ deF|
 """abc
 deF"""))
 
+    assert(lexUniqueToken(
+"""|hey there,
+What's up?
+
+See you!|""") === SymbolLit(
+"""hey there,
+What's up?
+
+See you!"""))
 
     assert(lexUniqueToken(""" AbCdEf """) === SymbolLit("AbCdEf"))
     assert(lexUniqueToken(""" abc!def """) === SymbolLit("abc!def"))
