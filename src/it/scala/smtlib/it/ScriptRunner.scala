@@ -145,6 +145,7 @@ class Tests extends FunSuite {
       val res: String = interpreter.eval(p.parseCommand).toString
       assert(expected.trim === res.trim)
     })
+    assert(p.parseCommand === null)
   }
 
 }
