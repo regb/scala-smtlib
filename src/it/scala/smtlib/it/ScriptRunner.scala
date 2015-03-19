@@ -136,6 +136,7 @@ class Tests extends FunSuite {
   def compareWithInterpreter(executable: (File) => Stream[String])
                             (interpreter: Interpreter, file: File) = {
 
+    println("running solver on: " + file.getPath)
     val output = executable(file)
 
     val l = new Lexer(new FileReader(file))
