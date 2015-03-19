@@ -50,17 +50,10 @@ trait TerminalTreesPrinter {
   }
 
   protected def printLogic(logic: Logic, writer: Writer): Unit = logic match {
-    case QF_UF => 
-      writer.write("QF_UF")
-    case QF_LIA => 
-      writer.write("QF_LIA")
-    case QF_LRA => 
-      writer.write("QF_LRA")
-    case QF_AX => 
-      writer.write("QF_AX")
-    case QF_A => 
-      writer.write("QF_A")
-    case Undef => ???
+    case (logic: StandardLogic) =>
+      writer.write(logic.toString)
+    case NonStandardLogic(symbol) =>
+      printSymbol(symbol, writer)
   }
 
   protected def printKeyword(keyword: SKeyword, writer: Writer): Unit = {

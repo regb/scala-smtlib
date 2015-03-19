@@ -91,21 +91,61 @@ object Commands {
    *       extractor for standard logics instead of a separate type.
    *       The reason being that the standard only requires a symbol here.
    */
-  sealed abstract class Logic
-  case object QF_UF extends Logic
-  case object QF_LIA extends Logic
-  case object QF_LRA extends Logic
-  case object QF_AX extends Logic
-  case object QF_A extends Logic
-  case object Undef extends Logic
+
+  trait Logic 
+
+  trait StandardLogic extends Logic
+
+  case object AUFLIA extends StandardLogic
+  case object AUFLIRA extends StandardLogic
+  case object AUFNIRA extends StandardLogic
+  case object LRA extends StandardLogic
+  case object QF_ABV extends StandardLogic
+  case object QF_AUFBV extends StandardLogic
+  case object QF_AUFLIA extends StandardLogic
+  case object QF_AX extends StandardLogic
+  case object QF_BV extends StandardLogic
+  case object QF_IDL extends StandardLogic
+  case object QF_LIA extends StandardLogic
+  case object QF_LRA extends StandardLogic
+  case object QF_NIA extends StandardLogic
+  case object QF_NRA extends StandardLogic
+  case object QF_RDL extends StandardLogic
+  case object QF_UF extends StandardLogic
+  case object QF_UFBV extends StandardLogic
+  case object QF_UFIDL extends StandardLogic
+  case object QF_UFLIA extends StandardLogic
+  case object QF_UFLRA extends StandardLogic
+  case object QF_UFNRA extends StandardLogic
+  case object UFLRA extends StandardLogic
+  case object UFNIA extends StandardLogic
+  case class NonStandardLogic(sym: SSymbol) extends Logic
 
   object Logic {
-    def fromString(logic: String): Logic = logic match {
-      case "QF_UF"  => QF_UF
+    val standardLogicFromString: PartialFunction[String, StandardLogic] = {
+      case "AUFLIA" => AUFLIA
+      case "AUFLIRA" => AUFLIRA
+      case "AUFNIRA" => AUFNIRA
+      case "LRA" => LRA
+      case "QF_ABV" => QF_ABV
+      case "QF_AUFBV" => QF_AUFBV
+      case "QF_AUFLIA" => QF_AUFLIA
+      case "QF_AX" => QF_AX
+      case "QF_BV" => QF_BV
+      case "QF_IDL" => QF_IDL
       case "QF_LIA" => QF_LIA
       case "QF_LRA" => QF_LRA
-      case "QF_AX"  => QF_AX
-      case "QF_A"   => QF_A
+      case "QF_NIA" => QF_NIA
+      case "QF_NRA" => QF_NRA
+      case "QF_RDL" => QF_RDL
+      case "QF_UF" => QF_UF
+      case "QF_UFBV" => QF_UFBV
+      case "QF_UFIDL" => QF_UFIDL
+      case "QF_UFLIA" => QF_UFLIA
+      case "QF_UFLRA" => QF_UFLRA
+      case "QF_UFNRA" => QF_UFNRA
+      case "UFLRA" => UFLRA
+      case "UFNIA" => UFNIA
     }
   }
 

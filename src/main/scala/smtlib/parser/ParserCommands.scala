@@ -36,7 +36,8 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
     val cmd = cmdNameToken.kind match {
       case Tokens.SetLogic => {
         val logicSymbol: SSymbol = parseSymbol
-        val logic = Logic.fromString(logicSymbol.name)
+        val logic: Logic = 
+          Logic.standardLogicFromString.lift(logicSymbol.name).getOrElse(NonStandardLogic(logicSymbol))
         SetLogic(logic)
       }
       case Tokens.SetOption => {

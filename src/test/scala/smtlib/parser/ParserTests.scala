@@ -364,11 +364,38 @@ class ParserTests extends FunSuite with Timeouts {
   }
 
   test("Parsing the different set-logic commands") {
-    assert(parseUniqueCmd("(set-logic QF_UF)")  === SetLogic(QF_UF))
+    assert(parseUniqueCmd("(set-logic AUFLIA)")  === SetLogic(AUFLIA))
+    assert(parseUniqueCmd("(set-logic AUFLIRA)")  === SetLogic(AUFLIRA))
+    assert(parseUniqueCmd("(set-logic AUFNIRA)")  === SetLogic(AUFNIRA))
+    assert(parseUniqueCmd("(set-logic LRA)")  === SetLogic(LRA))
+
+    assert(parseUniqueCmd("(set-logic QF_ABV)")  === SetLogic(QF_ABV))
+    assert(parseUniqueCmd("(set-logic QF_AUFBV)")  === SetLogic(QF_AUFBV))
+    assert(parseUniqueCmd("(set-logic QF_AUFLIA)")  === SetLogic(QF_AUFLIA))
+    assert(parseUniqueCmd("(set-logic QF_AX)")  === SetLogic(QF_AX))
+    assert(parseUniqueCmd("(set-logic QF_BV)")  === SetLogic(QF_BV))
+    assert(parseUniqueCmd("(set-logic QF_IDL)")  === SetLogic(QF_IDL))
     assert(parseUniqueCmd("(set-logic QF_LIA)") === SetLogic(QF_LIA))
     assert(parseUniqueCmd("(set-logic QF_LRA)") === SetLogic(QF_LRA))
-    assert(parseUniqueCmd("(set-logic QF_AX)")  === SetLogic(QF_AX))
-    assert(parseUniqueCmd("(set-logic QF_A)")   === SetLogic(QF_A))
+    assert(parseUniqueCmd("(set-logic QF_NIA)") === SetLogic(QF_NIA))
+    assert(parseUniqueCmd("(set-logic QF_NRA)") === SetLogic(QF_NRA))
+    assert(parseUniqueCmd("(set-logic QF_RDL)") === SetLogic(QF_RDL))
+    assert(parseUniqueCmd("(set-logic QF_UF)")  === SetLogic(QF_UF))
+    assert(parseUniqueCmd("(set-logic QF_UFBV)")  === SetLogic(QF_UFBV))
+    assert(parseUniqueCmd("(set-logic QF_UFIDL)")  === SetLogic(QF_UFIDL))
+    assert(parseUniqueCmd("(set-logic QF_UFLIA)")  === SetLogic(QF_UFLIA))
+    assert(parseUniqueCmd("(set-logic QF_UFLRA)")  === SetLogic(QF_UFLRA))
+    assert(parseUniqueCmd("(set-logic QF_UFNRA)")  === SetLogic(QF_UFNRA))
+
+    assert(parseUniqueCmd("(set-logic UFLRA)")  === SetLogic(UFLRA))
+    assert(parseUniqueCmd("(set-logic UFNIA)")  === SetLogic(UFNIA))
+  }
+
+  test("Parsing non standard set-logic commands") {
+    assert(parseUniqueCmd("(set-logic ALL)") === 
+      SetLogic(NonStandardLogic(SSymbol("ALL"))))
+    assert(parseUniqueCmd("(set-logic MY_COOL_LOGIC)") === 
+      SetLogic(NonStandardLogic(SSymbol("MY_COOL_LOGIC"))))
   }
 
   test("Parsing set-option command") {

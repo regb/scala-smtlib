@@ -203,11 +203,14 @@ What are you up to man?"""))
   }
 
   def testSingleCommands(implicit printer: Printer): Unit = {
+    checkCommand(SetLogic(AUFLIA))
+    checkCommand(SetLogic(AUFLIRA))
+    checkCommand(SetLogic(AUFNIRA))
+    checkCommand(SetLogic(LRA))
     checkCommand(SetLogic(QF_UF))
     checkCommand(SetLogic(QF_LIA))
     checkCommand(SetLogic(QF_LRA))
     checkCommand(SetLogic(QF_AX))
-    checkCommand(SetLogic(QF_A))
 
     checkCommand(DeclareSort("A", 0))
     checkCommand(DefineSort("A", Seq("B", "C"), 
