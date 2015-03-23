@@ -84,24 +84,45 @@ class LexerTests extends FunSuite with Timeouts {
     val lexer1 = new Lexer(reader1)
     assert(lexer1.nextToken === StringLit("12"))
 
-    val reader2 = new StringReader(""" "abc\"def" """)
-    val lexer2 = new Lexer(reader2)
-    assert(lexer2.nextToken === StringLit("abc\"def"))
+    assert(lexUniqueToken(""" "abcdefg" """) === StringLit("abcdefg"))
+  }
 
-    val reader3 = new StringReader(""" " abc \" def" """)
-    val lexer3 = new Lexer(reader3)
-    assert(lexer3.nextToken === StringLit(" abc \" def"))
+  test("String literal can contain spaces") {
+    assert(lexUniqueToken(""" "abc def" """) === StringLit("abc def"))
+    assert(lexUniqueToken(""" " abc def " """) === StringLit(" abc def "))
+  }
 
-    val reader4 = new StringReader(""" "\"abc\"" """)
-    val lexer4 = new Lexer(reader4)
-    assert(lexer4.nextToken === StringLit("\"abc\""))
+  test("Two consecutive quotes in string literal becomes a quote") {
+    assert(lexUniqueToken(""" "abc""d""efg" """) === StringLit("""abc"d"efg"""))
+    assert(lexUniqueToken(""" "She said: ""bye bye"" and left." """) ===
+           StringLit("""She said: "bye bye" and left."""))
+  }
 
+  test("Backslash in string literal is raw") {
     assert(lexUniqueToken(""" "abc\ndef" """) === StringLit("""abc\ndef"""))
     assert(lexUniqueToken(""" "abc\n def" """) === StringLit("""abc\n def"""))
     assert(lexUniqueToken(""" "123\d456" """) === StringLit("""123\d456"""))
 
-    assert(lexUniqueToken(""" "123\\456" """) === StringLit("""123\456"""))
-    assert(lexUniqueToken(""" "test\\" """) === StringLit("""test\"""))
+    assert(lexUniqueToken(""" "123\\456" """) === StringLit("""123\\456"""))
+    assert(lexUniqueToken(""" "test\\" """) === StringLit("""test\\"""))
+  }
+
+  test("Backslash in string does not escape a quote") {
+    val reader2 = new StringReader(""" "abc\" """)
+    val lexer2 = new Lexer(reader2)
+    assert(lexer2.nextToken === StringLit("""abc\"""))
+
+    val reader3 = new StringReader(""" " abc \" " def" """)
+    val lexer3 = new Lexer(reader3)
+    assert(lexer3.nextToken === StringLit(""" abc \"""))
+    assert(lexer3.nextToken === StringLit(""" def"""))
+
+    val reader4 = new StringReader(""" "\"abc"\" """)
+    val lexer4 = new Lexer(reader4)
+    assert(lexer4.nextToken === StringLit("""\"""))
+    assert(lexer4.nextToken === SymbolLit("abc"))
+    assert(lexer4.nextToken === StringLit("""\"""))
+
   }
 
 
@@ -223,7 +244,7 @@ See you!"""))
     assert(lexer.nextToken.kind === OParen)
     pis.write(")")
     assert(lexer.nextToken.kind === CParen)
-    pis.write("\"abcd\"")
+    pis.write("\"abcd\" ")
     assert(lexer.nextToken === StringLit("abcd"))
   }
 

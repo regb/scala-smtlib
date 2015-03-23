@@ -21,7 +21,7 @@ trait TerminalTreesPrinter {
     case SDecimal(value) => writer.write(value.toString)
     case SString(value) =>
       writer.write("\"")
-      writer.write(value.flatMap(c => if(c == '"') "\\\"" else List(c)))
+      writer.write(value.flatMap(c => if(c == '"') "\"\"" else List(c)))
       writer.write("\"")
   }
 

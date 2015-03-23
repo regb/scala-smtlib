@@ -109,9 +109,11 @@ class Lexer(reader: java.io.Reader) {
       case '"' => {
         val buffer = new scala.collection.mutable.ArrayBuffer[Char]
         var c = nextChar
-        while(c != '"') {
-          if(c == '\\' && (peek == '"' || peek == '\\'))
+        while(c != '"' || peek == '"') {
+          if(c == '"') {
+            assert(peek == '"')
             c = nextChar
+          }
           buffer.append(c)
           c = nextChar
         }
