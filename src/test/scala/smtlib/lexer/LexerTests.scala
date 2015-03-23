@@ -316,9 +316,10 @@ See you!"""))
   }
 
   test("Reserved words") {
-    assert(lexUniqueToken("par").kind === Par)
-    assert(lexUniqueToken("NUMERAL").kind === NUMERAL)
+    assert(lexUniqueToken("BINARY").kind === BINARY)
     assert(lexUniqueToken("DECIMAL").kind === DECIMAL)
+    assert(lexUniqueToken("HEXADECIMAL").kind === HEXADECIMAL)
+    assert(lexUniqueToken("NUMERAL").kind === NUMERAL)
     assert(lexUniqueToken("STRING").kind === STRING)
     assert(lexUniqueToken("_").kind === Underscore)
     assert(lexUniqueToken("!").kind === ExclamationMark)
@@ -326,6 +327,7 @@ See you!"""))
     assert(lexUniqueToken("let").kind === Let)
     assert(lexUniqueToken("forall").kind === ForAll)
     assert(lexUniqueToken("exists").kind === Exists)
+    assert(lexUniqueToken("par").kind === Par)
 
     assert(lexUniqueToken("assert").kind === Assert)
     assert(lexUniqueToken("check-sat").kind === CheckSat)
