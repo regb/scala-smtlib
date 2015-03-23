@@ -78,8 +78,6 @@ trait TerminalTreesPrinter {
       writer.write(":authors")
     case VersionInfoFlag =>
       writer.write(":version")
-    case StatusInfoFlag =>
-      writer.write(":status")
     case ReasonUnknownInfoFlag =>
       writer.write(":reason-unknown")
     case AllStatisticsInfoFlag =>

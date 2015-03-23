@@ -217,8 +217,8 @@ What are you up to man?"""))
     checkCommand(DeclareSort("A", 0))
     checkCommand(DefineSort("A", Seq("B", "C"), 
                  Sort(Identifier("Array"), Seq(Sort("B"), Sort("C")))))
-    checkCommand(DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
-    checkCommand(DefineFun("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a")))
+    checkCommand(DeclareFun(FunDec("xyz", Seq(Sort("A"), Sort("B")), Sort("C"))))
+    checkCommand(DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
 
     checkCommand(Push(1))
     checkCommand(Push(4))
@@ -288,7 +288,6 @@ It spans a couple lines""")))))
     checkCommand(GetInfo(NameInfoFlag))
     checkCommand(GetInfo(AuthorsInfoFlag))
     checkCommand(GetInfo(VersionInfoFlag))
-    checkCommand(GetInfo(StatusInfoFlag))
     checkCommand(GetInfo(ReasonUnknownInfoFlag))
     checkCommand(GetInfo(AllStatisticsInfoFlag))
     checkCommand(GetInfo(KeywordInfoFlag("custom")))
@@ -416,15 +415,15 @@ It spans a couple lines""")))))
     def printGetModel(res: GetModelResponse): String = printer.toString(res)
     def parseGetModel(in: String): GetModelResponse = Parser.fromString(in).parseGetModelResponse
     check(
-      GetModelResponseSuccess(List(DefineFun("z", Seq(), Sort("Int"), SNumeral(0)))),
+      GetModelResponseSuccess(List(DefineFun(FunDef("z", Seq(), Sort("Int"), SNumeral(0))))),
       printGetModel,
       parseGetModel
     )
 
     check(
       GetModelResponseSuccess(List(
-        DefineFun("z", Seq(), Sort("Int"), SNumeral(0)),
-        DeclareFun("a", Seq(), Sort("A")),
+        DefineFun(FunDef("z", Seq(), Sort("Int"), SNumeral(0))),
+        DeclareFun(FunDec("a", Seq(), Sort("A"))),
         ForAll(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
       )),
       printGetModel,

@@ -59,14 +59,14 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(name.name))
       actions.prepend(() => writer.write("(define-sort "))
     }
-    case DeclareFun(name, paramSorts, returnSort) => {
+    case DeclareFun(FunDec(name, paramSorts, returnSort)) => {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => printSort(returnSort, writer, actions))
       actions.prepend(() => printNary(writer, paramSorts, (s: Sort, writer: Writer) => printSort(s, writer, actions), " (", " ", ") ", actions))
       actions.prepend(() => writer.write(name.name))
       actions.prepend(() => writer.write("(declare-fun "))
     }
-    case DefineFun(name, sortedVars, returnSort, body) => {
+    case DefineFun(FunDef(name, sortedVars, returnSort, body)) => {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => printTerm(body, writer, actions))
       actions.prepend(() => writer.write(" "))
@@ -121,9 +121,6 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     }
     case Exit() => {
       actions.prepend(() => writer.write("(exit)\n"))
-    }
-    case NonStandardCommand(expr) => {
-      actions.prepend(() => printSExpr(expr, writer, actions))
     }
     case GetModel() => {
       actions.prepend(() => writer.write("(get-model)\n"))

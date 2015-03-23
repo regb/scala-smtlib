@@ -50,14 +50,14 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       printSort(sort, writer)
       writer.write(")\n")
     }
-    case DeclareFun(name, paramSorts, returnSort) => {
+    case DeclareFun(FunDec(name, paramSorts, returnSort)) => {
       writer.write("(declare-fun ")
       writer.write(name.name)
       printNary(writer, paramSorts, printSort _, " (", " ", ") ")
       printSort(returnSort, writer)
       writer.write(")\n")
     }
-    case DefineFun(name, sortedVars, returnSort, body) => {
+    case DefineFun(FunDef(name, sortedVars, returnSort, body)) => {
       writer.write("(define-fun ")
       writer.write(name.name)
       printNary(writer, sortedVars, printSortedVar _, " (", " ", ") ")
@@ -112,9 +112,6 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     }
     case Exit() => {
       writer.write("(exit)\n")
-    }
-    case NonStandardCommand(expr) => {
-      printSExpr(expr, writer)
     }
     case GetModel() => {
       writer.write("(get-model)\n")

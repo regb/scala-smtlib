@@ -247,7 +247,7 @@ class CommandsResponsesParserTests extends FunSuite {
   test("Parsing get-model response") {
     assert(Parser.fromString("(model (define-fun z () Int 0))").parseGetModelResponse === 
       GetModelResponseSuccess(List(
-        DefineFun("z", Seq(), Sort("Int"), SNumeral(0))))
+        DefineFun(FunDef("z", Seq(), Sort("Int"), SNumeral(0)))))
     )
 
     assert(Parser.fromString(
@@ -257,8 +257,8 @@ class CommandsResponsesParserTests extends FunSuite {
       )
 """).parseGetModelResponse === 
       GetModelResponseSuccess(List(
-        DefineFun("x", Seq(), Sort("Int"), 
-          FunctionApplication(QualifiedIdentifier("-"), Seq(SNumeral(1))))))
+        DefineFun(FunDef("x", Seq(), Sort("Int"), 
+          FunctionApplication(QualifiedIdentifier("-"), Seq(SNumeral(1)))))))
     )
 
     assert(Parser.fromString(
@@ -268,8 +268,8 @@ class CommandsResponsesParserTests extends FunSuite {
   (forall ((x A)) x)
 )""").parseGetModelResponse === 
       GetModelResponseSuccess(List(
-        DefineFun("z", Seq(), Sort("Int"), SNumeral(0)),
-        DeclareFun("a", Seq(), Sort("A")),
+        DefineFun(FunDef("z", Seq(), Sort("Int"), SNumeral(0))),
+        DeclareFun(FunDec("a", Seq(), Sort("A"))),
         ForAll(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
       ))
     )

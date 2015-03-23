@@ -329,12 +329,12 @@ class ParserTests extends FunSuite with Timeouts {
                                             Sort(Identifier("Array"), Seq(Sort("B"), Sort("C")))
                                     ))
     assert(parseUniqueCmd("(declare-fun xyz (A B) C)") ===
-           DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
+           DeclareFun(FunDec("xyz", Seq(Sort("A"), Sort("B")), Sort("C"))))
     assert(parseUniqueCmd("(define-fun f ((a A)) B a)") ===
-           DefineFun("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a")))
+           DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
     assert(parseUniqueCmd("(define-fun f ((a A)) B (f a))") ===
-           DefineFun("f", Seq(SortedVar("a", Sort("A"))), Sort("B"),
-                     FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a")))))
+           DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"),
+                     FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))))
 
     assert(parseUniqueCmd("(push 1)") === Push(1))
     assert(parseUniqueCmd("(push 4)") === Push(4))
@@ -440,7 +440,6 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(get-info :name)") === GetInfo(NameInfoFlag))
     assert(parseUniqueCmd("(get-info :authors)") === GetInfo(AuthorsInfoFlag))
     assert(parseUniqueCmd("(get-info :version)") === GetInfo(VersionInfoFlag))
-    assert(parseUniqueCmd("(get-info :status)") === GetInfo(StatusInfoFlag))
     assert(parseUniqueCmd("(get-info :reason-unknown)") === GetInfo(ReasonUnknownInfoFlag))
     assert(parseUniqueCmd("(get-info :all-statistics)") === GetInfo(AllStatisticsInfoFlag))
     assert(parseUniqueCmd("(get-info :custom)") === GetInfo(KeywordInfoFlag("custom")))
@@ -477,8 +476,8 @@ class ParserTests extends FunSuite with Timeouts {
       (check-sat)
     """
     val cmd1 = SetLogic(QF_UF)
-    val cmd2 = DeclareFun("f", Seq(Sort("Int")), Sort("Int"))
-    val cmd3 = DeclareFun("a", Seq(), Sort("Int"))
+    val cmd2 = DeclareFun(FunDec("f", Seq(Sort("Int")), Sort("Int")))
+    val cmd3 = DeclareFun(FunDec("a", Seq(), Sort("Int")))
     val cmd4 =
            Assert(FunctionApplication(
                     QualifiedIdentifier("="),

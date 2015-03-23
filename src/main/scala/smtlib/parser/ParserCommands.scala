@@ -65,27 +65,12 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
         DefineSort(sym, vars.toList, sort)
       }
       case Tokens.DeclareFun => {
-        val sym = parseSymbol
-
-        val params = new ListBuffer[Sort]
-        eat(Tokens.OParen)
-        while(peekToken.kind != Tokens.CParen)
-          params.append(parseSort)
-        eat(Tokens.CParen)
-
-        val sort = parseSort
-        DeclareFun(sym, params.toList, sort)
+        val funDec = parseFunDec
+        DeclareFun(funDec)
       }
       case Tokens.DefineFun => {
-        val name = parseSymbol
-
-        val sortedVars = parseMany(parseSortedVar _)
-
-        val sort = parseSort
-
-        val body = parseTerm
-
-        DefineFun(name, sortedVars, sort, body)
+        val funDef = parseFunDef
+        DefineFun(funDef)
       }
       case Tokens.Push => {
         val n = parseNumeral
@@ -143,6 +128,31 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
     cmd.setPos(head)
   }
 
+  def parseFunDec: FunDec = {
+    val sym = parseSymbol
+
+    val params = new ListBuffer[Sort]
+    eat(Tokens.OParen)
+    while(peekToken.kind != Tokens.CParen)
+      params.append(parseSort)
+    eat(Tokens.CParen)
+
+    val sort = parseSort
+    FunDec(sym, params.toList, sort)
+  }
+
+  def parseFunDef: FunDef = {
+    val name = parseSymbol
+
+    val sortedVars = parseMany(parseSortedVar _)
+
+    val sort = parseSort
+
+    val body = parseTerm
+
+    FunDef(name, sortedVars, sort, body)
+  }
+
   def parseDatatypes: (SSymbol, Seq[Constructor]) = {
     eat(Tokens.OParen)
     val name = parseSymbol
@@ -178,7 +188,6 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
       case Tokens.Keyword("name") => NameInfoFlag
       case Tokens.Keyword("authors") => AuthorsInfoFlag
       case Tokens.Keyword("version") => VersionInfoFlag
-      case Tokens.Keyword("status") => StatusInfoFlag
       case Tokens.Keyword("reason-unknown") => ReasonUnknownInfoFlag
       case Tokens.Keyword("all-statistics") => AllStatisticsInfoFlag
       case Tokens.Keyword(keyword) => KeywordInfoFlag(keyword)

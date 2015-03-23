@@ -12,40 +12,51 @@ object Commands {
 
   case class Script(commands: List[Command])
 
-  case class SetLogic(logic: Logic) extends Command
-  case class SetOption(option: SMTOption) extends Command
-  case class SetInfo(attribute: Attribute) extends Command
-
-  case class DeclareSort(name: SSymbol, arity: Int) extends Command
-  case class DefineSort(name: SSymbol, params: Seq[SSymbol], sort: Sort) extends Command
-  case class DeclareFun(name: SSymbol, paramSorts: Seq[Sort], returnSort: Sort) extends Command
-  case class DefineFun(name: SSymbol, params: Seq[SortedVar], returnSort: Sort, body: Term) extends Command
-
-  case class Push(n: Int) extends Command
-  case class Pop(n: Int) extends Command
   case class Assert(term: Term) extends Command
-
   case class CheckSat() extends Command
-  case class GetAssertions() extends Command
-  case class GetProof() extends Command
-  case class GetUnsatCore() extends Command
-  case class GetValue(term: Term, terms: Seq[Term]) extends Command
-  case class GetAssignment() extends Command
+  case class CheckSatAssuming(propLiterals: Seq[PropLiteral]) extends Command
 
-  case class GetOption(key: SKeyword) extends Command
-  case class GetInfo(flag: InfoFlag) extends Command
+  case class DeclareConst(name: SSymbol, sort: Sort) extends Command
+  case class DeclareFun(funDec: FunDec) extends Command
+  case class DeclareSort(name: SSymbol, arity: Int) extends Command
+  case class DefineFun(funDef: FunDef) extends Command
+  case class DefineFunRec(funDef: FunDef) extends Command
+  case class DefineFunsRec(funDecls: Seq[FunDec], bodies: Seq[Term]) extends Command {
+    require(!funDecls.isEmpty && funDecls.size == bodies.size)
+  }
+  case class DefineSort(name: SSymbol, params: Seq[SSymbol], sort: Sort) extends Command
+
+  case class Echo(value: SString) extends Command
 
   case class Exit() extends Command
 
-  //this command can be used to create and print arbitrary commands using the s-expression
-  //It can be used to send commands not supported in this library, such as non-standard commands like declare-datatypes
-  case class NonStandardCommand(sexpr: SExpr) extends Command
-
-
-  //z3 get-model
+  case class GetAssertions() extends Command
+  case class GetAssignment() extends Command
+  case class GetInfo(flag: InfoFlag) extends Command
   case class GetModel() extends Command
+  case class GetOption(key: SKeyword) extends Command
+  case class GetProof() extends Command
+  case class GetUnsatAssumptions() extends Command
+  case class GetUnsatCore() extends Command
+  case class GetValue(term: Term, terms: Seq[Term]) extends Command
+
+  case class Pop(n: Int) extends Command
+  case class Push(n: Int) extends Command
+
+  case class Reset() extends Command
+  case class ResetAssertions() extends Command
+
+  case class SetInfo(attribute: Attribute) extends Command
+  case class SetLogic(logic: Logic) extends Command
+  case class SetOption(option: SMTOption) extends Command
+
+
   //non standard declare-datatypes (no support for parametric types)
   case class DeclareDatatypes(datatypes: Seq[(SSymbol, Seq[Constructor])]) extends Command
+
+  case class FunDec(name: SSymbol, paramSorts: Seq[Sort], returnSort: Sort)
+  case class FunDef(name: SSymbol, params: Seq[SortedVar], returnSort: Sort, body: Term)
+  case class PropLiteral(symbol: SSymbol, polarity: Boolean)
 
   case class Constructor(sym: SSymbol, fields: Seq[(SSymbol, Sort)])
 
@@ -56,13 +67,13 @@ object Commands {
    * KeywordInfoFlag
    */
   sealed abstract class InfoFlag
+  case object AllStatisticsInfoFlag extends InfoFlag
+  case object AssertionStackLevelsInfoFlag extends InfoFlag
+  case object AuthorsInfoFlag extends InfoFlag
   case object ErrorBehaviorInfoFlag extends InfoFlag
   case object NameInfoFlag extends InfoFlag
-  case object AuthorsInfoFlag extends InfoFlag
-  case object VersionInfoFlag extends InfoFlag
-  case object StatusInfoFlag extends InfoFlag
   case object ReasonUnknownInfoFlag extends InfoFlag
-  case object AllStatisticsInfoFlag extends InfoFlag
+  case object VersionInfoFlag extends InfoFlag
   case class KeywordInfoFlag(keyword: String) extends InfoFlag
 
   /*
@@ -71,26 +82,23 @@ object Commands {
    * a generic syntax via attribute allows for solver-specific options
    */
   sealed abstract class SMTOption
-  case class PrintSuccess(value: Boolean) extends SMTOption
-  case class ExpandDefinitions(value: Boolean) extends SMTOption
-  case class InteractiveMode(value: Boolean) extends SMTOption
-  case class ProduceProofs(value: Boolean) extends SMTOption
-  case class ProduceUnsatCores(value: Boolean) extends SMTOption
-  case class ProduceModels(value: Boolean) extends SMTOption
-  case class ProduceAssignments(value: Boolean) extends SMTOption
-  case class RegularOutputChannel(value: String) extends SMTOption
   case class DiagnosticOutputChannel(value: String) extends SMTOption
+  case class ExpandDefinitions(value: Boolean) extends SMTOption
+  case class GlobalDeclarations(value: Boolean) extends SMTOption
+  case class InteractiveMode(value: Boolean) extends SMTOption
+  case class PrintSuccess(value: Boolean) extends SMTOption
+  case class ProduceAssertions(value: Boolean) extends SMTOption
+  case class ProduceAssignments(value: Boolean) extends SMTOption
+  case class ProduceModels(value: Boolean) extends SMTOption
+  case class ProduceProofs(value: Boolean) extends SMTOption
+  case class ProduceUnsatAssumptions(value: Boolean) extends SMTOption
+  case class ProduceUnsatCores(value: Boolean) extends SMTOption
   case class RandomSeed(value: Int) extends SMTOption
+  case class RegularOutputChannel(value: String) extends SMTOption
+  case class ReproducibleResourceLimit(value: Int) extends SMTOption
   case class Verbosity(value: Int) extends SMTOption
   case class AttributeOption(attribute: Attribute) extends SMTOption
 
-
-  /*
-   * TODO: It would probably be more consistent to use a SSymbol as 
-   *       the logic in SetLogic command, and maybe provides a list of
-   *       extractor for standard logics instead of a separate type.
-   *       The reason being that the standard only requires a symbol here.
-   */
 
   trait Logic 
 
