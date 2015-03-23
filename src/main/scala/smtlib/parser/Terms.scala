@@ -19,28 +19,32 @@ import Commands._
 
 object Terms {
 
-  //an identifier is either a symbol or an indexed symbol: (_ symbol <numeral>+)
-  trait Identifier {
-    val symbol: SSymbol
-    val indices: Seq[Int]
+
+
+  sealed trait Index
+  case class Identifier(symbol: SSymbol, indices: Seq[Index] = Seq()) {
 
     def isIndexed: Boolean = !indices.isEmpty
-  }
-  //provide apply/unapply for standard Identifier
-  object Identifier {
-    def apply(symbol: SSymbol, indices: Seq[Int] = Seq()): Identifier = 
-      StandardIdentifier(symbol, indices)
 
-    def unapply(id: Identifier): Option[(SSymbol, Seq[Int])] = id match {
-      case StandardIdentifier(s, is) => Some((s, is))
+  }
+
+  object SimpleIdentifier {
+    def apply(symbol: SSymbol) = Identifier(symbol, Seq())
+    def unapply(id: Identifier): Option[SSymbol] = id match {
+      case Identifier(sym, Seq()) => Some(sym)
       case _ => None
     }
   }
 
-  case class StandardIdentifier(symbol: SSymbol, indices: Seq[Int]) extends Identifier
-  //non standard, example:  (_ map or)
-  case class ExtendedIdentifier(symbol: SSymbol, extension: SSymbol) extends Identifier {
-    val indices: Seq[Int] = Seq()
+
+  //(_ map or)
+  object ExtendedIdentifier {
+    
+    def apply(symbol: SSymbol, extension: SSymbol) = Identifier(symbol, Seq(extension))
+    
+    def unapply(id: Identifier): Option[(SSymbol, SSymbol)] = id match {
+      case Identifier(sym, Seq(ext@SSymbol(_))) => Some((sym, ext))
+    }
   }
 
   case class Sort(id: Identifier, subSorts: Seq[Sort]) {
@@ -67,7 +71,7 @@ object Terms {
     def apply(sexprs: SExpr*): SList = SList(List(sexprs:_*))
   }
   case class SKeyword(name: String) extends SExpr
-  case class SSymbol(name: String) extends SExpr with AttributeValue
+  case class SSymbol(name: String) extends SExpr with AttributeValue with Index
 
   /* SComment is never parsed, only used for pretty printing */
   case class SComment(s: String) extends SExpr 
@@ -98,7 +102,7 @@ object Terms {
     val value: T
   }
 
-  case class SNumeral(value: BigInt) extends Literal[BigInt]
+  case class SNumeral(value: BigInt) extends Literal[BigInt] with Index
   case class SHexadecimal(value: Hexadecimal) extends Literal[Hexadecimal]
   case class SBinary(value: List[Boolean]) extends Literal[List[Boolean]]
   case class SDecimal(value: BigDecimal) extends Literal[BigDecimal]

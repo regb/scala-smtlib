@@ -12,15 +12,15 @@ class FixedSizeBitVectorsTests extends FunSuite {
 
   test("BitVector sort") {
     BitVectorSort(32) match {
-      case BitVectorSort(14) => assert(false)
-      case BitVectorSort(32) => assert(true)
+      case BitVectorSort(n) if n == 14 => assert(false)
+      case BitVectorSort(n) if n == 32 => assert(true)
       case _ => assert(false)
     }
 
     BitVectorSort(12) match {
-      case BitVectorSort(14) => assert(false)
-      case BitVectorSort(32) => assert(false)
-      case BitVectorSort(12) => assert(true)
+      case BitVectorSort(n) if n == 14 => assert(false)
+      case BitVectorSort(n) if n == 32 => assert(false)
+      case BitVectorSort(n) if n == 12 => assert(true)
       case _ => assert(false)
     }
   }
@@ -39,21 +39,21 @@ class FixedSizeBitVectorsTests extends FunSuite {
 
   test("smtlib bv constant notation") {
     Parser.fromString("(_ bv13 32)").parseTerm match {
-      case BitVectorConstant(x, 32) if x == 12 => assert(false)
-      case BitVectorConstant(x, 31) if x == 13 => assert(false)
-      case BitVectorConstant(x, 32) if x == 13 => assert(true)
+      case BitVectorConstant(x, n) if x == 12 && n == 32 => assert(false)
+      case BitVectorConstant(x, n) if x == 13 && n == 31 => assert(false)
+      case BitVectorConstant(x, n) if x == 13 && n == 32 => assert(true)
       case _ => assert(false)
     }
     Parser.fromString("(_ bv11 17)").parseTerm match {
-      case BitVectorConstant(x, 17) if x == 12 => assert(false)
-      case BitVectorConstant(x, 32) if x == 11 => assert(false)
-      case BitVectorConstant(x, 17) if x == 11 => assert(true)
+      case BitVectorConstant(x, n) if x == 12 && n == 17 => assert(false)
+      case BitVectorConstant(x, n) if x == 11 && n == 32 => assert(false)
+      case BitVectorConstant(x, n) if x == 11 && n == 17 => assert(true)
       case _ => assert(false)
     }
 
     val cst = BitVectorConstant(13, 32)
     cst match {
-      case BitVectorConstant(x, 32) if x == 13 => assert(true)
+      case BitVectorConstant(x, n) if x == 13 && n == 32 => assert(true)
       case _ => assert(false)
     }
   }
@@ -61,7 +61,7 @@ class FixedSizeBitVectorsTests extends FunSuite {
   test("smtlib bv constant with int overflow") {
     val cst = BitVectorConstant(BigInt("2147483648"), 32)
     cst match {
-      case BitVectorConstant(x, 32) if x.toInt == -2147483648 => assert(true)
+      case BitVectorConstant(x, n) if x.toInt == -2147483648 && n == 32 => assert(true)
       case _ => assert(false)
     }
   }
@@ -89,27 +89,27 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case _ => assert(false)
     }
     Parser.fromString("((_ extract 1 2) #b101)").parseTerm match {
-      case Extract(1, 2, BitVectorLit(List(true, false, true))) => assert(true)
+      case Extract(x, y, BitVectorLit(List(true, false, true))) if x == 1 && y == 2 => assert(true)
       case _ => assert(false)
     }
     Parser.fromString("((_ repeat 5) #b101)").parseTerm match {
-      case Repeat(5, BitVectorLit(List(true, false, true))) => assert(true)
+      case Repeat(n, BitVectorLit(List(true, false, true))) if n == 5 => assert(true)
       case _ => assert(false)
     }
     Parser.fromString("((_ zero_extend 3) #b101)").parseTerm match {
-      case ZeroExtend(3, BitVectorLit(List(true, false, true))) => assert(true)
+      case ZeroExtend(n, BitVectorLit(List(true, false, true))) if n == 3 => assert(true)
       case _ => assert(false)
     }
     Parser.fromString("((_ sign_extend 3) #b101)").parseTerm match {
-      case SignExtend(3, BitVectorLit(List(true, false, true))) => assert(true)
+      case SignExtend(n, BitVectorLit(List(true, false, true))) if n == 3 => assert(true)
       case _ => assert(false)
     }
     Parser.fromString("((_ rotate_left 3) #b101)").parseTerm match {
-      case RotateLeft(3, BitVectorLit(List(true, false, true))) => assert(true)
+      case RotateLeft(n, BitVectorLit(List(true, false, true))) if n == 3 => assert(true)
       case _ => assert(false)
     }
     Parser.fromString("((_ rotate_right 3) #b101)").parseTerm match {
-      case RotateRight(3, BitVectorLit(List(true, false, true))) => assert(true)
+      case RotateRight(n, BitVectorLit(List(true, false, true))) if n == 3 => assert(true)
       case _ => assert(false)
     }
   }

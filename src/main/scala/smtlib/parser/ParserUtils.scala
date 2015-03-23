@@ -70,7 +70,7 @@ trait ParserUtils {
     }
   }
 
-  protected def parseUntil[A](parseFun: () => A, endKind: TokenKind): Seq[A] = {
+  protected def parseUntil[A](endKind: TokenKind)(parseFun: () => A): Seq[A] = {
     val items = new ListBuffer[A]
     while(peekToken != null && peekToken.kind != endKind)
       items.append(parseFun())
@@ -79,9 +79,8 @@ trait ParserUtils {
   }
 
   protected def parseMany[A](parseFun: () => A): Seq[A] = {
-    val items = new ListBuffer[A]
     eat(Tokens.OParen)
-    parseUntil(parseFun, Tokens.CParen)
+    parseUntil(Tokens.CParen)(parseFun)
   }
 
   /* Parse a sequence of A inside () */

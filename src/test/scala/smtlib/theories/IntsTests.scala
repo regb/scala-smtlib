@@ -16,7 +16,8 @@ class IntsTests extends FunSuite {
     }
 
     IntSort() match {
-      case FixedSizeBitVectors.BitVectorSort(14) => assert(false)
+      case FixedSizeBitVectors.BitVectorSort(n) if n == 14 => assert(false)
+      case FixedSizeBitVectors.BitVectorSort(n) if n == 32 => assert(false)
       case IntSort() => assert(true)
       case _ => assert(false)
     }

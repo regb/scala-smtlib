@@ -30,6 +30,8 @@ class PrinterTests extends FunSuite {
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
   private implicit def strToKeyword(str: String): SKeyword = SKeyword(str)
   private implicit def symToTerm(sym: SSymbol): QualifiedIdentifier = QualifiedIdentifier(sym.name)
+  private implicit def intToNum(n: Int): SNumeral = SNumeral(n)
+  private implicit def IntSeqToIndices(ns: Seq[Int]): Seq[Index] = ns.map(n => SNumeral(n))
 
   def mkTests(printer: Printer): Unit = {
     implicit val p = printer

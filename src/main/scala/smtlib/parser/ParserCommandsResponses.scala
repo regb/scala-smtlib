@@ -54,7 +54,7 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val pairs = parseUntil(parsePair _, Tokens.CParen)
+            val pairs = parseUntil(Tokens.CParen)(parsePair _)
             GetAssignmentResponseSuccess(pairs)
           }
         }
@@ -78,7 +78,7 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val pairs = parseUntil(parsePair _, Tokens.CParen)
+            val pairs = parseUntil(Tokens.CParen)(parsePair _)
             GetValueResponseSuccess(pairs)
           }
         }
@@ -204,7 +204,7 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val responses = parseUntil(parseInfoResponse _, Tokens.CParen)
+            val responses = parseUntil(Tokens.CParen)(parseInfoResponse _)
             GetInfoResponseSuccess(responses.head, responses.tail)
           }
         }
@@ -233,7 +233,7 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val terms = parseUntil(parseTerm _, Tokens.CParen)
+            val terms = parseUntil(Tokens.CParen)(parseTerm _)
             GetAssertionsResponseSuccess(terms)
           }
         }
@@ -249,7 +249,7 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val syms = parseUntil(parseSymbol _, Tokens.CParen)
+            val syms = parseUntil(Tokens.CParen)(parseSymbol _)
             GetUnsatCoreResponseSuccess(syms)
           }
         }

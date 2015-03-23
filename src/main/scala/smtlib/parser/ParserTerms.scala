@@ -155,25 +155,22 @@ trait ParserTerms { this: ParserUtils =>
     }
   }
 
+  def parseIndex: Index = {
+    peekToken.kind match {
+      case Tokens.SymbolLitKind => parseSymbol
+      case Tokens.NumeralLitKind => parseNumeral
+      case _ => expected(peekToken, Tokens.SymbolLitKind, Tokens.NumeralLitKind)
+    }
+  }
+
   def parseUnderscoreIdentifier: Identifier = {
     eat(Tokens.Underscore)
     val sym = parseSymbol
 
-    peekToken.kind match {
-      case Tokens.SymbolLitKind => {
-        val ext = parseSymbol
-        eat(Tokens.CParen)
-        ExtendedIdentifier(sym, ext)
-      }
-      case _ => {
-        val firstIndex = parseNumeral.value.toInt
-        var indices = new ListBuffer[Int]
-        while(peekToken.kind != Tokens.CParen)
-          indices.append(parseNumeral.value.toInt)
-        eat(Tokens.CParen)
-        Identifier(sym, firstIndex :: indices.toList)
-      }
-    }
+    val head = parseIndex
+    val indices = parseUntil(Tokens.CParen)(parseIndex _)
+
+    Identifier(sym, head +: indices)
   }
 
   def parseQualifiedIdentifier: QualifiedIdentifier = {

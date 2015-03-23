@@ -9,13 +9,13 @@ object FixedSizeBitVectors {
 
   object BitVectorSort {
 
-    def apply(length: Int): Sort = {
+    def apply(length: BigInt): Sort = {
       require(length > 0)
-      Sort(Identifier(SSymbol("BitVec"), Seq(length)))
+      Sort(Identifier(SSymbol("BitVec"), Seq(SNumeral(length))))
     }
 
-    def unapply(sort: Sort): Option[Int] = sort match {
-      case Sort(Identifier(SSymbol("BitVec"), Seq(n)), Seq()) if n > 0 => Some(n)
+    def unapply(sort: Sort): Option[BigInt] = sort match {
+      case Sort(Identifier(SSymbol("BitVec"), Seq(SNumeral(n))), Seq()) if n > 0 => Some(n)
       case _ => None
     }
 
@@ -39,12 +39,12 @@ object FixedSizeBitVectors {
   //shorthand notation (_ bv13 32) for the number 13 with 32 bits
   object BitVectorConstant {
 
-    def apply(x: BigInt, n: Int): Term =
-      QualifiedIdentifier(Identifier(SSymbol("bv" + x), Seq(n)))
+    def apply(x: BigInt, n: BigInt): Term =
+      QualifiedIdentifier(Identifier(SSymbol("bv" + x), Seq(SNumeral(n))))
     
     //TODO: BigInt is not the best data representation for a bitvector, we should probably use a list of boolean kind of representation
-    def unapply(term: Term): Option[(BigInt, Int)] = term match {
-      case QualifiedIdentifier(Identifier(SSymbol(name), Seq(n)), None) => {
+    def unapply(term: Term): Option[(BigInt, BigInt)] = term match {
+      case QualifiedIdentifier(Identifier(SSymbol(name), Seq(SNumeral(n))), None) => {
         if(name.startsWith("bv")) {
           val value = name.substring(2)
           scala.util.Try(BigInt(value).toInt).toOption.map(v => (v, n))
@@ -76,16 +76,16 @@ object FixedSizeBitVectors {
 
   object Extract {
 
-    def apply(i: Int, j: Int, t: Term): Term =
+    def apply(i: BigInt, j: BigInt, t: Term): Term =
       FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("extract"), Seq(i, j))),
+        QualifiedIdentifier(Identifier(SSymbol("extract"), Seq(SNumeral(i), SNumeral(j)))),
         Seq(t)
       )
     
-    def unapply(term: Term): Option[(Int, Int, Term)] = term match {
+    def unapply(term: Term): Option[(BigInt, BigInt, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
-          Identifier(SSymbol("extract"), Seq(i, j)),
+          Identifier(SSymbol("extract"), Seq(SNumeral(i), SNumeral(j))),
           None
         ), Seq(t)) => Some((i, j, t))
       case _ => None
@@ -95,18 +95,18 @@ object FixedSizeBitVectors {
 
   object Repeat {
 
-    def apply(i: Int, t: Term): Term = {
+    def apply(i: BigInt, t: Term): Term = {
       require(i >= 1)
       FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("repeat"), Seq(i))),
+        QualifiedIdentifier(Identifier(SSymbol("repeat"), Seq(SNumeral(i)))),
         Seq(t)
       )
     }
     
-    def unapply(term: Term): Option[(Int, Term)] = term match {
+    def unapply(term: Term): Option[(BigInt, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
-          Identifier(SSymbol("repeat"), Seq(i)),
+          Identifier(SSymbol("repeat"), Seq(SNumeral(i))),
           None
         ), Seq(t)) => Some((i, t))
       case _ => None
@@ -116,18 +116,18 @@ object FixedSizeBitVectors {
 
   object ZeroExtend {
 
-    def apply(i: Int, t: Term): Term = {
+    def apply(i: BigInt, t: Term): Term = {
       require(i >= 0)
       FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("zero_extend"), Seq(i))),
+        QualifiedIdentifier(Identifier(SSymbol("zero_extend"), Seq(SNumeral(i)))),
         Seq(t)
       )
     }
     
-    def unapply(term: Term): Option[(Int, Term)] = term match {
+    def unapply(term: Term): Option[(BigInt, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
-          Identifier(SSymbol("zero_extend"), Seq(i)),
+          Identifier(SSymbol("zero_extend"), Seq(SNumeral(i))),
           None
         ), Seq(t)) => Some((i, t))
       case _ => None
@@ -137,18 +137,18 @@ object FixedSizeBitVectors {
 
   object SignExtend {
 
-    def apply(i: Int, t: Term): Term = {
+    def apply(i: BigInt, t: Term): Term = {
       require(i >= 0)
       FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("sign_extend"), Seq(i))),
+        QualifiedIdentifier(Identifier(SSymbol("sign_extend"), Seq(SNumeral(i)))),
         Seq(t)
       )
     }
     
-    def unapply(term: Term): Option[(Int, Term)] = term match {
+    def unapply(term: Term): Option[(BigInt, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
-          Identifier(SSymbol("sign_extend"), Seq(i)),
+          Identifier(SSymbol("sign_extend"), Seq(SNumeral(i))),
           None
         ), Seq(t)) => Some((i, t))
       case _ => None
@@ -158,18 +158,18 @@ object FixedSizeBitVectors {
 
   object RotateLeft {
 
-    def apply(i: Int, t: Term): Term = {
+    def apply(i: BigInt, t: Term): Term = {
       require(i >= 0)
       FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("rotate_left"), Seq(i))),
+        QualifiedIdentifier(Identifier(SSymbol("rotate_left"), Seq(SNumeral(i)))),
         Seq(t)
       )
     }
     
-    def unapply(term: Term): Option[(Int, Term)] = term match {
+    def unapply(term: Term): Option[(BigInt, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
-          Identifier(SSymbol("rotate_left"), Seq(i)),
+          Identifier(SSymbol("rotate_left"), Seq(SNumeral(i))),
           None
         ), Seq(t)) => Some((i, t))
       case _ => None
@@ -179,18 +179,18 @@ object FixedSizeBitVectors {
 
   object RotateRight {
 
-    def apply(i: Int, t: Term): Term = {
+    def apply(i: BigInt, t: Term): Term = {
       require(i >= 0)
       FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("rotate_right"), Seq(i))),
+        QualifiedIdentifier(Identifier(SSymbol("rotate_right"), Seq(SNumeral(i)))),
         Seq(t)
       )
     }
     
-    def unapply(term: Term): Option[(Int, Term)] = term match {
+    def unapply(term: Term): Option[(BigInt, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
-          Identifier(SSymbol("rotate_right"), Seq(i)),
+          Identifier(SSymbol("rotate_right"), Seq(SNumeral(i))),
           None
         ), Seq(t)) => Some((i, t))
       case _ => None

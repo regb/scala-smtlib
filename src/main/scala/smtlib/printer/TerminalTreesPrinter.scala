@@ -36,15 +36,23 @@ trait TerminalTreesPrinter {
     }
   }
 
+  private def printIndex(index: Index, writer: Writer): Unit = index match {
+    case SNumeral(n) => writer.write(n.toString)
+    case sym@SSymbol(_) => printSymbol(sym, writer)
+  }
+
   protected def printId(id: Identifier, writer: Writer): Unit = {
-    if(id.indices.isEmpty)
+    if(!id.isIndexed)
       printSymbol(id.symbol, writer)
     else {
       writer.write("(_ ")
       printSymbol(id.symbol, writer)
       writer.write(' ')
-      writer.write(id.indices.head.toString)
-      id.indices.tail.foreach(n => writer.write(" " + n.toString))
+      printIndex(id.indices.head, writer)
+      id.indices.tail.foreach(n => {
+        writer.write(' ')
+        printIndex(n, writer) 
+      })
       writer.write(")")
     }
   }

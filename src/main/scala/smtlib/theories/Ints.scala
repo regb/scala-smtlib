@@ -33,16 +33,16 @@ object Ints {
 
   object Divisible {
 
-    def apply(n: Int, t: Term): Term =
+    def apply(n: BigInt, t: Term): Term =
       FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("divisible"), Seq(n))),
+        QualifiedIdentifier(Identifier(SSymbol("divisible"), Seq(SNumeral(n)))),
         Seq(t)
       )
     
-    def unapply(term: Term): Option[(Int, Term)] = term match {
+    def unapply(term: Term): Option[(BigInt, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
-          Identifier(SSymbol("divisible"), Seq(n)),
+          Identifier(SSymbol("divisible"), Seq(SNumeral(n))),
           None
         ), Seq(t)) => Some((n, t))
       case _ => None
