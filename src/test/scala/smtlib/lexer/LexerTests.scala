@@ -44,6 +44,10 @@ class LexerTests extends FunSuite with Timeouts {
                           """) === NumeralLit(15))
   }
 
+  test("semicolon as part of string literal does not start a comment") {
+    assert(lexUniqueToken(""" "Hey ;there" """) === StringLit("Hey ;there"))
+  }
+
   test("integer literals") {
     assert(lexUniqueToken("0") === NumeralLit(0))
     assert(lexUniqueToken("1") === NumeralLit(1))
