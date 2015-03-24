@@ -259,7 +259,7 @@ class Lexer(reader: java.io.Reader) {
       case "pop" => Token(Pop)
       case "push" => Token(Push)
       case "reset" => Token(Reset)
-      case "reset-assetions" => Token(ResetAssertions)
+      case "reset-assertions" => Token(ResetAssertions)
       case "set-info" => Token(SetInfo)
       case "set-logic" => Token(SetLogic)
       case "set-option" => Token(SetOption)
