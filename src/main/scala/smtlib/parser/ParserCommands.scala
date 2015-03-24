@@ -34,23 +34,37 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
 
     val cmdNameToken = nextToken
     val cmd = cmdNameToken.kind match {
-      case Tokens.SetLogic => {
-        val logicSymbol: SSymbol = parseSymbol
-        val logic: Logic = 
-          Logic.standardLogicFromString.lift(logicSymbol.name).getOrElse(NonStandardLogic(logicSymbol))
-        SetLogic(logic)
+
+      case Tokens.Assert => {
+        Assert(parseTerm)
       }
+      case Tokens.CheckSat => CheckSat()
+      case Tokens.CheckSatAssuming => {
+        val props = parseUntil(Tokens.CParen, false)(parsePropLit _)
+        CheckSatAssuming(props)
+      }
+
+
+      case Tokens.DeclareConst => {
+        val name = parseSymbol
+        val sort = parseSort
+        DeclareConst(name, sort)
+      }
+      case Tokens.DeclareFun => {
+        val funDec = parseFunDec
+        DeclareFun(funDec)
+      }
+      case Tokens.DeclareSort => {
+        val sym = parseSymbol
+        val arity = parseNumeral
+        DeclareSort(sym, arity.value.toInt)
+      }
+
       case Tokens.SetOption => {
         SetOption(parseOption)
       }
       case Tokens.SetInfo => {
         SetInfo(parseAttribute)
-      }
-
-      case Tokens.DeclareSort => {
-        val sym = parseSymbol
-        val arity = parseNumeral
-        DeclareSort(sym, arity.value.toInt)
       }
       case Tokens.DefineSort => {
         val sym = parseSymbol
@@ -63,10 +77,6 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
 
         val sort = parseSort
         DefineSort(sym, vars.toList, sort)
-      }
-      case Tokens.DeclareFun => {
-        val funDec = parseFunDec
-        DeclareFun(funDec)
       }
       case Tokens.DefineFun => {
         val funDef = parseFunDef
@@ -81,11 +91,6 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
         Pop(n.value.toInt)
       }
 
-      case Tokens.Assert => {
-        Assert(parseTerm)
-      }
-
-      case Tokens.CheckSat => CheckSat()
       case Tokens.GetAssertions => GetAssertions()
       case Tokens.GetProof => GetProof()
       case Tokens.GetUnsatCore => GetUnsatCore()
@@ -110,6 +115,13 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
 
       case Tokens.Exit => Exit()
 
+      case Tokens.SetLogic => {
+        val logicSymbol: SSymbol = parseSymbol
+        val logic: Logic = 
+          Logic.standardLogicFromString.lift(logicSymbol.name).getOrElse(NonStandardLogic(logicSymbol))
+        SetLogic(logic)
+      }
+
       case Tokens.DeclareDatatypes => {
         eat(Tokens.OParen)
         eat(Tokens.CParen)
@@ -126,6 +138,24 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
     eat(Tokens.CParen)
 
     cmd.setPos(head)
+  }
+
+  def parsePropLit: PropLiteral = {
+    peekToken.kind match {
+      case Tokens.SymbolLitKind => {
+        PropLiteral(parseSymbol, true)
+      }
+      case Tokens.OParen => {
+        eat(Tokens.OParen)
+        eat(Tokens.SymbolLit("not"))
+        val sym = parseSymbol
+        eat(Tokens.CParen)
+        PropLiteral(sym, false)
+      }
+      case _ => {
+        expected(peekToken, Tokens.SymbolLitKind, Tokens.OParen)
+      }
+    }
   }
 
   def parseFunDec: FunDec = {

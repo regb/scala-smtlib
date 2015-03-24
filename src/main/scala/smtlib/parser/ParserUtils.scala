@@ -54,12 +54,21 @@ trait ParserUtils {
   }
 
   /*
-   * Make sure the next token corresponds to t and read
+   * Make sure the next token has the expected kind and read it
    */
   protected def eat(expected: TokenKind): Unit = {
     val token = nextToken
     check(token, expected)
   }
+  /*
+   * Make sure the next token is exactly ``expected`` (usually a symbol lit)
+   */
+  protected def eat(expected: Token): Unit = {
+    val token = nextToken
+    if(token != expected)
+      throw new UnexpectedTokenException(token, Seq(expected.kind))
+  }
+
 
   protected def check(current: Token, exp: TokenKind): Unit = {
     if(current == null)
@@ -70,11 +79,14 @@ trait ParserUtils {
     }
   }
 
-  protected def parseUntil[A](endKind: TokenKind)(parseFun: () => A): Seq[A] = {
+  protected def parseUntil[A](endKind: TokenKind, eatEnd: Boolean = true)(parseFun: () => A): Seq[A] = {
     val items = new ListBuffer[A]
     while(peekToken != null && peekToken.kind != endKind)
       items.append(parseFun())
-    eat(endKind)
+
+    if(eatEnd)
+      eat(endKind)
+
     items.toList
   }
 
