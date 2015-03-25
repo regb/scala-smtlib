@@ -261,39 +261,58 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
 
   def parseOption: SMTOption = {
     peekToken match {
-      case Tokens.Keyword("print-success") =>
-        nextToken
-        PrintSuccess(parseBool)
-      case Tokens.Keyword("expand-definitions") => 
-        nextToken
-        ExpandDefinitions(parseBool)
-      case Tokens.Keyword("interactive-mode") => 
-        nextToken
-        InteractiveMode(parseBool)
-      case Tokens.Keyword("produce-proofs") => 
-        nextToken
-        ProduceProofs(parseBool)
-      case Tokens.Keyword("produce-unsat-cores") => 
-        nextToken
-        ProduceUnsatCores(parseBool)
-      case Tokens.Keyword("produce-models") => 
-        nextToken
-        ProduceModels(parseBool)
-      case Tokens.Keyword("produce-assignments") => 
-        nextToken
-        ProduceAssignments(parseBool)
-      case Tokens.Keyword("regular-output-channel") => 
-        nextToken
-        RegularOutputChannel(parseString.value)
       case Tokens.Keyword("diagnostic-output-channel") => 
         nextToken
         DiagnosticOutputChannel(parseString.value)
+
+      case Tokens.Keyword("expand-definitions") => 
+        nextToken
+        ExpandDefinitions(parseBool)
+      case Tokens.Keyword("global-declarations") => 
+        nextToken
+        GlobalDeclarations(parseBool)
+
+      case Tokens.Keyword("interactive-mode") => 
+        nextToken
+        InteractiveMode(parseBool)
+      case Tokens.Keyword("print-success") =>
+        nextToken
+        PrintSuccess(parseBool)
+
+      case Tokens.Keyword("produce-assertions") => 
+        nextToken
+        ProduceAssertions(parseBool)
+      case Tokens.Keyword("produce-assignments") => 
+        nextToken
+        ProduceAssignments(parseBool)
+      case Tokens.Keyword("produce-models") => 
+        nextToken
+        ProduceModels(parseBool)
+      case Tokens.Keyword("produce-proofs") => 
+        nextToken
+        ProduceProofs(parseBool)
+      case Tokens.Keyword("produce-unsat-assumptions") => 
+        nextToken
+        ProduceUnsatAssumptions(parseBool)
+      case Tokens.Keyword("produce-unsat-cores") => 
+        nextToken
+        ProduceUnsatCores(parseBool)
+
       case Tokens.Keyword("random-seed") => 
         nextToken
         RandomSeed(parseNumeral.value.toInt)
+
+      case Tokens.Keyword("regular-output-channel") => 
+        nextToken
+        RegularOutputChannel(parseString.value)
+
+      case Tokens.Keyword("reproducible-resource-limit") => 
+        nextToken
+        ReproducibleResourceLimit(parseNumeral.value.toInt)
       case Tokens.Keyword("verbosity") => 
         nextToken
         Verbosity(parseNumeral.value.toInt)
+
       case _ => 
         AttributeOption(parseAttribute)
     }

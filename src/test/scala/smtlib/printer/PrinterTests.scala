@@ -205,6 +205,47 @@ What are you up to man?"""))
   }
 
   def testSingleCommands(implicit printer: Printer): Unit = {
+
+    checkCommand(Assert(QualifiedIdentifier("true")))
+    checkCommand(CheckSat())
+    checkCommand(CheckSatAssuming(Seq(PropLiteral("a", true), PropLiteral("b", false))))
+
+    checkCommand(DeclareConst("c", Sort("C")))
+    checkCommand(DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
+    checkCommand(DeclareSort("A", 0))
+
+    checkCommand(DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    checkCommand(DefineFunRec(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    checkCommand(DefineFunsRec(
+      Seq(FunDec("f", Seq(SortedVar("a", Sort("A"))), Sort("B")),
+          FunDec("g", Seq(SortedVar("a", Sort("A"))), Sort("B"))),
+      Seq(FunctionApplication(QualifiedIdentifier("g"), Seq(QualifiedIdentifier("a"))),
+          FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))))
+    checkCommand(DefineSort("A", Seq("B", "C"), 
+      Sort(Identifier("Array"), Seq(Sort("B"), Sort("C")))))
+
+    checkCommand(Echo(SString("abcd")))
+    checkCommand(Echo(SString("echoing")))
+    checkCommand(Exit())
+
+    checkCommand(GetAssertions())
+    checkCommand(GetAssignment())
+    checkCommand(GetInfo(AuthorsInfoFlag))
+    checkCommand(GetModel())
+    checkCommand(GetOption("keyword"))
+    checkCommand(GetProof())
+    checkCommand(GetUnsatAssumptions())
+    checkCommand(GetUnsatCore())
+    checkCommand(GetValue(SSymbol("x"), Seq(SSymbol("y"), SSymbol("z"))))
+
+    checkCommand(Pop(1))
+    checkCommand(Pop(2))
+    checkCommand(Push(1))
+    checkCommand(Push(4))
+
+    checkCommand(Reset())
+    checkCommand(ResetAssertions())
+
     checkCommand(SetLogic(AUFLIA))
     checkCommand(SetLogic(AUFLIRA))
     checkCommand(SetLogic(AUFNIRA))
@@ -213,38 +254,6 @@ What are you up to man?"""))
     checkCommand(SetLogic(QF_LIA))
     checkCommand(SetLogic(QF_LRA))
     checkCommand(SetLogic(QF_AX))
-
-    checkCommand(DeclareSort("A", 0))
-    checkCommand(DefineSort("A", Seq("B", "C"), 
-                 Sort(Identifier("Array"), Seq(Sort("B"), Sort("C")))))
-    checkCommand(DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
-    checkCommand(DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
-    checkCommand(DefineFunRec(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
-    checkCommand(
-        DefineFunsRec(
-          Seq(FunDec("f", Seq(SortedVar("a", Sort("A"))), Sort("B")),
-              FunDec("g", Seq(SortedVar("a", Sort("A"))), Sort("B"))),
-          Seq(FunctionApplication(QualifiedIdentifier("g"), Seq(QualifiedIdentifier("a"))),
-              FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))
-        ))
-
-    checkCommand(Push(1))
-    checkCommand(Push(4))
-    checkCommand(Pop(1))
-    checkCommand(Pop(2))
-    checkCommand(Assert(QualifiedIdentifier("true")))
-    checkCommand(CheckSat())
-
-    checkCommand(GetAssertions())
-    checkCommand(GetProof())
-    checkCommand(GetUnsatCore())
-    checkCommand(GetValue(SSymbol("x"), Seq(SSymbol("y"), SSymbol("z"))))
-    checkCommand(GetAssignment())
-
-    checkCommand(GetOption("keyword"))
-    checkCommand(GetInfo(AuthorsInfoFlag))
-
-    checkCommand(Exit())
   }
 
   def testDeclareDatatypes(implicit printer: Printer): Unit = {
@@ -257,26 +266,41 @@ What are you up to man?"""))
   }
 
   def testSetOptionCommand(implicit printer: Printer): Unit = {
-    checkCommand(SetOption(PrintSuccess(true)))
-    checkCommand(SetOption(PrintSuccess(false)))
+    checkCommand(SetOption(DiagnosticOutputChannel("toto")))
+
     checkCommand(SetOption(ExpandDefinitions(true)))
     checkCommand(SetOption(ExpandDefinitions(false)))
+    checkCommand(SetOption(GlobalDeclarations(true)))
+    checkCommand(SetOption(GlobalDeclarations(false)))
+
+    checkCommand(SetOption(PrintSuccess(true)))
+    checkCommand(SetOption(PrintSuccess(false)))
     checkCommand(SetOption(InteractiveMode(true)))
     checkCommand(SetOption(InteractiveMode(false)))
-    checkCommand(SetOption(ProduceProofs(true)))
-    checkCommand(SetOption(ProduceProofs(false)))
-    checkCommand(SetOption(ProduceUnsatCores(true)))
-    checkCommand(SetOption(ProduceUnsatCores(false)))
-    checkCommand(SetOption(ProduceModels(true)))
-    checkCommand(SetOption(ProduceModels(false)))
+
+    checkCommand(SetOption(ProduceAssertions(true)))
+    checkCommand(SetOption(ProduceAssertions(false)))
     checkCommand(SetOption(ProduceAssignments(true)))
     checkCommand(SetOption(ProduceAssignments(false)))
-    checkCommand(SetOption(RegularOutputChannel("test")))
-    checkCommand(SetOption(DiagnosticOutputChannel("toto")))
+    checkCommand(SetOption(ProduceModels(true)))
+    checkCommand(SetOption(ProduceModels(false)))
+    checkCommand(SetOption(ProduceProofs(true)))
+    checkCommand(SetOption(ProduceProofs(false)))
+    checkCommand(SetOption(ProduceUnsatAssumptions(true)))
+    checkCommand(SetOption(ProduceUnsatAssumptions(false)))
+    checkCommand(SetOption(ProduceUnsatCores(true)))
+    checkCommand(SetOption(ProduceUnsatCores(false)))
+
     checkCommand(SetOption(RandomSeed(42)))
     checkCommand(SetOption(RandomSeed(12)))
+
+    checkCommand(SetOption(RegularOutputChannel("test")))
+
+    checkCommand(SetOption(ReproducibleResourceLimit(4)))
+    checkCommand(SetOption(ReproducibleResourceLimit(1)))
     checkCommand(SetOption(Verbosity(4)))
     checkCommand(SetOption(Verbosity(1)))
+
     checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key")))))
     checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key"), Some(SString("value"))))))
   }

@@ -89,5 +89,14 @@ trait TerminalTreesPrinter {
       writer.write(keyword)
   }
 
+  protected def printPropLit(propLiteral: PropLiteral, writer: Writer): Unit = {
+    if(propLiteral.polarity)
+      printSymbol(propLiteral.symbol, writer)
+    else {
+      writer.write("(not ")
+      printSymbol(propLiteral.symbol, writer)
+      writer.write(')')
+    }
+  }
 
 }

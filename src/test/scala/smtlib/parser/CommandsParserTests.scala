@@ -253,29 +253,41 @@ class CommandsParserTests extends FunSuite with Timeouts {
   }
 
   test("Parsing set-option command") {
-    assert(parseUniqueCmd("(set-option :print-success true)") === SetOption(PrintSuccess(true)))
-    assert(parseUniqueCmd("(set-option :print-success false)") === SetOption(PrintSuccess(false)))
+    assert(parseUniqueCmd("""(set-option :diagnostic-output-channel "toto")""") === 
+
+                          SetOption(DiagnosticOutputChannel("toto")))
     assert(parseUniqueCmd("(set-option :expand-definitions true)") === SetOption(ExpandDefinitions(true)))
     assert(parseUniqueCmd("(set-option :expand-definitions false)") === SetOption(ExpandDefinitions(false)))
+    assert(parseUniqueCmd("(set-option :global-declarations true)") === SetOption(GlobalDeclarations(true)))
+    assert(parseUniqueCmd("(set-option :global-declarations false)") === SetOption(GlobalDeclarations(false)))
+
     assert(parseUniqueCmd("(set-option :interactive-mode true)") === SetOption(InteractiveMode(true)))
     assert(parseUniqueCmd("(set-option :interactive-mode false)") === SetOption(InteractiveMode(false)))
 
-    assert(parseUniqueCmd("(set-option :produce-proofs true)") === SetOption(ProduceProofs(true)))
-    assert(parseUniqueCmd("(set-option :produce-proofs false)") === SetOption(ProduceProofs(false)))
-    assert(parseUniqueCmd("(set-option :produce-unsat-cores true)") === SetOption(ProduceUnsatCores(true)))
-    assert(parseUniqueCmd("(set-option :produce-unsat-cores false)") === SetOption(ProduceUnsatCores(false)))
-    assert(parseUniqueCmd("(set-option :produce-models true)") === SetOption(ProduceModels(true)))
-    assert(parseUniqueCmd("(set-option :produce-models false)") === SetOption(ProduceModels(false)))
+    assert(parseUniqueCmd("(set-option :print-success true)") === SetOption(PrintSuccess(true)))
+    assert(parseUniqueCmd("(set-option :print-success false)") === SetOption(PrintSuccess(false)))
+
+    assert(parseUniqueCmd("(set-option :produce-assertions true)") === SetOption(ProduceAssertions(true)))
+    assert(parseUniqueCmd("(set-option :produce-assertions false)") === SetOption(ProduceAssertions(false)))
     assert(parseUniqueCmd("(set-option :produce-assignments true)") === SetOption(ProduceAssignments(true)))
     assert(parseUniqueCmd("(set-option :produce-assignments false)") === SetOption(ProduceAssignments(false)))
-
-    assert(parseUniqueCmd("""(set-option :regular-output-channel "test")""") === 
-                          SetOption(RegularOutputChannel("test")))
-    assert(parseUniqueCmd("""(set-option :diagnostic-output-channel "toto")""") === 
-                          SetOption(DiagnosticOutputChannel("toto")))
+    assert(parseUniqueCmd("(set-option :produce-models true)") === SetOption(ProduceModels(true)))
+    assert(parseUniqueCmd("(set-option :produce-models false)") === SetOption(ProduceModels(false)))
+    assert(parseUniqueCmd("(set-option :produce-proofs true)") === SetOption(ProduceProofs(true)))
+    assert(parseUniqueCmd("(set-option :produce-proofs false)") === SetOption(ProduceProofs(false)))
+    assert(parseUniqueCmd("(set-option :produce-unsat-assumptions true)") === SetOption(ProduceUnsatAssumptions(true)))
+    assert(parseUniqueCmd("(set-option :produce-unsat-assumptions false)") === SetOption(ProduceUnsatAssumptions(false)))
+    assert(parseUniqueCmd("(set-option :produce-unsat-cores true)") === SetOption(ProduceUnsatCores(true)))
+    assert(parseUniqueCmd("(set-option :produce-unsat-cores false)") === SetOption(ProduceUnsatCores(false)))
 
     assert(parseUniqueCmd("(set-option :random-seed 42)") === SetOption(RandomSeed(42)))
     assert(parseUniqueCmd("(set-option :random-seed 12)") === SetOption(RandomSeed(12)))
+
+    assert(parseUniqueCmd("""(set-option :regular-output-channel "test")""") === 
+                          SetOption(RegularOutputChannel("test")))
+
+    assert(parseUniqueCmd("(set-option :reproducible-resource-limit 4)") === SetOption(ReproducibleResourceLimit(4)))
+    assert(parseUniqueCmd("(set-option :reproducible-resource-limit 1)") === SetOption(ReproducibleResourceLimit(1)))
     assert(parseUniqueCmd("(set-option :verbosity 4)") === SetOption(Verbosity(4)))
     assert(parseUniqueCmd("(set-option :verbosity 1)") === SetOption(Verbosity(1)))
 
