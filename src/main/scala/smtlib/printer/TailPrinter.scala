@@ -59,7 +59,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(name.name))
       actions.prepend(() => writer.write("(define-sort "))
     }
-    case DeclareFun(FunDec(name, paramSorts, returnSort)) => {
+    case DeclareFun(name, paramSorts, returnSort) => {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => printSort(returnSort, writer, actions))
       actions.prepend(() => printNary(writer, paramSorts, (s: Sort, writer: Writer) => printSort(s, writer, actions), " (", " ", ") ", actions))
@@ -74,6 +74,21 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => printNary(writer, sortedVars, (v: SortedVar, w: Writer) => printSortedVar(v, w, actions), " (", " ", ") ", actions))
       actions.prepend(() => writer.write(name.name))
       actions.prepend(() => writer.write("(define-fun "))
+    }
+    case DefineFunRec(FunDef(name, sortedVars, returnSort, body)) => {
+      actions.prepend(() => writer.write(")\n"))
+      actions.prepend(() => printTerm(body, writer, actions))
+      actions.prepend(() => writer.write(" "))
+      actions.prepend(() => printSort(returnSort, writer, actions))
+      actions.prepend(() => printNary(writer, sortedVars, (v: SortedVar, w: Writer) => printSortedVar(v, w, actions), " (", " ", ") ", actions))
+      actions.prepend(() => writer.write(name.name))
+      actions.prepend(() => writer.write("(define-fun-rec "))
+    }
+    case DefineFunsRec(funDecs, bodies) => {
+      actions.prepend(() => writer.write(")\n"))
+      actions.prepend(() => printNary(writer, bodies, (t: Term, w: Writer) => printTerm(t, w, actions), "(", " ", ")", actions))
+      actions.prepend(() => printNary(writer, funDecs, (fd: FunDec, w: Writer) => printFunDec(fd, w, actions), "(", " ", ")", actions))
+      actions.prepend(() => writer.write("(define-funs-rec "))
     }
     case Push(n) => {
       actions.prepend(() => writer.write(")\n"))
@@ -419,6 +434,14 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       writer.write(num.toString)
     case AttributeOption(attribute) => 
       printAttribute(attribute, writer)
+  }
+
+  protected def printFunDec(funDec: FunDec, writer: Writer, actions: LinkedList[Action]): Unit = {
+    actions.prepend(() => writer.write(')'))
+    actions.prepend(() => printSort(funDec.returnSort, writer, actions))
+    actions.prepend(() => printNary(writer, funDec.params, (v: SortedVar, w: Writer) => printSortedVar(v, w, actions), " (", " ", ") ", actions))
+    actions.prepend(() => printSymbol(funDec.name, writer))
+    actions.prepend(() => writer.write('('))
   }
 
   private def printNary[A](

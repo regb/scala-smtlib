@@ -58,7 +58,7 @@ class CommandsParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(check-sat)") === CheckSat())
   }
 
-  test("Parsing check-sat-assuming command") {
+  test("Parsing check-sat-assuming commands") {
     assert(parseUniqueCmd("(check-sat-assuming (a b c))") === 
            CheckSatAssuming(Seq(
              PropLiteral("a", true),
@@ -71,7 +71,7 @@ class CommandsParserTests extends FunSuite with Timeouts {
              PropLiteral("c", false))))
   }
 
-  test("Parsing declare-const") {
+  test("Parsing declare-const commands") {
     assert(parseUniqueCmd("(declare-const a A)") ===
            DeclareConst(SSymbol("a"), Sort("A")))
     assert(parseUniqueCmd("(declare-const comp (A B))") ===
@@ -79,9 +79,55 @@ class CommandsParserTests extends FunSuite with Timeouts {
                         Sort("A", Seq(Sort("B")))))
   }
 
+
+  test("Parsing declare-fun commands") {
+    assert(parseUniqueCmd("(declare-fun xyz (A B) C)") ===
+           DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
+    assert(parseUniqueCmd("(declare-fun xyz () C)") ===
+           DeclareFun("xyz", Seq(), Sort("C")))
+    assert(parseUniqueCmd("(declare-fun xyz (A B) (C D))") ===
+           DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C", Seq(Sort("D")))))
+  }
+
   test("Parsing declare-sort commands") {
     assert(parseUniqueCmd("(declare-sort A 0)") === DeclareSort("A", 0))
     assert(parseUniqueCmd("(declare-sort A 3)") === DeclareSort("A", 3))
+  }
+
+
+  test("Parsing define-fun commands") {
+    assert(parseUniqueCmd("(define-fun f ((a A)) B a)") ===
+           DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    assert(parseUniqueCmd("(define-fun f ((a A)) B (f a))") ===
+           DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"),
+                     FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))))
+  }
+
+  test("Parsing define-fun-rec commands") {
+    assert(parseUniqueCmd("(define-fun-rec f ((a A)) B a)") ===
+           DefineFunRec(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    assert(parseUniqueCmd("(define-fun-rec f ((a A)) B (f a))") ===
+           DefineFunRec(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"),
+                        FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))))
+    assert(parseUniqueCmd("(define-fun-rec f ((a A)) A (f a))") ===
+           DefineFunRec(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("A"), 
+                        FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))))
+
+  }
+
+  test("Parsing define-funs-rec commands") {
+    assert(parseUniqueCmd(
+"""(define-funs-rec
+      ( (f ((a A)) B) (g ((a A)) B) )
+      ( (g a) (f a) )
+)""") ===
+        DefineFunsRec(
+          Seq(FunDec("f", Seq(SortedVar("a", Sort("A"))), Sort("B")),
+              FunDec("g", Seq(SortedVar("a", Sort("A"))), Sort("B"))),
+          Seq(FunctionApplication(QualifiedIdentifier("g"), Seq(QualifiedIdentifier("a"))),
+              FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))
+        )
+    )
   }
 
   test("Parsing define-sort commands") {
@@ -95,13 +141,6 @@ class CommandsParserTests extends FunSuite with Timeouts {
 
   test("Parsing single commands") {
 
-    assert(parseUniqueCmd("(declare-fun xyz (A B) C)") ===
-           DeclareFun(FunDec("xyz", Seq(Sort("A"), Sort("B")), Sort("C"))))
-    assert(parseUniqueCmd("(define-fun f ((a A)) B a)") ===
-           DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
-    assert(parseUniqueCmd("(define-fun f ((a A)) B (f a))") ===
-           DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"),
-                     FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))))
 
     assert(parseUniqueCmd("(push 1)") === Push(1))
     assert(parseUniqueCmd("(push 4)") === Push(4))

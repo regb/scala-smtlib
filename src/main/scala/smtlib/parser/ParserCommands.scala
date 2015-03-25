@@ -51,13 +51,36 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
         DeclareConst(name, sort)
       }
       case Tokens.DeclareFun => {
-        val funDec = parseFunDec
-        DeclareFun(funDec)
+        val sym = parseSymbol
+
+        val params = new ListBuffer[Sort]
+        eat(Tokens.OParen)
+        while(peekToken.kind != Tokens.CParen)
+          params.append(parseSort)
+        eat(Tokens.CParen)
+
+        val sort = parseSort
+        DeclareFun(sym, params.toList, sort)
       }
       case Tokens.DeclareSort => {
         val sym = parseSymbol
         val arity = parseNumeral
         DeclareSort(sym, arity.value.toInt)
+      }
+
+      case Tokens.DefineFun => {
+        val funDef = parseFunDef
+        DefineFun(funDef)
+      }
+      case Tokens.DefineFunRec => {
+        val funDef = parseFunDef
+        DefineFunRec(funDef)
+      }
+      case Tokens.DefineFunsRec => {
+        val (funDef, funDefs) = parseOneOrMore(parseFunDec _)
+        val (body, bodies) = parseOneOrMore(parseTerm _)
+        assert(funDefs.size == bodies.size)
+        DefineFunsRec(funDef +: funDefs, body +: bodies)
       }
 
       case Tokens.SetOption => {
@@ -77,10 +100,6 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
 
         val sort = parseSort
         DefineSort(sym, vars.toList, sort)
-      }
-      case Tokens.DefineFun => {
-        val funDef = parseFunDef
-        DefineFun(funDef)
       }
       case Tokens.Push => {
         val n = parseNumeral
@@ -159,16 +178,15 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
   }
 
   def parseFunDec: FunDec = {
-    val sym = parseSymbol
-
-    val params = new ListBuffer[Sort]
     eat(Tokens.OParen)
-    while(peekToken.kind != Tokens.CParen)
-      params.append(parseSort)
-    eat(Tokens.CParen)
+    val name = parseSymbol
+
+    val sortedVars = parseMany(parseSortedVar _)
 
     val sort = parseSort
-    FunDec(sym, params.toList, sort)
+    eat(Tokens.CParen)
+
+    FunDec(name, sortedVars, sort)
   }
 
   def parseFunDef: FunDef = {

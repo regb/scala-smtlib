@@ -269,7 +269,7 @@ class CommandsResponsesParserTests extends FunSuite {
 )""").parseGetModelResponse === 
       GetModelResponseSuccess(List(
         DefineFun(FunDef("z", Seq(), Sort("Int"), SNumeral(0))),
-        DeclareFun(FunDec("a", Seq(), Sort("A"))),
+        DeclareFun("a", Seq(), Sort("A")),
         ForAll(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
       ))
     )

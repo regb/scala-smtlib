@@ -50,7 +50,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       printSort(sort, writer)
       writer.write(")\n")
     }
-    case DeclareFun(FunDec(name, paramSorts, returnSort)) => {
+    case DeclareFun(name, paramSorts, returnSort) => {
       writer.write("(declare-fun ")
       writer.write(name.name)
       printNary(writer, paramSorts, printSort _, " (", " ", ") ")
@@ -64,6 +64,21 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       printSort(returnSort, writer)
       writer.write(" ")
       printTerm(body, writer)
+      writer.write(")\n")
+    }
+    case DefineFunRec(FunDef(name, sortedVars, returnSort, body)) => {
+      writer.write("(define-fun-rec ")
+      writer.write(name.name)
+      printNary(writer, sortedVars, printSortedVar _, " (", " ", ") ")
+      printSort(returnSort, writer)
+      writer.write(" ")
+      printTerm(body, writer)
+      writer.write(")\n")
+    }
+    case DefineFunsRec(funDecs, bodies) => {
+      writer.write("(define-funs-rec ")
+      printNary(writer, funDecs, printFunDec _, "(", " ", ")")
+      printNary(writer, bodies, printTerm _, "(", " ", ")")
       writer.write(")\n")
     }
     case Push(n) => {
@@ -383,6 +398,13 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     writer.write(')')
   }
 
+  protected def printFunDec(funDec: FunDec, writer: Writer): Unit = {
+    writer.write('(')
+    printSymbol(funDec.name, writer)
+    printNary(writer, funDec.params, printSortedVar _, " (", " ", ") ")
+    printSort(funDec.returnSort, writer)
+    writer.write(')')
+  }
 
   private def printNary[A](
     writer: Writer, as: Seq[A], printer: (A, Writer) => Unit,

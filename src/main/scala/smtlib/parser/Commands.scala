@@ -17,7 +17,7 @@ object Commands {
   case class CheckSatAssuming(propLiterals: Seq[PropLiteral]) extends Command
 
   case class DeclareConst(name: SSymbol, sort: Sort) extends Command
-  case class DeclareFun(funDec: FunDec) extends Command
+  case class DeclareFun(name: SSymbol, paramSorts: Seq[Sort], returnSort: Sort) extends Command
   case class DeclareSort(name: SSymbol, arity: Int) extends Command
   case class DefineFun(funDef: FunDef) extends Command
   case class DefineFunRec(funDef: FunDef) extends Command
@@ -54,7 +54,7 @@ object Commands {
   //non standard declare-datatypes (no support for parametric types)
   case class DeclareDatatypes(datatypes: Seq[(SSymbol, Seq[Constructor])]) extends Command
 
-  case class FunDec(name: SSymbol, paramSorts: Seq[Sort], returnSort: Sort)
+  case class FunDec(name: SSymbol, params: Seq[SortedVar], returnSort: Sort)
   case class FunDef(name: SSymbol, params: Seq[SortedVar], returnSort: Sort, body: Term)
   case class PropLiteral(symbol: SSymbol, polarity: Boolean)
 

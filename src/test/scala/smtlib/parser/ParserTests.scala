@@ -330,8 +330,8 @@ class ParserTests extends FunSuite with Timeouts {
       (check-sat)
     """
     val cmd1 = SetLogic(QF_UF)
-    val cmd2 = DeclareFun(FunDec("f", Seq(Sort("Int")), Sort("Int")))
-    val cmd3 = DeclareFun(FunDec("a", Seq(), Sort("Int")))
+    val cmd2 = DeclareFun("f", Seq(Sort("Int")), Sort("Int"))
+    val cmd3 = DeclareFun("a", Seq(), Sort("Int"))
     val cmd4 =
            Assert(FunctionApplication(
                     QualifiedIdentifier("="),

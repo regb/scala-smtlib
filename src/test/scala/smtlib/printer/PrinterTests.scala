@@ -217,8 +217,16 @@ What are you up to man?"""))
     checkCommand(DeclareSort("A", 0))
     checkCommand(DefineSort("A", Seq("B", "C"), 
                  Sort(Identifier("Array"), Seq(Sort("B"), Sort("C")))))
-    checkCommand(DeclareFun(FunDec("xyz", Seq(Sort("A"), Sort("B")), Sort("C"))))
+    checkCommand(DeclareFun("xyz", Seq(Sort("A"), Sort("B")), Sort("C")))
     checkCommand(DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    checkCommand(DefineFunRec(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    checkCommand(
+        DefineFunsRec(
+          Seq(FunDec("f", Seq(SortedVar("a", Sort("A"))), Sort("B")),
+              FunDec("g", Seq(SortedVar("a", Sort("A"))), Sort("B"))),
+          Seq(FunctionApplication(QualifiedIdentifier("g"), Seq(QualifiedIdentifier("a"))),
+              FunctionApplication(QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"))))
+        ))
 
     checkCommand(Push(1))
     checkCommand(Push(4))
@@ -423,7 +431,7 @@ It spans a couple lines""")))))
     check(
       GetModelResponseSuccess(List(
         DefineFun(FunDef("z", Seq(), Sort("Int"), SNumeral(0))),
-        DeclareFun(FunDec("a", Seq(), Sort("A"))),
+        DeclareFun("a", Seq(), Sort("A")),
         ForAll(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
       )),
       printGetModel,
