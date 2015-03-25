@@ -121,11 +121,8 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseId("test") === Identifier("test"))
     assert(parseId("(_ a 1)") === Identifier("a", Seq(1)))
     assert(parseId("(_ a 42 12)") === Identifier("a", Seq(42, 12)))
-
-    //non standard syntax used by Z3 for extensions
-    assert(parseId("(_ a sym)") === ExtendedIdentifier("a", SSymbol("sym")))
-    assert(parseId("(_ map f)") === ExtendedIdentifier("map", SSymbol("f")))
-
+    assert(parseId("(_ a sym)") === Identifier("a", Seq(SSymbol("sym"))))
+    assert(parseId("(_ map f)") === Identifier("map", Seq(SSymbol(("f")))))
   }
 
   test("comments are ignored after a term") {

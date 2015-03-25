@@ -70,18 +70,20 @@ trait TerminalTreesPrinter {
   }
 
   protected def printInfoFlag(flag: InfoFlag, writer: Writer): Unit = flag match {
+    case AllStatisticsInfoFlag =>
+      writer.write(":all-statistics")
+    case AssertionStackLevelsInfoFlag =>
+      writer.write(":assertion-stack-levels")
+    case AuthorsInfoFlag =>
+      writer.write(":authors")
     case ErrorBehaviorInfoFlag =>
       writer.write(":error-behavior")
     case NameInfoFlag =>
       writer.write(":name")
-    case AuthorsInfoFlag =>
-      writer.write(":authors")
-    case VersionInfoFlag =>
-      writer.write(":version")
     case ReasonUnknownInfoFlag =>
       writer.write(":reason-unknown")
-    case AllStatisticsInfoFlag =>
-      writer.write(":all-statistics")
+    case VersionInfoFlag =>
+      writer.write(":version")
     case KeywordInfoFlag(keyword) =>
       writer.write(':')
       writer.write(keyword)

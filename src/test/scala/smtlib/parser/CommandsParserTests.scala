@@ -139,34 +139,82 @@ class CommandsParserTests extends FunSuite with Timeouts {
                            Seq(Sort("B"), Sort("C")))))
   }
 
-  test("Parsing single commands") {
+  test("Parsing echo commands") {
+    assert(parseUniqueCmd("""(echo "abcd")""") === Echo(SString("abcd")))
+    assert(parseUniqueCmd("""(echo "alpha")""") === Echo(SString("alpha")))
+  }
+  test("Parsing exit command") {
+    assert(parseUniqueCmd("(exit)") === Exit())
+  }
 
+  test("Parsing get-assertions command") {
+    assert(parseUniqueCmd("(get-assertions)") === GetAssertions())
+  }
+  test("Parsing get-assignment command") {
+    assert(parseUniqueCmd("(get-assignment)") === GetAssignment())
+  }
 
-    assert(parseUniqueCmd("(push 1)") === Push(1))
-    assert(parseUniqueCmd("(push 4)") === Push(4))
+  test("Parsing get-info commands") {
+    assert(parseUniqueCmd("(get-info :all-statistics)") === GetInfo(AllStatisticsInfoFlag))
+    assert(parseUniqueCmd("(get-info :assertion-stack-levels)") === GetInfo(AssertionStackLevelsInfoFlag))
+    assert(parseUniqueCmd("(get-info :authors)") === GetInfo(AuthorsInfoFlag))
+    assert(parseUniqueCmd("(get-info :error-behavior)") === GetInfo(ErrorBehaviorInfoFlag))
+    assert(parseUniqueCmd("(get-info :name)") === GetInfo(NameInfoFlag))
+    assert(parseUniqueCmd("(get-info :reason-unknown)") === GetInfo(ReasonUnknownInfoFlag))
+    assert(parseUniqueCmd("(get-info :version)") === GetInfo(VersionInfoFlag))
+    assert(parseUniqueCmd("(get-info :custom)") === GetInfo(KeywordInfoFlag("custom")))
+  }
+
+  test("Parsing get-model command") {
+    assert(parseUniqueCmd("(get-model)") === GetModel())
+  }
+
+  test("Parsing get-option commands") {
+    assert(parseUniqueCmd("(get-option :keyword)") === GetOption("keyword"))
+    assert(parseUniqueCmd("(get-option :custom)") === GetOption("custom"))
+  }
+
+  test("Parsing get-proof command") {
+    assert(parseUniqueCmd("(get-proof)") === GetProof())
+  }
+  test("Parsing get-unsat-assumptions command") {
+    assert(parseUniqueCmd("(get-unsat-assumptions)") === GetUnsatAssumptions())
+  }
+  test("Parsing get-unsat-core command") {
+    assert(parseUniqueCmd("(get-unsat-core)") === GetUnsatCore())
+  }
+
+  test("Parsing get-value commands") {
+    assert(parseUniqueCmd("(get-value (x y z))") === GetValue(SSymbol("x"), Seq(SSymbol("y"), SSymbol("z"))))
+  }
+
+  //TODO
+  //test("get-value expects at least one term") {
+  //  intercept[UnexpectedTokenException] {
+  //    parseUniqueCmd("(get-value ())")
+  //  }
+  //}
+
+  test("Parsing pop commands") {
     assert(parseUniqueCmd("(pop 1)") === Pop(1))
     assert(parseUniqueCmd("(pop 2)") === Pop(2))
+  }
+  test("Parsing push commands") {
+    assert(parseUniqueCmd("(push 1)") === Push(1))
+    assert(parseUniqueCmd("(push 4)") === Push(4))
+  }
 
-    assert(parseUniqueCmd("(get-assertions)") === GetAssertions())
-    assert(parseUniqueCmd("(get-proof)") === GetProof())
-    assert(parseUniqueCmd("(get-unsat-core)") === GetUnsatCore())
-    assert(parseUniqueCmd("(get-value (x y z))") === GetValue(SSymbol("x"), Seq(SSymbol("y"), SSymbol("z"))))
-    assert(parseUniqueCmd("(get-assignment)") === GetAssignment())
+  test("Parsing reset command") {
+    assert(parseUniqueCmd("(reset)") === Reset())
+  }
+  test("Parsing reset-assertions command") {
+    assert(parseUniqueCmd("(reset-assertions)") === ResetAssertions())
+  }
 
-    assert(parseUniqueCmd("(get-option :keyword)") === GetOption("keyword"))
-
-    assert(parseUniqueCmd("(exit)") === Exit())
-
-    assert(parseUniqueCmd(
-      "(declare-datatypes () ( (A (A1 (a1 Int) (a2 A)) (A2)) ))") ===
-      DeclareDatatypes(Seq(
-        (SSymbol("A"), Seq(Constructor("A1", 
-                            Seq((SSymbol("a1"), Sort("Int")), (SSymbol("a2"), Sort("A")))),
-                           Constructor("A2", Seq())
-                          ))
-      ))
-    )
-
+  test("Parsing set-info command") {
+    assert(parseUniqueCmd("""(set-info :author "Reg")""") === SetInfo(Attribute(SKeyword("author"), Some(SString("Reg")))))
+    assert(parseUniqueCmd("""(set-info :number 42)""") === SetInfo(Attribute(SKeyword("number"), Some(SNumeral(42)))))
+    assert(parseUniqueCmd("""(set-info :test)""") === SetInfo(Attribute(SKeyword("test"), None)))
   }
 
   test("Parsing the different set-logic commands") {
@@ -239,27 +287,10 @@ class CommandsParserTests extends FunSuite with Timeouts {
       Attribute(SKeyword("custom"), Some(SString("abcd"))))))
   }
 
-  test("Parsing get-info command") {
-    assert(parseUniqueCmd("(get-info :error-behavior)") === GetInfo(ErrorBehaviorInfoFlag))
-    assert(parseUniqueCmd("(get-info :name)") === GetInfo(NameInfoFlag))
-    assert(parseUniqueCmd("(get-info :authors)") === GetInfo(AuthorsInfoFlag))
-    assert(parseUniqueCmd("(get-info :version)") === GetInfo(VersionInfoFlag))
-    assert(parseUniqueCmd("(get-info :reason-unknown)") === GetInfo(ReasonUnknownInfoFlag))
-    assert(parseUniqueCmd("(get-info :all-statistics)") === GetInfo(AllStatisticsInfoFlag))
-    assert(parseUniqueCmd("(get-info :custom)") === GetInfo(KeywordInfoFlag("custom")))
-  }
-
-  //no (set-option :attribute :value)
   test("Attribute value cannot be a kewyord. Should throw UnexpectedTokenException") {
     intercept[UnexpectedTokenException] {
       parseUniqueCmd("""(set-option :custom :abcd)""")
     }
-  }
-
-  test("Parsing set-info command") {
-    assert(parseUniqueCmd("""(set-info :author "Reg")""") === SetInfo(Attribute(SKeyword("author"), Some(SString("Reg")))))
-    assert(parseUniqueCmd("""(set-info :number 42)""") === SetInfo(Attribute(SKeyword("number"), Some(SNumeral(42)))))
-    assert(parseUniqueCmd("""(set-info :test)""") === SetInfo(Attribute(SKeyword("test"), None)))
   }
 
   test("Parsing unknown command throws UnknownCommandException") {
@@ -269,6 +300,20 @@ class CommandsParserTests extends FunSuite with Timeouts {
     intercept[UnknownCommandException] {
       parser1.parseCommand
     }
+  }
+
+
+  test("Parsing declare-datatypes commands") {
+    assert(parseUniqueCmd(
+      "(declare-datatypes () ( (A (A1 (a1 Int) (a2 A)) (A2)) ))") ===
+      DeclareDatatypes(Seq(
+        (SSymbol("A"), Seq(Constructor("A1", 
+                            Seq((SSymbol("a1"), Sort("Int")), (SSymbol("a2"), Sort("A")))),
+                           Constructor("A2", Seq())
+                          ))
+      ))
+    )
+
   }
 
 }

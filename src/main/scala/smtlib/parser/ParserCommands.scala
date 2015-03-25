@@ -82,13 +82,6 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
         assert(funDefs.size == bodies.size)
         DefineFunsRec(funDef +: funDefs, body +: bodies)
       }
-
-      case Tokens.SetOption => {
-        SetOption(parseOption)
-      }
-      case Tokens.SetInfo => {
-        SetInfo(parseAttribute)
-      }
       case Tokens.DefineSort => {
         val sym = parseSymbol
 
@@ -101,18 +94,32 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
         val sort = parseSort
         DefineSort(sym, vars.toList, sort)
       }
-      case Tokens.Push => {
-        val n = parseNumeral
-        Push(n.value.toInt)
+
+      case Tokens.Echo => {
+        val value = parseString
+        Echo(value)
       }
-      case Tokens.Pop => {
-        val n = parseNumeral
-        Pop(n.value.toInt)
-      }
+      case Tokens.Exit => Exit()
 
       case Tokens.GetAssertions => GetAssertions()
+      case Tokens.GetAssignment => GetAssignment()
+
+      case Tokens.GetInfo => {
+        val infoFlag = parseInfoFlag
+        GetInfo(infoFlag)
+      }
+
+      case Tokens.GetModel => GetModel()
+
+      case Tokens.GetOption => {
+        val keyword = parseKeyword
+        GetOption(keyword)
+      }
+
       case Tokens.GetProof => GetProof()
+      case Tokens.GetUnsatAssumptions => GetUnsatAssumptions()
       case Tokens.GetUnsatCore => GetUnsatCore()
+
       case Tokens.GetValue => {
         eat(Tokens.OParen)
         val ts = new ListBuffer[Term]
@@ -121,24 +128,31 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
         eat(Tokens.CParen)
         GetValue(ts.head, ts.tail.toList)
       }
-      case Tokens.GetAssignment => GetAssignment()
 
-      case Tokens.GetOption => {
-        val keyword = parseKeyword
-        GetOption(keyword)
+      case Tokens.Pop => {
+        val n = parseNumeral
+        Pop(n.value.toInt)
       }
-      case Tokens.GetInfo => {
-        val infoFlag = parseInfoFlag
-        GetInfo(infoFlag)
+      case Tokens.Push => {
+        val n = parseNumeral
+        Push(n.value.toInt)
       }
 
-      case Tokens.Exit => Exit()
+      case Tokens.Reset => Reset()
+      case Tokens.ResetAssertions => ResetAssertions()
+
+      case Tokens.SetInfo => {
+        SetInfo(parseAttribute)
+      }
 
       case Tokens.SetLogic => {
         val logicSymbol: SSymbol = parseSymbol
         val logic: Logic = 
           Logic.standardLogicFromString.lift(logicSymbol.name).getOrElse(NonStandardLogic(logicSymbol))
         SetLogic(logic)
+      }
+      case Tokens.SetOption => {
+        SetOption(parseOption)
       }
 
       case Tokens.DeclareDatatypes => {
@@ -232,12 +246,13 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
 
   def parseInfoFlag: InfoFlag = {
     nextToken match {
+      case Tokens.Keyword("all-statistics") => AllStatisticsInfoFlag
+      case Tokens.Keyword("assertion-stack-levels") => AssertionStackLevelsInfoFlag
+      case Tokens.Keyword("authors") => AuthorsInfoFlag
       case Tokens.Keyword("error-behavior") => ErrorBehaviorInfoFlag
       case Tokens.Keyword("name") => NameInfoFlag
-      case Tokens.Keyword("authors") => AuthorsInfoFlag
-      case Tokens.Keyword("version") => VersionInfoFlag
       case Tokens.Keyword("reason-unknown") => ReasonUnknownInfoFlag
-      case Tokens.Keyword("all-statistics") => AllStatisticsInfoFlag
+      case Tokens.Keyword("version") => VersionInfoFlag
       case Tokens.Keyword(keyword) => KeywordInfoFlag(keyword)
       case t => expected(t, Tokens.KeywordKind)
     }
