@@ -380,4 +380,36 @@ class ParserTests extends FunSuite with Timeouts {
 
   }
 
+  test("identifiers object helpers work") {
+    val abc = SSymbol("abc")
+    val ext = SSymbol("def")
+
+    val simpleId = SimpleIdentifier(abc)
+    assert(simpleId === Identifier(abc))
+    simpleId match {
+      case SimpleIdentifier(sym) => assert(sym === abc)
+      case _ => assert(false)
+    }
+    simpleId match {
+      case ExtendedIdentifier(sym, ext) => assert(false)
+      case SimpleIdentifier(sym) => assert(sym === abc)
+      case _ => assert(false)
+    }
+
+    val extId = ExtendedIdentifier(abc, ext)
+    assert(extId === Identifier(abc, Seq(ext)))
+    extId match {
+      case ExtendedIdentifier(a, b) => 
+        assert(a === abc)
+        assert(b === ext)
+    }
+    extId match {
+      case SimpleIdentifier(sym) => assert(false)
+      case ExtendedIdentifier(a, b) => 
+        assert(a === abc)
+        assert(b === ext)
+    }
+
+  }
+
 }
