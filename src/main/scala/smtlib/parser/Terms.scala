@@ -44,6 +44,7 @@ object Terms {
     
     def unapply(id: Identifier): Option[(SSymbol, SSymbol)] = id match {
       case Identifier(sym, Seq(ext@SSymbol(_))) => Some((sym, ext))
+      case _ => None
     }
   }
 
