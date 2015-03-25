@@ -58,10 +58,18 @@ class CommandsParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(check-sat)") === CheckSat())
   }
 
-  //TODO:
-  //test("Parsing check-sat command") {
-  //  assert(parseUniqueCmd("(check-sat-assuming)") === CheckSatAssuming())
-  //}
+  test("Parsing check-sat-assuming command") {
+    assert(parseUniqueCmd("(check-sat-assuming (a b c))") === 
+           CheckSatAssuming(Seq(
+             PropLiteral("a", true),
+             PropLiteral("b", true),
+             PropLiteral("c", true))))
+    assert(parseUniqueCmd("(check-sat-assuming ((not a) b (not c)))") === 
+           CheckSatAssuming(Seq(
+             PropLiteral("a", false),
+             PropLiteral("b", true),
+             PropLiteral("c", false))))
+  }
 
   test("Parsing declare-const") {
     assert(parseUniqueCmd("(declare-const a A)") ===

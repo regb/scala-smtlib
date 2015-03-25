@@ -40,7 +40,7 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
       }
       case Tokens.CheckSat => CheckSat()
       case Tokens.CheckSatAssuming => {
-        val props = parseUntil(Tokens.CParen, false)(parsePropLit _)
+        val props = parseMany(parsePropLit _)
         CheckSatAssuming(props)
       }
 
