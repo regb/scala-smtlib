@@ -191,7 +191,7 @@ representing the actual theory expression.
 Development
 -----------
 
-The project is still under development and the API will likely go through quite a few
+The library is still under development and the API will likely go through quite a few
 changes. It was originally part of [CafeSat](https://github.com/regb/scabolic)
 and has been made standalone in order for the
 [Leon](https://github.com/epfl-lara/leon) project to rely on it.
@@ -202,4 +202,4 @@ Changelog
 
 ###Current
 
-This is the first release.
+this is the first release.
