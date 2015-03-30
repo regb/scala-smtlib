@@ -83,20 +83,64 @@ until the end of command:
 
 You can decompose a command using pattern matching:
 
+    import smtlib.parser.Commands._
     cmd match {
       case Assert(term) => ???
       case CheckSat() => ???
       case Pop(1) => ???
     }
 
+If you want to generate a script to feed to a solver, you can build the AST
+explicitly, and use the pretty printers:
+
+    import smtlib.parser.Commands._
+    import smtlib.parser.theories.Ints._
+    val x = QualifiedIdentifier(SimpleIdentifier(SSymbol("x")))
+    val y = QualifiedIdentifier(SimpleIdentifier(SSymbol("y")))
+    val formula = Assert(LessThan(NumeralLit(0), Plus(x, y)))
+    smtlib.printer.RecursivePrinter.toString(formula) //(assert (< 0 (+ x y)))
+    
+The above is a little bit verbose due to the objective of supporting all of
+SMT-LIB. We are hoping to provide a nicer API in the future to build SMT-LIB
+scripts, at least in the common cases, but the AST will probably remain at the
+core of the library.
+
 Low Level API
 -------------
 
-This section describes the low level API of Scala SMT-LIB. In the future, it is
-expected to be wrapped by a higher-level API to perform common operations.
+This section introduces the low level API of Scala SMT-LIB. In the future, it is
+expected to be wrapped by a higher-level API to perform most common operations.
+However, that API is expected to remain relatively stable and at the core of the
+library, so if that fits your needs you should be able to safely use it. It comes
+with a relatively extensive test suite to make sure it is working as expected.
 
 The [`lexer`](/src/main/scala/smtlib/lexer) package implements low level
-parsing of [`Tokens`](/src/main/scala/smtlib/lexer/Tokens.scala),
+parsing of [`Tokens`](/src/main/scala/smtlib/lexer/Tokens.scala), The 
+[`Lexer`](/src/main/scala/smtlib/lexer/Lexer.scala) lexes the input into
+tokens. It reads lazily from a `java.io.Reader`, on invocation of the `nextToken`
+method:
+
+    class Lexer(reader: java.io.Reader) { 
+      def nextToken: Token = { ... }
+    }
+
+One call to `nextToken` will only consume the input until the end of the
+current token. It will read one character at a time from the input `Reader`
+until it was able to unambiguously identify the end of the token. You can
+provide a buffered input as a way to improve performance on some use cases.
+
+`nextToken` either returns a valid `Token`, or `null` if EOF is reached in the
+input `Reader`. It will signal errors with exceptions: a value of `null` is not
+an error and is expected to be eventually reached (unless the input never ends,
+such as `stdin`). The following two exceptions can be thrown by the lexer:
+
+* `UnexpectedCharException` signals that an error in the input. It corresponds
+  to a malformed token --- for example, a `#ffff` (instead of `#xffff`) would
+  throw the exception on the first `f`. The exception indicates the position
+  in the input.
+* `UnexpectedEOFException` occurs when the EOF is reached in the middle of an
+  un-completed token. For example, a string literal which is not closed before
+  the EOF.
 
 
 then the [`parser`](/src/main/scala/smtlib/parser) provides the extraction of
