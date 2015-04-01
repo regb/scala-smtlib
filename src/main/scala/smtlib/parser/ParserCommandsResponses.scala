@@ -165,6 +165,12 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
 
   def parseInfoResponse: InfoResponse = {
     peekToken match {
+      case Tokens.Keyword("assertion-stack-levels") =>
+        nextToken
+        AssertionStackLevelsInfoResponse(parseNumeral.value.toInt)
+      case Tokens.Keyword("authors") =>
+        nextToken
+        AuthorsInfoResponse(parseString.value)
       case Tokens.Keyword("error-behavior") =>
         nextToken
         val behaviour = nextToken match {
@@ -176,21 +182,18 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
       case Tokens.Keyword("name") =>
         nextToken
         NameInfoResponse(parseString.value)
-      case Tokens.Keyword("authors") =>
-        nextToken
-        AuthorsInfoResponse(parseString.value)
-      case Tokens.Keyword("version") =>
-        nextToken
-        VersionInfoResponse(parseString.value)
       case Tokens.Keyword("reason-unknown") =>
         nextToken
         val reason = nextToken match {
           case Tokens.SymbolLit("timeout") => TimeoutReasonUnknown
           case Tokens.SymbolLit("memout") => MemoutReasonUnknown
           case Tokens.SymbolLit("incomplete") => IncompleteReasonUnknown
-          case t => expected(t) //TODO: precise error
+          case t => expected(t) //TODO: SMTLIB 2.5 allows arbitrary s-expr
         }
         ReasonUnknownInfoResponse(reason)
+      case Tokens.Keyword("version") =>
+        nextToken
+        VersionInfoResponse(parseString.value)
       case _ =>
         AttributeInfoResponse(parseAttribute)
     }
@@ -225,6 +228,17 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
     }
   }
 
+  def parseEchoResponse: EchoResponse = {
+    nextToken match {
+      case Tokens.StringLit(value) => EchoResponseSuccess(value)
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        parseErrorResponse
+      }
+    }
+  }
+
   def parseGetAssertionsResponse: GetAssertionsResponse = {
     nextToken match {
       case Tokens.SymbolLit("unsupported") => Unsupported
@@ -235,6 +249,22 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
           case t => {
             val terms = parseUntil(Tokens.CParen)(parseTerm _)
             GetAssertionsResponseSuccess(terms)
+          }
+        }
+      }
+    }
+  }
+
+  def parseGetUnsatAssumptionsResponse: GetUnsatAssumptionsResponse = {
+    nextToken match {
+      case Tokens.SymbolLit("unsupported") => Unsupported
+      case t => {
+        check(t, Tokens.OParen)
+        peekToken match {
+          case Tokens.SymbolLit("error") => parseErrorResponse
+          case t => {
+            val syms = parseUntil(Tokens.CParen)(parseSymbol _)
+            GetUnsatAssumptionsResponseSuccess(syms)
           }
         }
       }
@@ -256,5 +286,4 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
       }
     }
   }
-
 }
