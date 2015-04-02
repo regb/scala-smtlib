@@ -19,10 +19,13 @@ trait TerminalTreesPrinter {
     case SHexadecimal(value) => writer.write(value.toString)
     case SBinary(value) => writer.write("#b" + value.map(if(_) "1" else "0").mkString)
     case SDecimal(value) => writer.write(value.toString)
-    case SString(value) =>
-      writer.write("\"")
-      writer.write(value.flatMap(c => if(c == '"') "\"\"" else List(c)))
-      writer.write("\"")
+    case SString(value) => printString(value, writer)
+  }
+
+  protected def printString(value: String, writer: Writer): Unit = {
+    writer.write("\"")
+    writer.write(value.flatMap(c => if(c == '"') "\"\"" else List(c)))
+    writer.write("\"")
   }
 
   protected def printSymbol(s: SSymbol, writer: Writer): Unit = {

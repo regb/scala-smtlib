@@ -51,7 +51,7 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing basic commands responses") { testCommandsResponses }
     test(printerName + ": Printing get-assignment response quoted symbols") { testGetAssignmentResponseQuotedSymbol }
     test(printerName + ": Printing get-Info responses") { testGetInfoResponses }
-    test(printerName + ": Printing non-standard Commands Responses") { testNonStandardCommandsResponses }
+    test(printerName + ": Printing get-model responses") { testGetModelResponse }
   }
 
   mkTests(RecursivePrinter)
@@ -351,21 +351,49 @@ It spans a couple lines""")))))
     check(CheckSatStatus(UnsatStatus), printCheckSat, parseCheckSat)
     check(CheckSatStatus(UnknownStatus), printCheckSat, parseCheckSat)
 
-    def printGetOption(res: GetOptionResponse): String = printer.toString(res)
-    def parseGetOption(in: String): GetOptionResponse = Parser.fromString(in).parseGetOptionResponse
-
-    check(GetOptionResponseSuccess(SSymbol("test")), printGetOption, parseGetOption)
+    def printEcho(res: EchoResponse): String = printer.toString(res) 
+    def parseEcho(in: String): EchoResponse = Parser.fromString(in).parseEchoResponse
+    check(EchoResponseSuccess("abcd"), printEcho, parseEcho)
+    check(EchoResponseSuccess("Hello, World"), printEcho, parseEcho)
 
     def printGetAssertions(res: GetAssertionsResponse): String = printer.toString(res)
     def parseGetAssertions(in: String): GetAssertionsResponse = Parser.fromString(in).parseGetAssertionsResponse
-
     check(GetAssertionsResponseSuccess(Seq(
            QualifiedIdentifier("a"), SNumeral(42)
           )), printGetAssertions, parseGetAssertions)
 
+    def printGetAssignment(res: GetAssignmentResponse): String = printer.toString(res)
+    def parseGetAssignment(in: String): GetAssignmentResponse = Parser.fromString(in).parseGetAssignmentResponse
+    check(GetAssignmentResponseSuccess(Seq(
+      (SSymbol("a"), true), (SSymbol("b"), false))),
+      printGetAssignment, 
+      parseGetAssignment)
+
+    def printGetOption(res: GetOptionResponse): String = printer.toString(res)
+    def parseGetOption(in: String): GetOptionResponse = Parser.fromString(in).parseGetOptionResponse
+    check(GetOptionResponseSuccess(SSymbol("test")), printGetOption, parseGetOption)
+
+    def printGetProof(res: GetProofResponse): String = printer.toString(res)
+    def parseGetProof(in: String): GetProofResponse = Parser.fromString(in).parseGetProofResponse
+    check(GetProofResponseSuccess(SList(SSymbol("a"), SNumeral(42))),
+          printGetProof, parseGetProof)
+
+    def printGetUnsatAssumptions(res: GetUnsatAssumptionsResponse): String = printer.toString(res)
+    def parseGetUnsatAssumptions(in: String): GetUnsatAssumptionsResponse = Parser.fromString(in).parseGetUnsatAssumptionsResponse
+    check(GetUnsatAssumptionsResponseSuccess(Seq(SSymbol("a"))),
+          printGetUnsatAssumptions, parseGetUnsatAssumptions)
+    check(GetUnsatAssumptionsResponseSuccess(
+            Seq(SSymbol("a"), SSymbol("b"))), 
+          printGetUnsatAssumptions, parseGetUnsatAssumptions)
+
+    def printGetUnsatCore(res: GetUnsatCoreResponse): String = printer.toString(res)
+    def parseGetUnsatCore(in: String): GetUnsatCoreResponse = Parser.fromString(in).parseGetUnsatCoreResponse
+    check(GetUnsatCoreResponseSuccess(Seq(SSymbol("a"))), printGetUnsatCore, parseGetUnsatCore)
+    check(GetUnsatCoreResponseSuccess(
+            Seq(SSymbol("a"), SSymbol("b"))), printGetUnsatCore, parseGetUnsatCore)
+
     def printGetValue(res: GetValueResponse): String = printer.toString(res)
     def parseGetValue(in: String): GetValueResponse = Parser.fromString(in).parseGetValueResponse
-
     check(GetValueResponseSuccess(Seq( 
            (SSymbol("a"), SNumeral(42)) 
           )), printGetValue, parseGetValue)
@@ -373,28 +401,6 @@ It spans a couple lines""")))))
            (SSymbol("a"), SNumeral(42)), 
            (SSymbol("b"), SNumeral(12)) 
          )), printGetValue, parseGetValue)
-
-    def printGetUnsatCore(res: GetUnsatCoreResponse): String = printer.toString(res)
-    def parseGetUnsatCore(in: String): GetUnsatCoreResponse = Parser.fromString(in).parseGetUnsatCoreResponse
-
-    check(GetUnsatCoreResponseSuccess(Seq(SSymbol("a"))), printGetUnsatCore, parseGetUnsatCore)
-    check(GetUnsatCoreResponseSuccess(
-            Seq(SSymbol("a"), SSymbol("b"))), printGetUnsatCore, parseGetUnsatCore)
-
-    def printGetAssignment(res: GetAssignmentResponse): String = printer.toString(res)
-    def parseGetAssignment(in: String): GetAssignmentResponse = Parser.fromString(in).parseGetAssignmentResponse
-
-    check(GetAssignmentResponseSuccess(Seq(
-      (SSymbol("a"), true), (SSymbol("b"), false))),
-      printGetAssignment, 
-      parseGetAssignment)
-
-    def printGetProof(res: GetProofResponse): String = printer.toString(res)
-    def parseGetProof(in: String): GetProofResponse = Parser.fromString(in).parseGetProofResponse
-
-    check(GetProofResponseSuccess(SList(SSymbol("a"), SNumeral(42))),
-          printGetProof,
-          parseGetProof)
   }
 
   def testGetAssignmentResponseQuotedSymbol(implicit printer: Printer): Unit = {
@@ -412,38 +418,37 @@ It spans a couple lines""")))))
     def printGetInfo(res: GetInfoResponse): String = printer.toString(res)
     def parseGetInfo(in: String): GetInfoResponse = Parser.fromString(in).parseGetInfoResponse
 
+    check(GetInfoResponseSuccess(AssertionStackLevelsInfoResponse(13), Seq()),
+          printGetInfo, parseGetInfo)
+
+    check(GetInfoResponseSuccess(AuthorsInfoResponse("Regis Blanc"), Seq()),
+          printGetInfo, parseGetInfo)
+
     check(GetInfoResponseSuccess(
             ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior), Seq()),
-          printGetInfo,
-          parseGetInfo)
+          printGetInfo, parseGetInfo)
     check(GetInfoResponseSuccess(
             ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior), Seq()),
-          printGetInfo,
-          parseGetInfo)
+          printGetInfo, parseGetInfo)
+
     check(GetInfoResponseSuccess(NameInfoResponse("Scala-SmtLib"), Seq()),
-          printGetInfo,
-          parseGetInfo)
-    check(GetInfoResponseSuccess(AuthorsInfoResponse("Regis Blanc"), Seq()),
-          printGetInfo,
-          parseGetInfo)
-    check(GetInfoResponseSuccess(VersionInfoResponse("2.13.7"), Seq()),
-          printGetInfo,
-          parseGetInfo)
+          printGetInfo, parseGetInfo)
+
     check(GetInfoResponseSuccess(ReasonUnknownInfoResponse(TimeoutReasonUnknown), Seq()),
-          printGetInfo,
-          parseGetInfo)
+          printGetInfo, parseGetInfo)
     check(GetInfoResponseSuccess(ReasonUnknownInfoResponse(MemoutReasonUnknown), Seq()),
-          printGetInfo,
-          parseGetInfo)
+          printGetInfo, parseGetInfo)
     check(GetInfoResponseSuccess(ReasonUnknownInfoResponse(IncompleteReasonUnknown), Seq()),
-          printGetInfo,
-          parseGetInfo)
+          printGetInfo, parseGetInfo)
+
+    check(GetInfoResponseSuccess(VersionInfoResponse("2.13.7"), Seq()),
+          printGetInfo, parseGetInfo)
+
     check(GetInfoResponseSuccess(AttributeInfoResponse(Attribute(SKeyword("key"))), Seq()),
-          printGetInfo,
-          parseGetInfo)
+          printGetInfo, parseGetInfo)
   }
 
-  def testNonStandardCommandsResponses(implicit printer: Printer): Unit = {
+  def testGetModelResponse(implicit printer: Printer): Unit = {
     def printGetModel(res: GetModelResponse): String = printer.toString(res)
     def parseGetModel(in: String): GetModelResponse = Parser.fromString(in).parseGetModelResponse
     check(

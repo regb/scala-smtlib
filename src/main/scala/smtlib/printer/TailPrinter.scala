@@ -223,6 +223,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(msg))
       actions.prepend(() => writer.write('"'))
       actions.prepend(() => writer.write("(error "))
+
     case CheckSatStatus(SatStatus) =>
       actions.prepend(() => writer.write("sat\n"))
     case CheckSatStatus(UnsatStatus) =>
@@ -230,27 +231,29 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     case CheckSatStatus(UnknownStatus) =>
       actions.prepend(() => writer.write("unknown\n"))
 
+    case EchoResponseSuccess(value) =>
+      actions.prepend(() => printString(value, writer))
+
     case GetAssertionsResponseSuccess(assertions) =>
       printNary(writer, assertions, printTerm, "(", " ", " )", actions)
 
-    case GetValueResponseSuccess(valuationPairs) => {
-      def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
+    case GetAssignmentResponseSuccess(valuationPairs) => {
+      def printValuationPair(pair: (SSymbol, Boolean), writer: Writer): Unit = {
         actions.prepend(() => writer.write(')'))
-        actions.prepend(() => printTerm(pair._2, writer, actions))
+        actions.prepend(() => writer.write(pair._2.toString))
         actions.prepend(() => writer.write(' '))
-        actions.prepend(() => printTerm(pair._1, writer, actions))
+        actions.prepend(() => printSymbol(pair._1, writer))
         actions.prepend(() => writer.write('('))
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
     }
+
     case GetInfoResponseSuccess(response, responses) => {
       printNary(writer, response +: responses, 
                 (ir: InfoResponse, w: Writer) => actions.prepend(() => printInfoResponse(ir, w, actions)),
                 "(", " ", ")", actions)
     }
-    case GetOptionResponseSuccess(av) => {
-      printSExpr(av, writer, actions)
-    }
+
     case GetModelResponseSuccess(exprs) => {
       def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
         case (cmd: Command) => printCommand(cmd, writer, actions)
@@ -261,18 +264,28 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => printNary(writer, exprs, printGetModelResponseEntry, "", "\n", "", actions))
       actions.prepend(() => writer.write("(model \n"))
     }
+
+    case GetOptionResponseSuccess(av) => {
+      printSExpr(av, writer, actions)
+    }
+
     case GetProofResponseSuccess(proof) => {
       actions.prepend(() => printSExpr(proof, writer, actions))
+    }
+
+    case GetUnsatAssumptionsResponseSuccess(symbols) => {
+      printNary(writer, symbols, printSExpr, "(", " ", ")", actions)
     }
     case GetUnsatCoreResponseSuccess(symbols) => {
       printNary(writer, symbols, printSExpr, "(", " ", ")", actions)
     }
-    case GetAssignmentResponseSuccess(valuationPairs) => {
-      def printValuationPair(pair: (SSymbol, Boolean), writer: Writer): Unit = {
+
+    case GetValueResponseSuccess(valuationPairs) => {
+      def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
         actions.prepend(() => writer.write(')'))
-        actions.prepend(() => writer.write(pair._2.toString))
+        actions.prepend(() => printTerm(pair._2, writer, actions))
         actions.prepend(() => writer.write(' '))
-        actions.prepend(() => printSymbol(pair._1, writer))
+        actions.prepend(() => printTerm(pair._1, writer, actions))
         actions.prepend(() => writer.write('('))
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")", actions)
@@ -372,6 +385,13 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
 
 
   private def printInfoResponse(infoResponse: InfoResponse, writer: Writer, actions: LinkedList[Action]): Unit = infoResponse match {
+    case AssertionStackLevelsInfoResponse(level) =>
+      actions.prepend(() => writer.write(level.toString))
+      actions.prepend(() => writer.write(":assertion-stack-levels "))
+    case AuthorsInfoResponse(authors) =>
+      actions.prepend(() => writer.write('"'))
+      actions.prepend(() => writer.write(authors))
+      actions.prepend(() => writer.write(":authors \""))
     case ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior) =>
       actions.prepend(() => writer.write(":error-behavior immediate-exit"))
     case ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior) =>
@@ -380,20 +400,16 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write('"'))
       actions.prepend(() => writer.write(name))
       actions.prepend(() => writer.write(":name \""))
-    case AuthorsInfoResponse(authors) =>
-      actions.prepend(() => writer.write('"'))
-      actions.prepend(() => writer.write(authors))
-      actions.prepend(() => writer.write(":authors \""))
-    case VersionInfoResponse(version) =>
-      actions.prepend(() => writer.write('"'))
-      actions.prepend(() => writer.write(version))
-      actions.prepend(() => writer.write(":version \""))
     case ReasonUnknownInfoResponse(TimeoutReasonUnknown) =>
       actions.prepend(() => writer.write(":reason-unknown timeout"))
     case ReasonUnknownInfoResponse(MemoutReasonUnknown) =>
       actions.prepend(() => writer.write(":reason-unknown memout"))
     case ReasonUnknownInfoResponse(IncompleteReasonUnknown) =>
       actions.prepend(() => writer.write(":reason-unknown incomplete"))
+    case VersionInfoResponse(version) =>
+      actions.prepend(() => writer.write('"'))
+      actions.prepend(() => writer.write(version))
+      actions.prepend(() => writer.write(":version \""))
     case AttributeInfoResponse(attribute) =>
       actions.prepend(() => printAttribute(attribute, writer))
   }

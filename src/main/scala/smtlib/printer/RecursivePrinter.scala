@@ -257,6 +257,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       writer.write(msg)
       writer.write('"')
       writer.write(")\n")
+
     case CheckSatStatus(SatStatus) =>
       writer.write("sat\n")
     case CheckSatStatus(UnsatStatus) =>
@@ -264,19 +265,26 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case CheckSatStatus(UnknownStatus) =>
       writer.write("unknown\n")
 
+    case EchoResponseSuccess(value) =>
+      printString(value, writer)
+
     case GetAssertionsResponseSuccess(assertions) =>
       printNary(writer, assertions, printTerm, "(", " ", " )")
 
-    case GetValueResponseSuccess(valuationPairs) => {
-      def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
+    case GetAssignmentResponseSuccess(valuationPairs) => {
+      def printValuationPair(pair: (SSymbol, Boolean), writer: Writer): Unit = {
         writer.write('(')
-        printTerm(pair._1, writer)
+        printSymbol(pair._1, writer)
         writer.write(' ')
-        printTerm(pair._2, writer)
+        writer.write(pair._2.toString)
         writer.write(')')
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")")
     }
+
+    case GetInfoResponseSuccess(response, responses) =>
+      printNary(writer, response +: responses, printInfoResponse, "(", " ", ")")
+
     case GetModelResponseSuccess(exprs) => {
       def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
         case (cmd: Command) => printCommand(cmd, writer)
@@ -287,24 +295,25 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       printNary(writer, exprs, printGetModelResponseEntry, "", "\n", "")
       writer.write(')')
     }
-    case GetInfoResponseSuccess(response, responses) => {
-      printNary(writer, response +: responses, printInfoResponse, "(", " ", ")")
-    }
-    case GetOptionResponseSuccess(av) => {
+
+    case GetOptionResponseSuccess(av) =>
       printSExpr(av, writer)
-    }
-    case GetProofResponseSuccess(proof) => {
+
+    case GetProofResponseSuccess(proof) =>
       printSExpr(proof, writer)
-    }
-    case GetUnsatCoreResponseSuccess(symbols) => {
+
+    case GetUnsatAssumptionsResponseSuccess(symbols) =>
       printNary(writer, symbols, printSExpr, "(", " ", ")")
-    }
-    case GetAssignmentResponseSuccess(valuationPairs) => {
-      def printValuationPair(pair: (SSymbol, Boolean), writer: Writer): Unit = {
+
+    case GetUnsatCoreResponseSuccess(symbols) =>
+      printNary(writer, symbols, printSExpr, "(", " ", ")")
+
+    case GetValueResponseSuccess(valuationPairs) => {
+      def printValuationPair(pair: (Term, Term), writer: Writer): Unit = {
         writer.write('(')
-        printSymbol(pair._1, writer)
+        printTerm(pair._1, writer)
         writer.write(' ')
-        writer.write(pair._2.toString)
+        printTerm(pair._2, writer)
         writer.write(')')
       }
       printNary(writer, valuationPairs, printValuationPair, "(", " ", ")")
@@ -374,6 +383,13 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
   }
 
   private def printInfoResponse(infoResponse: InfoResponse, writer: Writer): Unit = infoResponse match {
+    case AssertionStackLevelsInfoResponse(level) =>
+      writer.write(":assertion-stack-levels ")
+      writer.write(level.toString)
+    case AuthorsInfoResponse(authors) =>
+      writer.write(":authors \"")
+      writer.write(authors)
+      writer.write('"')
     case ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior) =>
       writer.write(":error-behavior immediate-exit")
     case ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior) =>
@@ -382,20 +398,16 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       writer.write(":name \"")
       writer.write(name)
       writer.write('"')
-    case AuthorsInfoResponse(authors) =>
-      writer.write(":authors \"")
-      writer.write(authors)
-      writer.write('"')
-    case VersionInfoResponse(version) =>
-      writer.write(":version \"")
-      writer.write(version)
-      writer.write('"')
     case ReasonUnknownInfoResponse(TimeoutReasonUnknown) =>
       writer.write(":reason-unknown timeout")
     case ReasonUnknownInfoResponse(MemoutReasonUnknown) =>
       writer.write(":reason-unknown memout")
     case ReasonUnknownInfoResponse(IncompleteReasonUnknown) =>
       writer.write(":reason-unknown incomplete")
+    case VersionInfoResponse(version) =>
+      writer.write(":version \"")
+      writer.write(version)
+      writer.write('"')
     case AttributeInfoResponse(attribute) =>
       printAttribute(attribute, writer)
   }
