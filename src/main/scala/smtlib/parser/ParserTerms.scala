@@ -2,21 +2,12 @@ package smtlib
 package parser
 
 import lexer.Tokens
-import Tokens.{Token, TokenKind}
-import lexer.Lexer
-
 import Terms._
-import Commands._
-import CommandsResponses._
-
-import common._
+import Parser._
 
 import scala.collection.mutable.ListBuffer
 
 trait ParserTerms { this: ParserUtils =>
-
-  import Parser._
-
 
   def parseAttribute: Attribute = {
     val keyword = parseKeyword
@@ -142,7 +133,7 @@ trait ParserTerms { this: ParserUtils =>
 
         val name = parseIdentifier
 
-        var subSorts = new ListBuffer[Sort]
+        val subSorts = new ListBuffer[Sort]
         while(peekToken.kind != Tokens.CParen)
           subSorts.append(parseSort)
         eat(Tokens.CParen)
@@ -299,7 +290,7 @@ trait ParserTerms { this: ParserUtils =>
 
   //parse s-list assuming the parentheses has been parsed
   protected def parseSListContent: SList = {
-    var exprs = new ListBuffer[SExpr]
+    val exprs = new ListBuffer[SExpr]
     while(peekToken.kind != Tokens.CParen)
       exprs.append(parseSExpr)
     eat(Tokens.CParen)

@@ -8,8 +8,6 @@ import parser.CommandsResponses._
 import parser.Terms._
 
 import java.io.Writer
-import java.io.StringWriter
-import java.io.BufferedWriter
 
 object TailPrinter extends Printer with TerminalTreesPrinter {
 
@@ -345,7 +343,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       }
 
     case AnnotatedTerm(term, attr, attrs) => {
-      actions.prepend(() => printNary(writer, attr +: attrs, printAttribute _, " ", " ", ")", actions))
+      actions.prepend(() => printNary(writer, attr +: attrs, printAttribute, " ", " ", ")", actions))
       actions.prepend(() => printTerm(term, writer, actions))
       actions.prepend(() => writer.write("(! "))
     }
@@ -432,7 +430,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
   }
   def printSExpr(sexpr: SExpr, writer: Writer, actions: LinkedList[Action]): Unit = sexpr match {
     case SList(es) =>
-      printNary(writer, es, printSExpr _, "(", " ", ")", actions)
+      printNary(writer, es, printSExpr, "(", " ", ")", actions)
     case SKeyword(key) =>
       writer.write(":")
       writer.write(key)
@@ -516,12 +514,12 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     writer: Writer, as: Seq[A], printer: (A, Writer) => Unit,
     pre: String, op: String, post: String, actions: LinkedList[Action]): Unit = {
 
-    var newActions = new scala.collection.mutable.ListBuffer[Action]()
+    val newActions = new scala.collection.mutable.ListBuffer[Action]()
 
     newActions.append(() => writer.write(pre))
 
     var c = 0
-    var sz = as.size
+    val sz = as.size
 
     as.foreach(a => {
       newActions.append(() => printer(a, writer))

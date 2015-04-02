@@ -42,7 +42,7 @@ object Interpreter {
 
   def execute(scriptReader: Reader)(implicit interpreter: Interpreter): Unit = {
     val parser = new Parser(new lexer.Lexer(scriptReader))
-    var cmd: Command = null
+    val cmd: Command = null
     do {
       val cmd = parser.parseCommand
       if(cmd != null)

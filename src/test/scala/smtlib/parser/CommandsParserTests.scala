@@ -2,9 +2,7 @@ package smtlib
 package parser
 
 import lexer._
-import common._
 import Commands._
-import CommandsResponses._
 import Terms._
 import Parser._
 
@@ -12,7 +10,6 @@ import java.io.StringReader
 
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.Timeouts
-import org.scalatest.time.SpanSugar._
 
 import scala.language.implicitConversions
 

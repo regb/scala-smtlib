@@ -75,7 +75,7 @@ object Hexadecimal {
    */
   def fromInt(n: Int): Hexadecimal = {
     if(n < 0) {
-      var res = "00000000".toArray
+      val res = "00000000".toArray
       for(i <- 0 until 8) {
         val digit = (n >> (32 - 4*(i+1))) & 15
         res(i) = toDigit(digit)

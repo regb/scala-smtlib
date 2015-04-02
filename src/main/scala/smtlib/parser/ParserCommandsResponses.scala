@@ -2,14 +2,8 @@ package smtlib
 package parser
 
 import lexer.Tokens
-import Tokens.{Token, TokenKind}
-import lexer.Lexer
-
 import Terms._
-import Commands._
 import CommandsResponses._
-
-import common._
 
 import scala.collection.mutable.ListBuffer
 
@@ -137,7 +131,7 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
               case Tokens.SymbolLit("model") => ()
               case t => expected(t, Tokens.SymbolLitKind) //TODO: expected symbol of value "model"
             }
-            var exprs: ListBuffer[SExpr] = new ListBuffer
+            val exprs: ListBuffer[SExpr] = new ListBuffer
             while(peekToken.kind != Tokens.CParen) {
               try {
                 exprs.append(parseCommand)

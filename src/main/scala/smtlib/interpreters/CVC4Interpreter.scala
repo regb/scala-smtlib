@@ -1,14 +1,9 @@
 package smtlib
 package interpreters
 
-import lexer.Lexer
-import parser.Parser
 import parser.Commands._
 import parser.CommandsResponses._
-import printer._
-
-//import scala.sys.process._
-import java.io._
+import printer.RecursivePrinter
 
 class CVC4Interpreter(executable: String, args: Array[String]) extends ProcessInterpreter(executable, args) {
 

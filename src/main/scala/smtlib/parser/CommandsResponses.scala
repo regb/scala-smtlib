@@ -1,7 +1,6 @@
 package smtlib
 package parser
 
-import Commands._
 import Terms._
 
 object CommandsResponses {

@@ -4,7 +4,6 @@ package parser
 import lexer._
 import common._
 import Commands._
-import CommandsResponses._
 import Terms._
 import Parser._
 

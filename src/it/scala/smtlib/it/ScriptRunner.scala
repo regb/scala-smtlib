@@ -77,12 +77,12 @@ class Tests extends FunSuite {
   filesInResourceDir("regression/smtlib/solving/all", _.endsWith(".smt2")).foreach(file => {
     if(isZ3Available) {
       test("With Z3: SMTLIB benchmark: " + file.getPath) {
-        compareWithInterpreter(executeZ3 _)(getZ3Interpreter, file)
+        compareWithInterpreter(executeZ3)(getZ3Interpreter, file)
       }
     }
     if(isCVC4Available) {
       test("With CVC4: SMTLIB benchmark: " + file.getPath) {
-        compareWithInterpreter(executeCVC4 _)(getCVC4Interpreter, file)
+        compareWithInterpreter(executeCVC4)(getCVC4Interpreter, file)
       }
     }
   })
@@ -90,7 +90,7 @@ class Tests extends FunSuite {
   if(isZ3Available) {
     filesInResourceDir("regression/smtlib/solving/z3", _.endsWith(".smt2")).foreach(file => {
       test("With Z3: SMTLIB benchmark: " + file.getPath) {
-        compareWithInterpreter(executeZ3 _)(getZ3Interpreter, file)
+        compareWithInterpreter(executeZ3)(getZ3Interpreter, file)
       }
     })
   }
@@ -98,7 +98,7 @@ class Tests extends FunSuite {
   if(isCVC4Available) {
     filesInResourceDir("regression/smtlib/solving/cvc4", _.endsWith(".smt2")).foreach(file => {
       test("With CVC4: SMTLIB benchmark: " + file.getPath) {
-        compareWithInterpreter(executeCVC4 _)(getCVC4Interpreter, file)
+        compareWithInterpreter(executeCVC4)(getCVC4Interpreter, file)
       }
     })
   }

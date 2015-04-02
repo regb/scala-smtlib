@@ -2,14 +2,8 @@ package smtlib
 package parser
 
 import lexer.Tokens
-import Tokens.{Token, TokenKind}
-import lexer.Lexer
-
 import Terms._
 import Commands._
-import CommandsResponses._
-
-import common._
 
 import scala.collection.mutable.ListBuffer
 
@@ -19,7 +13,7 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
 
   def parseScript: Script = {
 
-    var cmds = new ListBuffer[Command]()
+    val cmds = new ListBuffer[Command]()
     var cmd = parseCommand
     while(cmd != null) {
       cmds.append(cmd)
@@ -218,7 +212,7 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
   def parseDatatypes: (SSymbol, Seq[Constructor]) = {
     eat(Tokens.OParen)
     val name = parseSymbol
-    var constructors = new ListBuffer[Constructor]
+    val constructors = new ListBuffer[Constructor]
     while(peekToken.kind != Tokens.CParen) {
       constructors.append(parseConstructor)
     }
@@ -230,7 +224,7 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
     eat(Tokens.OParen)
     val name = parseSymbol
 
-    var fields = new ListBuffer[(SSymbol, Sort)]
+    val fields = new ListBuffer[(SSymbol, Sort)]
     while(peekToken.kind != Tokens.CParen) {
       eat(Tokens.OParen)
       val fieldName = parseSymbol

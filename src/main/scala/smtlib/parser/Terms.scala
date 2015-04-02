@@ -15,16 +15,13 @@ import common._
  * That choice is also influenced by the somewhat unclear treatment of upper/lower case symbols in SMT-LIB.
  */
 
-import Commands._
 
 object Terms {
-
-
 
   sealed trait Index
   case class Identifier(symbol: SSymbol, indices: Seq[Index] = Seq()) {
 
-    def isIndexed: Boolean = !indices.isEmpty
+    def isIndexed: Boolean = indices.nonEmpty
 
   }
 
@@ -93,7 +90,7 @@ object Terms {
   case class AnnotatedTerm(term: Term, attribute: Attribute, attributes: Seq[Attribute]) extends Term
   case class FunctionApplication(fun: QualifiedIdentifier, terms: Seq[Term]) extends Term {
     //a function application with no argument is a qualified identifier
-    require(!terms.isEmpty)
+    require(terms.nonEmpty)
   }
 
 

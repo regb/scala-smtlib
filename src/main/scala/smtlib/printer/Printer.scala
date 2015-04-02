@@ -23,7 +23,7 @@ trait Printer {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printScript(script, sWriter)
-    sWriter.flush
+    sWriter.flush()
     output.toString
   }
 
@@ -31,7 +31,7 @@ trait Printer {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printCommand(command, sWriter)
-    sWriter.flush
+    sWriter.flush()
     output.toString
   }
 
@@ -39,7 +39,7 @@ trait Printer {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printTerm(term, sWriter)
-    sWriter.flush
+    sWriter.flush()
     output.toString
   }
 
@@ -47,7 +47,7 @@ trait Printer {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printSort(sort, sWriter)
-    sWriter.flush
+    sWriter.flush()
     output.toString
   }
 
@@ -55,7 +55,7 @@ trait Printer {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)
     printCommandResponse(response, sWriter)
-    sWriter.flush
+    sWriter.flush()
     output.toString
   }
 

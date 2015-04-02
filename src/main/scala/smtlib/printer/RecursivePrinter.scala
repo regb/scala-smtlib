@@ -6,8 +6,6 @@ import parser.CommandsResponses._
 import parser.Terms._
 
 import java.io.Writer
-import java.io.StringWriter
-import java.io.BufferedWriter
 
 object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
@@ -45,7 +43,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case DeclareFun(name, paramSorts, returnSort) => {
       writer.write("(declare-fun ")
       writer.write(name.name)
-      printNary(writer, paramSorts, printSort _, " (", " ", ") ")
+      printNary(writer, paramSorts, printSort, " (", " ", ") ")
       printSort(returnSort, writer)
       writer.write(")\n")
     }
@@ -60,7 +58,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case DefineFun(FunDef(name, sortedVars, returnSort, body)) => {
       writer.write("(define-fun ")
       writer.write(name.name)
-      printNary(writer, sortedVars, printSortedVar _, " (", " ", ") ")
+      printNary(writer, sortedVars, printSortedVar, " (", " ", ") ")
       printSort(returnSort, writer)
       writer.write(" ")
       printTerm(body, writer)
@@ -69,7 +67,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case DefineFunRec(FunDef(name, sortedVars, returnSort, body)) => {
       writer.write("(define-fun-rec ")
       writer.write(name.name)
-      printNary(writer, sortedVars, printSortedVar _, " (", " ", ") ")
+      printNary(writer, sortedVars, printSortedVar, " (", " ", ") ")
       printSort(returnSort, writer)
       writer.write(" ")
       printTerm(body, writer)
@@ -77,8 +75,8 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     }
     case DefineFunsRec(funDecs, bodies) => {
       writer.write("(define-funs-rec ")
-      printNary(writer, funDecs, printFunDec _, "(", " ", ")")
-      printNary(writer, bodies, printTerm _, "(", " ", ")")
+      printNary(writer, funDecs, printFunDec, "(", " ", ")")
+      printNary(writer, bodies, printTerm, "(", " ", ")")
       writer.write(")\n")
     }
     case DefineSort(name, params, sort) => {
@@ -128,7 +126,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     }
     case GetValue(t, ts) => {
       writer.write("(get-value ")
-      printNary(writer, t +: ts, printTerm _, "(", " ", "))")
+      printNary(writer, t +: ts, printTerm, "(", " ", "))")
     }
 
     case Pop(n) => {
@@ -201,33 +199,33 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case Let(vb, vbs, t) =>
       writer.write("(let (")
       printVarBinding(vb, writer)
-      printNary(writer, vbs, printVarBinding _, "", " ", ") ")
+      printNary(writer, vbs, printVarBinding, "", " ", ") ")
       printTerm(t, writer)
       writer.write(")")
     case ForAll(sortedVar, sortedVars, t) =>
       writer.write("(forall (")
       printSortedVar(sortedVar, writer)
-      printNary(writer, sortedVars, printSortedVar _, "", " ", ") ")
+      printNary(writer, sortedVars, printSortedVar, "", " ", ") ")
       printTerm(t, writer)
       writer.write(")")
     case Exists(sortedVar, sortedVars, t) =>
       writer.write("(exists (")
       printSortedVar(sortedVar, writer)
-      printNary(writer, sortedVars, printSortedVar _, "", " ", ") ")
+      printNary(writer, sortedVars, printSortedVar, "", " ", ") ")
       printTerm(t, writer)
       writer.write(")")
     case FunctionApplication(fun, ts) =>
       if (ts.nonEmpty) {
         writer.write("(")
         printQualifiedId(fun, writer)
-        printNary(writer, ts, printTerm _, " ", " ", ")")
+        printNary(writer, ts, printTerm, " ", " ", ")")
       } else {
         printQualifiedId(fun, writer)
       }
     case AnnotatedTerm(term, attr, attrs) => {
       writer.write("(! ")
       printTerm(term, writer)
-      printNary(writer, attr +: attrs, printAttribute _, " ", " ", ")")
+      printNary(writer, attr +: attrs, printAttribute, " ", " ", ")")
     }
     case id@QualifiedIdentifier(_, _) => 
       printQualifiedId(id, writer)
@@ -242,7 +240,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     else {
       writer.write("(")
       printId(id, writer)
-      printNary(writer, sort.subSorts, printSort _, " ", " ", ")")
+      printNary(writer, sort.subSorts, printSort, " ", " ", ")")
     }
   }
   
@@ -423,7 +421,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
   private def printSExpr(sexpr: SExpr, writer: Writer): Unit = sexpr match {
     case SList(es) =>
-      printNary(writer, es, printSExpr _, "(", " ", ")")
+      printNary(writer, es, printSExpr, "(", " ", ")")
     case SKeyword(key) =>
       writer.write(":")
       writer.write(key)
@@ -464,7 +462,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
   protected def printFunDec(funDec: FunDec, writer: Writer): Unit = {
     writer.write('(')
     printSymbol(funDec.name, writer)
-    printNary(writer, funDec.params, printSortedVar _, " (", " ", ") ")
+    printNary(writer, funDec.params, printSortedVar, " (", " ", ") ")
     printSort(funDec.returnSort, writer)
     writer.write(')')
   }
@@ -476,7 +474,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     writer.write(pre)
 
     var c = 0
-    var sz = as.size
+    val sz = as.size
 
     as.foreach(a => {
       printer(a, writer)

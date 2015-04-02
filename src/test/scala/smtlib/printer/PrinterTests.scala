@@ -1,15 +1,12 @@
 package smtlib
 package printer
 
-import lexer.Lexer
 import parser.Terms._
 import parser.Commands._
 import parser.CommandsResponses._
 import parser.Parser
 
 import common._
-
-import java.io.StringReader
 
 import org.scalatest.FunSuite
 

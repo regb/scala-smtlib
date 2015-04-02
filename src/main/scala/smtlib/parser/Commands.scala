@@ -22,7 +22,7 @@ object Commands {
   case class DefineFun(funDef: FunDef) extends Command
   case class DefineFunRec(funDef: FunDef) extends Command
   case class DefineFunsRec(funDecls: Seq[FunDec], bodies: Seq[Term]) extends Command {
-    require(!funDecls.isEmpty && funDecls.size == bodies.size)
+    require(funDecls.nonEmpty && funDecls.size == bodies.size)
   }
   case class DefineSort(name: SSymbol, params: Seq[SSymbol], sort: Sort) extends Command
 

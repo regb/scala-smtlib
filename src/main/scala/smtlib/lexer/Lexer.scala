@@ -12,7 +12,6 @@ class Lexer(reader: java.io.Reader) {
 
   private def isNewLine(c: Char) = c == '\n' || c == '\r'
   private def isBlank(c: Char) = c == '\n' || c == '\r' || c == ' '
-  private def isSeparator(c: Char) = isBlank(c) || c == ')' || c == '('
 
   /*
    * Note that we do not start reading the input until the next function is called.
@@ -200,7 +199,7 @@ class Lexer(reader: java.io.Reader) {
   }
 
   private def readBinary(): Seq[Boolean] = {
-    var res = new ListBuffer[Boolean]
+    val res = new ListBuffer[Boolean]
     if(peek != '1' && peek != '0')
       throw new Exception
     while(peek == '1' || peek == '0') {
@@ -278,7 +277,7 @@ object Lexer {
 
   class UnexpectedEOFException(val position: Position) extends Exception
 
-  private var extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&', '_', 
+  private val extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&', '_',
                                      '!', '?', '[', ']', '{', '}', '=', '<', '>', '~', '.')
 
   def isSymbolChar(c: Char): Boolean =
@@ -291,11 +290,11 @@ object Lexer {
   /* if c is digit in radix r (1 < r <= 36) */
   def isDigit(c: Char, r: Int): Boolean = {
     require(r > 1 && r <= 36)
-    val d = (c - '0').toInt
+    val d = (c - '0')
     if(d < 10 && d >= 0)
       d < r
     else {
-      val ld = (c.toLower - 'a').toInt
+      val ld = (c.toLower - 'a')
       ld >= 0 && ld < r - 10
     }
   }

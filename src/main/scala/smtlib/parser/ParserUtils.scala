@@ -5,12 +5,6 @@ import lexer.Tokens
 import Tokens.{Token, TokenKind}
 import lexer.Lexer
 
-import Terms._
-import Commands._
-import CommandsResponses._
-
-import common._
-
 import scala.collection.mutable.ListBuffer
 
 trait ParserUtils {
