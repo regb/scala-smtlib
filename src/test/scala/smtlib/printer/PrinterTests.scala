@@ -423,6 +423,8 @@ It spans a couple lines""")))))
 
     check(GetInfoResponseSuccess(AuthorsInfoResponse("Regis Blanc"), Seq()),
           printGetInfo, parseGetInfo)
+    check(GetInfoResponseSuccess(AuthorsInfoResponse("Regis \"Rage\" Blanc"), Seq()),
+          printGetInfo, parseGetInfo)
 
     check(GetInfoResponseSuccess(
             ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior), Seq()),

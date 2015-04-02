@@ -389,9 +389,8 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(level.toString))
       actions.prepend(() => writer.write(":assertion-stack-levels "))
     case AuthorsInfoResponse(authors) =>
-      actions.prepend(() => writer.write('"'))
-      actions.prepend(() => writer.write(authors))
-      actions.prepend(() => writer.write(":authors \""))
+      actions.prepend(() => printString(authors, writer))
+      actions.prepend(() => writer.write(":authors "))
     case ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior) =>
       actions.prepend(() => writer.write(":error-behavior immediate-exit"))
     case ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior) =>

@@ -387,9 +387,8 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       writer.write(":assertion-stack-levels ")
       writer.write(level.toString)
     case AuthorsInfoResponse(authors) =>
-      writer.write(":authors \"")
-      writer.write(authors)
-      writer.write('"')
+      writer.write(":authors ")
+      printString(authors, writer)
     case ErrorBehaviorInfoResponse(ImmediateExitErrorBehavior) =>
       writer.write(":error-behavior immediate-exit")
     case ErrorBehaviorInfoResponse(ContinuedExecutionErrorBehavior) =>
