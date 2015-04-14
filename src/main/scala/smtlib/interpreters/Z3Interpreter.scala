@@ -10,12 +10,7 @@ import printer._
 //import scala.sys.process._
 import java.io._
 
-class Z3Interpreter(executable: String = "z3") extends ProcessInterpreter {
-
-  protected override val process =
-    new ProcessBuilder(executable,
-                        "-in",
-                        "-smt2").redirectErrorStream(true).start
+class Z3Interpreter(executable: String, args: Array[String]) extends ProcessInterpreter(executable, args) {
 
   RecursivePrinter.printCommand(SetOption(PrintSuccess(true)), in)
   in.write("\n")
@@ -24,13 +19,18 @@ class Z3Interpreter(executable: String = "z3") extends ProcessInterpreter {
 
 }
 
-class Z3InterpreterV3 extends ProcessInterpreter {
+object Z3Interpreter {
 
-  protected override val process = new ProcessBuilder("z3", "-in", "-m", "-smt2").redirectErrorStream(true).start
+  def buildDefault: Z3Interpreter = {
+    val executable = "z3"
+    val args = Array("-in", "-smt2")
+    new Z3Interpreter(executable, args)
+  }
 
-  RecursivePrinter.printCommand(SetOption(PrintSuccess(true)), in)
-  in.write("\n")
-  in.flush
-  parser.parseGenResponse
+  def buildForV3: Z3Interpreter = {
+    val executable = "z3"
+    val args = Array("-in", "-m", "-smt2")
+    new Z3Interpreter(executable, args)
+  }
 
 }

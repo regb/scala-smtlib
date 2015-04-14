@@ -104,8 +104,8 @@ class Tests extends FunSuite {
   }
 
   
-  def getZ3Interpreter: Interpreter = new Z3Interpreter("z3")
-  def getCVC4Interpreter: Interpreter = new CVC4Interpreter("cvc4")
+  def getZ3Interpreter: Interpreter = Z3Interpreter.buildDefault
+  def getCVC4Interpreter: Interpreter = CVC4Interpreter.buildDefault
 
   def isZ3Available: Boolean = try {
     val output: String = "z3 -help".!! 

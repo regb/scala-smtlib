@@ -9,9 +9,12 @@ import printer._
 
 import java.io._
 
-abstract class ProcessInterpreter extends Interpreter {
+abstract class ProcessInterpreter(protected val process: Process) extends Interpreter {
 
-  protected val process: Process
+  def this(executable: String, args: Array[String]) = {
+    this(new ProcessBuilder((executable :: args.toList):_*).redirectErrorStream(true).start())
+  }
+
 
   lazy val in = new BufferedWriter(new OutputStreamWriter(process.getOutputStream))
   lazy val out = new BufferedReader(new InputStreamReader(process.getInputStream))
