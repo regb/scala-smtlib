@@ -21,26 +21,29 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
 
   lazy val parser = new Parser(new Lexer(out))
 
+  def parseResponseOf(cmd: Command): CommandResponse = cmd match {
+    case CheckSat() => parser.parseCheckSatResponse
+    case GetAssertions() => parser.parseGetAssertionsResponse
+    case GetUnsatCore() => parser.parseGetUnsatCoreResponse
+    case GetProof() => parser.parseGetProofResponse
+    case GetValue(_, _) => parser.parseGetValueResponse
+    case GetAssignment() => parser.parseGetAssignmentResponse
+
+    case GetOption(_) => parser.parseGetOptionResponse
+    case GetInfo(_) => parser.parseGetInfoResponse
+
+    case GetModel() => parser.parseGetModelResponse
+
+    case _ => parser.parseGenResponse
+  }
+
   override def eval(cmd: Command): CommandResponse = {
     try {
       RecursivePrinter.printCommand(cmd, in)
       in.write("\n")
       in.flush
-      cmd match {
-        case CheckSat() => parser.parseCheckSatResponse
-        case GetAssertions() => parser.parseGetAssertionsResponse
-        case GetUnsatCore() => parser.parseGetUnsatCoreResponse
-        case GetProof() => parser.parseGetProofResponse
-        case GetValue(_, _) => parser.parseGetValueResponse
-        case GetAssignment() => parser.parseGetAssignmentResponse
 
-        case GetOption(_) => parser.parseGetOptionResponse
-        case GetInfo(_) => parser.parseGetInfoResponse
-
-        case GetModel() => parser.parseGetModelResponse
-
-        case _ => parser.parseGenResponse
-      }
+      parseResponseOf(cmd)
     } catch {
       case (ex: Exception) => {
         if(cmd == CheckSat()) CheckSatStatus(UnknownStatus)
