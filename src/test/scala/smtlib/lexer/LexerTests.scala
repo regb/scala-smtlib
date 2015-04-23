@@ -150,6 +150,8 @@ class LexerTests extends FunSuite with Timeouts {
 
   test("Symbols can contain digits") {
     assert(lexUniqueToken("d12") === SymbolLit("d12"))
+    assert(lexUniqueToken("ab42cd") === SymbolLit("ab42cd"))
+    assert(lexUniqueToken("a1b2c3") === SymbolLit("a1b2c3"))
   }
 
   test("symbols do not contain backslashes") {
