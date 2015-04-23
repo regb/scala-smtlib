@@ -59,6 +59,22 @@ recent build. [Here](https://github.com/regb/cafesat/blob/master/build.sbt) is
 an example of how to do it, you can pick any commit. If you are interested in
 this route, you should check the sbt official documentation.
 
+Optionnaly, you can test Scala SMT-LIB in your environment by running the test
+suite. The tests are organized in unit and functional tests. Tu run the unit
+tests (very fast) you can type:
+
+    sbt test
+
+All tests should pass. Please open an issue if any test is failing. The
+functional tests are testing end-to-end flows of Scala SMT-LIB. They do take a
+bit more time and require some setup in your environment. In particular, they
+will try to use the SMT solvers `z3` and/or `cvc4` if they are available in
+your PATH (the commands tried are exactly `z3` and `cvc4`). If present in the
+PATH, Scala SMT-LIB will test its interpreter module directly against these SMT
+solvers. You can run those tests with:
+
+    sbt fun:test
+
 Getting started with Examples
 -----------------------------
 
