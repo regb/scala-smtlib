@@ -130,32 +130,40 @@ class LexerTests extends FunSuite with Timeouts {
   }
 
 
-  test("symbol literals") {
-    val reader1 = new StringReader(""" d12 """)
-    val lexer1 = new Lexer(reader1)
-    assert(lexer1.nextToken === SymbolLit("d12"))
+  test("lower case alphabetical symbols are correctly lexed") {
+    assert(lexUniqueToken("abcd") === SymbolLit("abcd"))
+    assert(lexUniqueToken("aaa") === SymbolLit("aaa"))
+  }
 
-    val reader2 = new StringReader(""" abc\ def """)
-    val lexer2 = new Lexer(reader2)
-    assert(lexer2.nextToken === SymbolLit("abc def"))
+  test("symbols can contain upper case and are case sensitive") {
+    assert(lexUniqueToken("ABCD") === SymbolLit("ABCD"))
+    assert(lexUniqueToken("XYZ") === SymbolLit("XYZ"))
+    assert(lexUniqueToken(""" AbCdEf """) === SymbolLit("AbCdEf"))
+  }
 
-    val reader3 = new StringReader("""  ab\c\ d\ef" """)
-    val lexer3 = new Lexer(reader3)
-    assert(lexer3.nextToken === SymbolLit("abc def"))
+  test("Symbols can be single letter") {
+    assert(lexUniqueToken("h") === SymbolLit("h"))
+  }
 
-    val reader4 = new StringReader(""" |abc deF| """)
-    val lexer4 = new Lexer(reader4)
-    assert(lexer4.nextToken === SymbolLit("abc deF"))
+  test("Symbols can contain digits") {
+    assert(lexUniqueToken("d12") === SymbolLit("d12"))
+  }
 
-    val reader5 = new StringReader(""" 
-|abc
+  test("symbols do not contain backslashes") {
+    //"abc\def"
+    //"abc\ def"
+    //"x\ng"
+  }
+
+  test("quoted symbols can have spaces") {
+    assert(lexUniqueToken("|abc deF|") === SymbolLit("abc deF"))
+  }
+
+  test("quoted symbols can have new lines") {
+    assert(lexUniqueToken("""|abc
 deF| 
-""")
-    val lexer5 = new Lexer(reader5)
-    assert(lexer5.nextToken === SymbolLit(
-"""abc
+""") === SymbolLit("""abc
 deF"""))
-
     assert(lexUniqueToken(
 """|hey there,
 What's up?
@@ -166,7 +174,9 @@ What's up?
 
 See you!"""))
 
-    assert(lexUniqueToken(""" AbCdEf """) === SymbolLit("AbCdEf"))
+  }
+
+  test("symbols can contain special characters") {
     assert(lexUniqueToken(""" abc!def """) === SymbolLit("abc!def"))
     assert(lexUniqueToken(""" a@$%f """) === SymbolLit("a@$%f"))
     assert(lexUniqueToken(""" _+_ """) === SymbolLit("_+_"))
@@ -174,7 +184,13 @@ See you!"""))
     assert(lexUniqueToken(""" /// """) === SymbolLit("///"))
     assert(lexUniqueToken("""<abc>""") === SymbolLit("<abc>"))
     assert(lexUniqueToken(""".42""") === SymbolLit(".42"))
+  }
 
+  test("symbols cannot start with a digit") {
+    //TODO: actually test that
+  }
+
+  test("testing lexer for weird symbols") {
     assert(lexUniqueToken("""||""") === SymbolLit(""))
     assert(lexUniqueToken("""|af klj^*(0(&*)&(#^>>?"']]984|""") === SymbolLit("""af klj^*(0(&*)&(#^>>?"']]984"""))
   }
