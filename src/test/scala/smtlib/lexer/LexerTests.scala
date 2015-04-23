@@ -173,7 +173,6 @@ See you!|""") === SymbolLit(
 What's up?
 
 See you!"""))
-
   }
 
   test("symbols can contain special characters") {
@@ -184,6 +183,10 @@ See you!"""))
     assert(lexUniqueToken(""" /// """) === SymbolLit("///"))
     assert(lexUniqueToken("""<abc>""") === SymbolLit("<abc>"))
     assert(lexUniqueToken(""".42""") === SymbolLit(".42"))
+  }
+
+  test("Symbols can start with underscore") {
+    assert(lexUniqueToken("""_ufmt_1""") === SymbolLit("_ufmt_1"))
   }
 
   test("symbols cannot start with a digit") {

@@ -124,6 +124,11 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseId("(_ map f)") === Identifier("map", Seq(SSymbol(("f")))))
   }
 
+  ignore("parsing magical lambda terms form CVC4") {
+    val t = parseUniqueTerm("(LAMBDA ((_ufmt_1 Int)) (ite (= _ufmt_1 2) 3 5))")
+    println(t)
+  }
+
   test("comments are ignored after a term") {
     assert(parseUniqueTerm("42 ;I'm a comment") === SNumeral(42))
     assert(parseUniqueTerm("42;I'm another comment") === SNumeral(42))
