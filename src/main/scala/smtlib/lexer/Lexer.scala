@@ -150,6 +150,11 @@ class Lexer(reader: java.io.Reader) {
         val res = toReserved(sym)
         res.getOrElse(SymbolLit(sym))
       }
+      case c => {
+        throw new UnexpectedCharException(c,
+          Position(_currentLine, _currentCol), 
+          "not a valid start for a token")
+      }
     }
 
     res.setPos(currentPosition)
@@ -173,15 +178,7 @@ class Lexer(reader: java.io.Reader) {
       }
     } else {
       buffer.append(currentChar)
-      while(isSymbolChar(peek.toChar) || peek == '\\') {
-        if(peek == '\\') { //TODO: check what we should do here
-          /*
-	         * Escaped char was intended to be interpreted in its actual case.
-	         * Probably not making a lot of sense in the SMT-LIB standard, but we
-	         * are ignoring the backslash and recording the escaped char.
-	         */
-          nextChar
-	      }
+      while(isSymbolChar(peek.toChar)) {
         buffer.append(nextChar)
       }
     }

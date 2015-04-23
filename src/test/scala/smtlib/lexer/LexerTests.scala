@@ -3,6 +3,7 @@ package lexer
 
 import Tokens._
 import common._
+import Lexer.UnexpectedCharException
 
 import java.io.StringReader
 
@@ -10,7 +11,9 @@ import org.scalatest.FunSuite
 import org.scalatest.concurrent.Timeouts
 import org.scalatest.time.SpanSugar._
 
+
 class LexerTests extends FunSuite with Timeouts {
+
 
   override def suiteName = "Lexer Test Suite"
 
@@ -150,9 +153,27 @@ class LexerTests extends FunSuite with Timeouts {
   }
 
   test("symbols do not contain backslashes") {
-    //"abc\def"
-    //"abc\ def"
-    //"x\ng"
+    intercept[UnexpectedCharException] {
+      lexUniqueToken("""abc\def""")
+      val reader = new StringReader("""abc\def""")
+      val lexer = new Lexer(reader)
+      assert(lexer.nextToken === SymbolLit("abc"))
+      lexer.nextToken
+    }
+    intercept[UnexpectedCharException] {
+      lexUniqueToken("""abc\def""")
+      val reader = new StringReader("""abc\ def""")
+      val lexer = new Lexer(reader)
+      assert(lexer.nextToken === SymbolLit("abc"))
+      lexer.nextToken
+    }
+    intercept[UnexpectedCharException] {
+      lexUniqueToken("""abc\def""")
+      val reader = new StringReader("""x\ng""")
+      val lexer = new Lexer(reader)
+      assert(lexer.nextToken === SymbolLit("x"))
+      lexer.nextToken
+    }
   }
 
   test("quoted symbols can have spaces") {
