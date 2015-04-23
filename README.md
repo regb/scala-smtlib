@@ -216,14 +216,4 @@ Hopefully, it can be useful to other people as well.
 Changelog
 ---------
 
-###Current
-
-
-###v0.1
-*Released April 2, 2015*
-
-Initial release of Scala SMT-LIB.
-
-* Extensive support for the SMT-LIB language version 2.5 (Close to 100%).
-  Providing both parsing and printing.
-* Basic interpreter API to communicate with Z3 and CVC4 native executables.
+See [Changelog](/CHANGELOG.md).
