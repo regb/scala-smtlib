@@ -36,11 +36,12 @@ You may want to use Scala SMT-LIB if:
   Scala SMT-LIB abstract syntax tree, and use the printer components to get
   a valid SMT-LIB representation to pass along to another tool.
 * You need to query an external black-box SMT solver, but the task of setting
-  up a proper communication with this strange beast seems a bit too daunting? 
-  Scala SMT-LIB offers a module that abstracts SMTLIB-compliant solvers. You can 
-  program your tool against this simple high-level API. Scala SMT-LIB provides 
-  integration with Z3 and CVC4 out of the box, and you can add support for 
-  any other solver by implementing a relatively thin interface.
+  up a proper communication with this strange beast seems a bit too daunting?
+  Scala SMT-LIB offers a module that abstracts SMTLIB-compliant solvers. You
+  can program your tool against this simple high-level API. Scala SMT-LIB
+  provides integration with [Z3](https://github.com/Z3Prover/z3) and
+  [CVC4](http://cvc4.cs.nyu.edu/web/) out of the box, and you can add support
+  for any other solver by implementing a relatively thin interface.
    
 
 Setup
