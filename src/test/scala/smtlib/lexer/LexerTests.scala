@@ -156,25 +156,27 @@ class LexerTests extends FunSuite with Timeouts {
 
   test("symbols do not contain backslashes") {
     intercept[UnexpectedCharException] {
-      lexUniqueToken("""abc\def""")
       val reader = new StringReader("""abc\def""")
       val lexer = new Lexer(reader)
       assert(lexer.nextToken === SymbolLit("abc"))
       lexer.nextToken
     }
     intercept[UnexpectedCharException] {
-      lexUniqueToken("""abc\def""")
       val reader = new StringReader("""abc\ def""")
       val lexer = new Lexer(reader)
       assert(lexer.nextToken === SymbolLit("abc"))
       lexer.nextToken
     }
     intercept[UnexpectedCharException] {
-      lexUniqueToken("""abc\def""")
       val reader = new StringReader("""x\ng""")
       val lexer = new Lexer(reader)
       assert(lexer.nextToken === SymbolLit("x"))
       lexer.nextToken
+    }
+  }
+  test("quoted symbols do not contain backslashes") {
+    intercept[UnexpectedCharException] {
+      lexUniqueToken("""|abc\def|""")
     }
   }
 

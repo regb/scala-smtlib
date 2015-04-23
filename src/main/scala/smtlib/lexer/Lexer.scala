@@ -172,7 +172,9 @@ class Lexer(reader: java.io.Reader) {
       var c = nextChar
       while(c != '|') {
         if(c == '\\')
-          c = nextChar
+          throw new UnexpectedCharException(c, 
+                                            Position(_currentLine, _currentCol),
+                                            "Quoted symbols cannot contain backslashes")
         buffer.append(c)
         c = nextChar
       }
