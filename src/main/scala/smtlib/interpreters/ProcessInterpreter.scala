@@ -12,7 +12,7 @@ import java.io._
 abstract class ProcessInterpreter(protected val process: Process) extends Interpreter {
 
   def this(executable: String, args: Array[String]) = {
-    this(new ProcessBuilder((executable :: args.toList):_*).redirectErrorStream(true).start())
+    this(java.lang.Runtime.getRuntime.exec((executable :: args.toList).mkString(" ")))
   }
 
 
