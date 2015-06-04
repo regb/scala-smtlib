@@ -83,7 +83,7 @@ object Core {
     def apply(ts: Term*): Term = 
       if(ts.isEmpty) True()
       else if(ts.size == 1) ts.head
-      else ts.foldLeft(ts.head)((acc, t) => And(acc, t))
+      else ts.tail.foldLeft(ts.head)((acc, t) => And(acc, t))
       
     
     
@@ -106,7 +106,7 @@ object Core {
     def apply(ts: Term*): Term = 
       if(ts.isEmpty) False()
       else if(ts.size == 1) ts.head
-      else ts.foldLeft(ts.head)((acc, t) => Or(acc, t))
+      else ts.tail.foldLeft(ts.head)((acc, t) => Or(acc, t))
     
     def unapply(term: Term): Option[(Term, Term)] = term match {
       case FunctionApplication(
