@@ -119,14 +119,14 @@ object Reals {
 
     def apply(t1: Term, t2: Term): Term =
       FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("div"))),
+        QualifiedIdentifier(Identifier(SSymbol("/"))),
         Seq(t1, t2)
       )
     
     def unapply(term: Term): Option[(Term, Term)] = term match {
       case FunctionApplication(
         QualifiedIdentifier(
-          Identifier(SSymbol("div"), Seq()),
+          Identifier(SSymbol("/"), Seq()),
           None
         ), Seq(t1, t2)) => Some((t1, t2))
       case _ => None
