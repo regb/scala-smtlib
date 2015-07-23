@@ -76,7 +76,7 @@ solvers. You can run those tests with:
 
     sbt fun:test
 
-Getting started with Examples
+Getting Started with Examples
 -----------------------------
 
 To construct a parser, you will need a java.io.Reader and a lexer:
@@ -198,7 +198,7 @@ The [`printer`](/src/main/scala/smtlib/printer) helps with printing out SMT-LIB
 complient commands. This means that the output of a printer can be send
 directly to an SMT solver.
 
-###Standard theories
+###Standard Theories
 
 Finally the [`theories`](/src/main/scala/smtlib/theories) module provides tree
 builders to create theory-specific formulas. Each theory module provides
