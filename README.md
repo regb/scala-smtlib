@@ -214,6 +214,19 @@ and has been made standalone in order for the
 [Leon](https://github.com/epfl-lara/leon) project to rely on it.
 Hopefully, it can be useful to other people as well.
 
+###Testing
+
+In order to attain a decent level of quality, there is a relatively strict policy for testing.
+Testing is separated in two levels of testing: unit tests and integration tests. Unit test
+are dependency free and run entirely in memory. While integration tests will rely on things
+like file system and external solvers. Unit test are very fast and should be easy to run as part
+of a regular build cycle (you can run them after each compile), while integration tests are a bit
+slower and are meant to pass on each commit.
+
+In SBT, the command `sbt test` will run the unit test suite, while the command
+`sbt it:test` will run the integration test suite. During developement, it
+should be fine to run in mode `~testQuick`.
+
 Changelog
 ---------
 
