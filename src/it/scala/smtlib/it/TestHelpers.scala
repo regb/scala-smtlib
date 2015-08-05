@@ -60,7 +60,7 @@ trait TestHelpers {
   }
 
   def executeCVC4(file: File): Stream[String] = {
-    val output: Stream[String] = Seq("cvc4", "--lang", "smt", file.getPath).lineStream
+    val output: Stream[String] = Seq("cvc4", "--lang", "smt", "--incremental", "--produce-models", file.getPath).lineStream
     output
   }
 
