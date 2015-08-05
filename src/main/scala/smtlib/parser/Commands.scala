@@ -120,6 +120,7 @@ object Commands {
 
   trait Logic 
 
+  /** A standard logic language */
   trait StandardLogic extends Logic
 
   case object AUFLIA extends StandardLogic
@@ -145,6 +146,11 @@ object Commands {
   case object QF_UFNRA extends StandardLogic
   case object UFLRA extends StandardLogic
   case object UFNIA extends StandardLogic
+
+  /** Most general logic supported by the solver */
+  case object ALL extends Logic
+
+  /** A non-standard logic symbol supported by the solver */
   case class NonStandardLogic(sym: SSymbol) extends Logic
 
   object Logic {
