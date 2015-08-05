@@ -259,9 +259,6 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
         nextToken
         DiagnosticOutputChannel(parseString.value)
 
-      case Tokens.Keyword("expand-definitions") => 
-        nextToken
-        ExpandDefinitions(parseBool)
       case Tokens.Keyword("global-declarations") => 
         nextToken
         GlobalDeclarations(parseBool)

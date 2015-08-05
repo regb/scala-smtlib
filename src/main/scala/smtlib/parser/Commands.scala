@@ -83,9 +83,7 @@ object Commands {
    */
   sealed abstract class SMTOption
   case class DiagnosticOutputChannel(value: String) extends SMTOption
-  case class ExpandDefinitions(value: Boolean) extends SMTOption
   case class GlobalDeclarations(value: Boolean) extends SMTOption
-  case class InteractiveMode(value: Boolean) extends SMTOption
   case class PrintSuccess(value: Boolean) extends SMTOption
   case class ProduceAssertions(value: Boolean) extends SMTOption
   case class ProduceAssignments(value: Boolean) extends SMTOption
@@ -98,6 +96,26 @@ object Commands {
   case class ReproducibleResourceLimit(value: Int) extends SMTOption
   case class Verbosity(value: Int) extends SMTOption
   case class AttributeOption(attribute: Attribute) extends SMTOption
+
+  @deprecated("The solver option :iteractive-mode has been renamed :produce-assertions. Use ProduceAssertions instead", "SMT-LIB 2.5")
+  class InteractiveMode(val value: Boolean) extends SMTOption {
+
+    override def equals(o: Any): Boolean = o != null && (o match {
+      case (that: InteractiveMode) => this.value == that.value
+      case _ => false
+    })
+
+    override def hashCode = value.hashCode
+  }
+
+  @deprecated("The solver option :iteractive-mode has been renamed :produce-assertions. Use ProduceAssertions instead", "SMT-LIB 2.5")
+  object InteractiveMode {
+    def apply(value: Boolean) = new InteractiveMode(value)
+    def unapply(opt: SMTOption): Option[Boolean] = opt match {
+      case (im: InteractiveMode) => Some(im.value)
+      case _ => None
+    }
+  }
 
 
   trait Logic 

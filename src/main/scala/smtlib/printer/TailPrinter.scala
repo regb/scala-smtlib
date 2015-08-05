@@ -448,9 +448,6 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       writer.write(value)
       writer.write('"')
 
-    case ExpandDefinitions(value) => 
-      writer.write(":expand-definitions ")
-      writer.write(value.toString)
     case GlobalDeclarations(value) => 
       writer.write(":global-declarations ")
       writer.write(value.toString)

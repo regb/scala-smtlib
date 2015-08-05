@@ -265,8 +265,6 @@ What are you up to man?"""))
   def testSetOptionCommand(implicit printer: Printer): Unit = {
     checkCommand(SetOption(DiagnosticOutputChannel("toto")))
 
-    checkCommand(SetOption(ExpandDefinitions(true)))
-    checkCommand(SetOption(ExpandDefinitions(false)))
     checkCommand(SetOption(GlobalDeclarations(true)))
     checkCommand(SetOption(GlobalDeclarations(false)))
 

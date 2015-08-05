@@ -253,8 +253,6 @@ class CommandsParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("""(set-option :diagnostic-output-channel "toto")""") === 
 
                           SetOption(DiagnosticOutputChannel("toto")))
-    assert(parseUniqueCmd("(set-option :expand-definitions true)") === SetOption(ExpandDefinitions(true)))
-    assert(parseUniqueCmd("(set-option :expand-definitions false)") === SetOption(ExpandDefinitions(false)))
     assert(parseUniqueCmd("(set-option :global-declarations true)") === SetOption(GlobalDeclarations(true)))
     assert(parseUniqueCmd("(set-option :global-declarations false)") === SetOption(GlobalDeclarations(false)))
 
