@@ -96,6 +96,21 @@ class LexerTests extends FunSuite with Timeouts {
     }
   }
 
+  test("decimal cannot have leading 0") {
+    intercept[IllegalTokenException] {
+      lexUniqueToken("012.12")
+    }
+    intercept[IllegalTokenException] {
+      lexUniqueToken("0041.11")
+    }
+  }
+
+  test("decimal can have leading 0 after the decimal point") {
+    assert(lexUniqueToken("12.012") === DecimalLit(12.012))
+    assert(lexUniqueToken("12.0012") === DecimalLit(12.0012))
+
+  }
+
   test("hexadecimal can be a mix of lower and upper case") {
     assert(lexUniqueToken("#x0aBcD") === HexadecimalLit(Hexadecimal.fromString("0abcd").get))
     assert(lexUniqueToken("#x0ABCD") === HexadecimalLit(Hexadecimal.fromString("0abcd").get))
