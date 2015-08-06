@@ -4,6 +4,7 @@ package lexer
 import Tokens._
 import common._
 import Lexer.UnexpectedCharException
+import Lexer.IllegalTokenException
 
 import java.io.StringReader
 
@@ -84,6 +85,15 @@ class LexerTests extends FunSuite with Timeouts {
     val reader6 = new StringReader("#b1010")
     val lexer6 = new Lexer(reader6)
     assert(lexer6.nextToken === BinaryLit(Seq(true, false, true, false)))
+  }
+
+  test("numeral cannot have leading 0") {
+    intercept[IllegalTokenException] {
+      lexUniqueToken("012")
+    }
+    intercept[IllegalTokenException] {
+      lexUniqueToken("0041")
+    }
   }
 
   test("hexadecimal can be a mix of lower and upper case") {

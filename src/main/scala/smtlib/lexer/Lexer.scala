@@ -189,11 +189,21 @@ class Lexer(reader: java.io.Reader) {
 
   private def readInt(currentChar: Char, r: Int): BigInt = {
     require(r > 1 && r <= 36)
+
+    val pos = Position(_currentLine, _currentCol)
+
+    var literal: String = currentChar.toString
     var acc: BigInt = currentChar.asDigit //asDigit works for 'A', 'F', ...
     while(isDigit(peek.toChar, r)) {
       acc *= r
-      acc += nextChar.asDigit
+      val c = nextChar
+      acc += c.asDigit
+      literal += c.toString
     }
+
+    if(literal.head == '0' && literal.size > 1)
+      throw new IllegalTokenException(literal, pos, "Numeral should not have leading 0")
+
     acc
   }
 
@@ -275,6 +285,9 @@ object Lexer {
     Exception("Encountered unexpected character: '" + char + "' at " + position + ": " + msg)
 
   class UnexpectedEOFException(val position: Position) extends Exception
+
+  class IllegalTokenException(val token: String, val position: Position, msg: String) extends Exception(s"Illegal token [$token] at $position: $msg")
+
 
   private val extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&', '_',
                                      '!', '?', '[', ']', '{', '}', '=', '<', '>', '~', '.')
