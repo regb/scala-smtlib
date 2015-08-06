@@ -86,6 +86,12 @@ class LexerTests extends FunSuite with Timeouts {
     assert(lexer6.nextToken === BinaryLit(Seq(true, false, true, false)))
   }
 
+  test("hexadecimal can be a mix of lower and upper case") {
+    assert(lexUniqueToken("#x0aBcD") === HexadecimalLit(Hexadecimal.fromString("0abcd").get))
+    assert(lexUniqueToken("#x0ABCD") === HexadecimalLit(Hexadecimal.fromString("0abcd").get))
+    assert(lexUniqueToken("#x0abcd") === HexadecimalLit(Hexadecimal.fromString("0ABCD").get))
+  }
+
   test("string literals") {
     val reader1 = new StringReader(""" "12" """)
     val lexer1 = new Lexer(reader1)
