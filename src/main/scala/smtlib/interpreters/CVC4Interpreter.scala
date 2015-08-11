@@ -37,7 +37,7 @@ object CVC4Interpreter {
                      "--tear-down-incremental",
                      "--dt-rewrite-error-sel",
                      "--print-success",
-                     "--lang", "smt")
+                     "--lang", "smt2.5")
     new CVC4Interpreter(executable, args)
   }
 
