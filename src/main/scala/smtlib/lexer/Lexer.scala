@@ -239,7 +239,7 @@ class Lexer(reader: java.io.Reader) {
       case "!" => Token(ExclamationMark)
       case "as" => Token(As)
       case "let" => Token(Let)
-      case "forall" => Token(ForAll)
+      case "forall" => Token(Forall)
       case "exists" => Token(Exists)
       case "par" => Token(Par)
 

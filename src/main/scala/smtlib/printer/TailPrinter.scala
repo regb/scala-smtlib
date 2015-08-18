@@ -319,7 +319,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => printVarBinding(vb, writer, actions))
       actions.prepend(() => writer.write("(let ("))
       
-    case ForAll(sortedVar, sortedVars, t) =>
+    case Forall(sortedVar, sortedVars, t) =>
       actions.prepend(() => writer.write(")"))
       actions.prepend(() => printTerm(t, writer, actions))
       actions.prepend(() => printNary(writer, sortedVars, (v: SortedVar, w: Writer) => printSortedVar(v, w, actions), "", " ", ") ", actions))

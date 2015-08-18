@@ -108,7 +108,6 @@ class LexerTests extends FunSuite with Timeouts {
   test("decimal can have leading 0 after the decimal point") {
     assert(lexUniqueToken("12.012") === DecimalLit(12.012))
     assert(lexUniqueToken("12.0012") === DecimalLit(12.0012))
-
   }
 
   test("hexadecimal can be a mix of lower and upper case") {
@@ -404,7 +403,7 @@ See you!"""))
     assert(lexUniqueToken("!").kind === ExclamationMark)
     assert(lexUniqueToken("as").kind === As)
     assert(lexUniqueToken("let").kind === Let)
-    assert(lexUniqueToken("forall").kind === ForAll)
+    assert(lexUniqueToken("forall").kind === Forall)
     assert(lexUniqueToken("exists").kind === Exists)
     assert(lexUniqueToken("par").kind === Par)
 

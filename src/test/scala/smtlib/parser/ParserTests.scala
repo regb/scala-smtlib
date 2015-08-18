@@ -217,10 +217,10 @@ class ParserTests extends FunSuite with Timeouts {
 
   test("Parsing quantified terms") {
     assert(parseUniqueTerm("(forall ((a A)) a)") ===
-           ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
+           Forall(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a"))
           )
     assert(parseUniqueTerm("(forall ((a A) (b B) (c C)) (f a c))") ===
-           ForAll(SortedVar("a", Sort("A")), 
+           Forall(SortedVar("a", Sort("A")), 
                   Seq(SortedVar("b", Sort("B")), SortedVar("c", Sort("C"))),
                   FunctionApplication(QualifiedIdentifier("f"),
                     Seq(QualifiedIdentifier("a"), QualifiedIdentifier("c")))))

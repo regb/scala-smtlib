@@ -129,7 +129,7 @@ class PrinterTests extends FunSuite {
             QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
     checkTerm(Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))
 
-    checkTerm(ForAll(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
+    checkTerm(Forall(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
     checkTerm(Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
     checkTerm(AnnotatedTerm(QualifiedIdentifier("a"), Attribute(SKeyword("note"), Some(SSymbol("abcd"))), Seq()))
 
@@ -458,7 +458,7 @@ It spans a couple lines""")))))
       GetModelResponseSuccess(List(
         DefineFun(FunDef("z", Seq(), Sort("Int"), SNumeral(0))),
         DeclareFun("a", Seq(), Sort("A")),
-        ForAll(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
+        Forall(SortedVar("x", Sort("A")), Seq(), QualifiedIdentifier("x"))
       )),
       printGetModel,
       parseGetModel

@@ -211,12 +211,12 @@ trait ParserTerms { this: ParserUtils =>
           val term = parseTerm
           eat(Tokens.CParen)
           Let(head, bindings, term)
-        case Tokens.ForAll =>
-          eat(Tokens.ForAll)
+        case Tokens.Forall =>
+          eat(Tokens.Forall)
           val (head, vars) = parseOneOrMore(parseSortedVar _)
           val term = parseTerm
           eat(Tokens.CParen)
-          ForAll(head, vars, term)
+          Forall(head, vars, term)
         case Tokens.Exists =>
           eat(Tokens.Exists)
           val (head, vars) = parseOneOrMore(parseSortedVar _)

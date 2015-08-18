@@ -76,7 +76,7 @@ object CommandsResponses {
 
   /*
    * Z3 get-model. the model is a list of SExpr, but most S-Expr are actually well structured
-   * like define-fun commands. We use SExpr as there are some ForAll Term as well (which are
+   * like define-fun commands. We use SExpr as there are some Forall Term as well (which are
    * not the same type as Command)
    * TODO: SMTLIB 2.5 has a new standard for get-model
    */

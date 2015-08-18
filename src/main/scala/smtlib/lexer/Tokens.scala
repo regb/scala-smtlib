@@ -59,7 +59,7 @@ object Tokens {
   case object ExclamationMark extends ReservedWord /* ! */
   case object As extends ReservedWord /* as */
   case object Let extends ReservedWord /* let */
-  case object ForAll extends ReservedWord /* forall */
+  case object Forall extends ReservedWord /* forall */
   case object Exists extends ReservedWord /* exists */
   case object Par extends ReservedWord
 

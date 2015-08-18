@@ -202,7 +202,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       printNary(writer, vbs, printVarBinding, "", " ", ") ")
       printTerm(t, writer)
       writer.write(")")
-    case ForAll(sortedVar, sortedVars, t) =>
+    case Forall(sortedVar, sortedVars, t) =>
       writer.write("(forall (")
       printSortedVar(sortedVar, writer)
       printNary(writer, sortedVars, printSortedVar, "", " ", ") ")

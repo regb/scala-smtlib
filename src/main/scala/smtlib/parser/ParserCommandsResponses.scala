@@ -138,11 +138,11 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
               } catch {
                 case ex: UnknownCommandException => {
                   ex.commandName match { //recover for exceptions case in get-model
-                    case Tokens.ForAll =>
+                    case Tokens.Forall =>
                       val vars = parseMany(parseSortedVar _)
                       val term = parseTerm
                       eat(Tokens.CParen)
-                      exprs.append(ForAll(vars.head, vars.tail, term))
+                      exprs.append(Forall(vars.head, vars.tail, term))
                     case _ =>
                       throw ex
                   }

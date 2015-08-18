@@ -79,7 +79,7 @@ object Terms {
   }
 
   case class Let(binding: VarBinding, bindings: Seq[VarBinding], term: Term) extends Term
-  case class ForAll(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
+  case class Forall(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
   case class Exists(sortedVar: SortedVar, sortedVars: Seq[SortedVar], term: Term) extends Term
 
   case class QualifiedIdentifier(id: Identifier, sort: Option[Sort]) extends Term
