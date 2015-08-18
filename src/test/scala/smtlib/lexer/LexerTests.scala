@@ -184,7 +184,7 @@ class LexerTests extends FunSuite with Timeouts {
     assert(lexUniqueToken("a1b2c3") === SymbolLit("a1b2c3"))
   }
 
-  test("symbols do not contain backslashes") {
+  test("symbols cannot contain backslashes") {
     intercept[UnexpectedCharException] {
       val reader = new StringReader("""abc\def""")
       val lexer = new Lexer(reader)
@@ -256,9 +256,13 @@ See you!"""))
     assert(lexer.nextToken === NumeralLit(12))
   }
 
-  test("testing lexer for weird symbols") {
+  test("symbols can have a really weird name") {
     assert(lexUniqueToken("""||""") === SymbolLit(""))
     assert(lexUniqueToken("""|af klj^*(0(&*)&(#^>>?"']]984|""") === SymbolLit("""af klj^*(0(&*)&(#^>>?"']]984"""))
+  }
+
+  test("quoted simple symbols can be equals to simple symbols") {
+    assert(lexUniqueToken("|abc|") === lexUniqueToken("abc"))
   }
 
   test("keywords") {
