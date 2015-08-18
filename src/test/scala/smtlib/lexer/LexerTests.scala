@@ -238,6 +238,12 @@ See you!"""))
     assert(lexUniqueToken(""" /// """) === SymbolLit("///"))
     assert(lexUniqueToken("""<abc>""") === SymbolLit("<abc>"))
     assert(lexUniqueToken(""".42""") === SymbolLit(".42"))
+    assert(lexUniqueToken("""*$s&6""") === SymbolLit("*$s&6"))
+  }
+
+  test("Digits with leading +/- are actually symbols") {
+    assert(lexUniqueToken("""+34""") === SymbolLit("+34"))
+    assert(lexUniqueToken("""-7""") === SymbolLit("-7"))
   }
 
   test("Symbols can start with underscore") {
@@ -245,7 +251,9 @@ See you!"""))
   }
 
   test("symbols cannot start with a digit") {
-    //TODO: actually test that
+    val reader = new StringReader("""12x_ng""")
+    val lexer = new Lexer(reader)
+    assert(lexer.nextToken === NumeralLit(12))
   }
 
   test("testing lexer for weird symbols") {
