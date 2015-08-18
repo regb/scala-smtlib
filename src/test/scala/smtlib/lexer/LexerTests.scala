@@ -204,7 +204,7 @@ class LexerTests extends FunSuite with Timeouts {
       lexer.nextToken
     }
   }
-  test("quoted symbols do not contain backslashes") {
+  test("quoted symbols cannot contain backslashes") {
     intercept[UnexpectedCharException] {
       lexUniqueToken("""|abc\def|""")
     }
