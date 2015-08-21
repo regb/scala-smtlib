@@ -40,6 +40,9 @@ object Terms {
     def apply(id: Identifier): Sort = Sort(id, Seq())
   }
 
+  /* TODO
+     Should we have an abstract class attribute and a bunch of predefined 
+     attributes along with a default non-standard attribute? */
   case class Attribute(keyword: SKeyword, value: Option[AttributeValue])
   object Attribute {
     def apply(key: SKeyword): Attribute = Attribute(key, None)
