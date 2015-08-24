@@ -156,9 +156,24 @@ class SemanticsDriver(
 
     var assertions: Set[Term] = Set()
 
+    private var sortSymbols: Map[SSymbol, Int] = Map()
+    private var sortAliases: Map[SSymbol, (Seq[SSymbol], Sort)] = Map()
+
+    def isSortDefined(name: SSymbol): Boolean = 
+      sortSymbols.contains(name) || sortAliases.contains(name)
+
+    def newSortSymbol(name: SSymbol, arity: Int): Unit = {
+      require(!sortSymbols.contains(name))
+      sortSymbols += (name -> arity)
+    }
+    def newSortAlias(name: SSymbol, params: Seq[SSymbol], body: Sort): Unit = {
+      require(!sortAliases.contains(name))
+      sortAliases += (name -> ((params, body)))
+    }
+
+
     var declareFuns: Set[DeclareFun] = Set()
     var declareConsts: Set[DeclareConst] = Set()
-    var declareSorts: Set[DeclareSort] = Set()
   }
 
   private var assertionStack: List[AssertionLevel] = List(new AssertionLevel)
@@ -173,6 +188,7 @@ class SemanticsDriver(
       regularOutputChannel(Error("You cannot pop more elements than was pushed"))
     else {
       assertionStack = assertionStack.drop(n)
+      executionMode = AssertMode
       rawSolver.eval(Pop(n))
       doPrintSuccess()
     }
@@ -184,6 +200,7 @@ class SemanticsDriver(
     else {
       for(i <- 1 to n)
         assertionStack ::= new AssertionLevel
+      executionMode = AssertMode
       rawSolver.eval(Push(n))
       doPrintSuccess()
     }
@@ -198,6 +215,31 @@ class SemanticsDriver(
     } else {
 
       command match {
+
+        case DeclareSort(name, arity) => {
+          //TODO: global definitions
+          if(currentAssertionLevel.isSortDefined(name)) {
+            regularOutputChannel(Error("Sort " + name + " already defined"))
+          } else {
+            currentAssertionLevel.newSortSymbol(name, arity)
+            executionMode = AssertMode
+            rawSolver.eval(command)
+            doPrintSuccess()
+          }
+        }
+
+        case DefineSort(name, params, body) => {
+          //TODO: global definitions
+          //TODO: check well defined sort
+          if(currentAssertionLevel.isSortDefined(name)) {
+            regularOutputChannel(Error("Sort " + name + " already defined"))
+          } else {
+            currentAssertionLevel.newSortAlias(name, params, body)
+            executionMode = AssertMode
+            rawSolver.eval(command)
+            doPrintSuccess()
+          }
+        }
 
         case GetInfo(infoFlag) => {
           processGetInfo(infoFlag)
