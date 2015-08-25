@@ -79,4 +79,14 @@ object TermsOps {
   }
 
 
+  def fold[T](f: (Sort, Seq[T]) => T)(sort: Sort): T = {
+    val rec = fold(f) _
+    val Sort(_, ss) = sort
+    f(sort, ss.map(rec))
+  }
+
+
+  def exists(matcher: (Sort) => Boolean)(sort: Sort): Boolean =
+    fold[Boolean]({ (s, subs) => matcher(s) || subs.contains(true) } )(sort)
+
 }
