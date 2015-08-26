@@ -22,6 +22,8 @@ import printer.RecursivePrinter
   * the :diagnostic-output-channel or :regular-output-channel options, that
   * will redirect this behaviour and send the outputs to files.
   * Basically: stdout and stderr are the iterator attached to this driver.
+  *
+  * TODO: this is work in progress, not usable yet.
   */
 class SemanticsDriver(
   rawSolver: Interpreter,
@@ -206,6 +208,12 @@ class SemanticsDriver(
     }
   }
 
+  /* check that the sort is well defined: correct arity, symbol in context.
+   * TODO: how to check for built-in sorts?
+   */
+  def checkSort(sort: Sort, params: Seq[SSymbol]): Unit = {
+
+  }
 
 
   def eval(command: Command): Unit = {
@@ -218,7 +226,7 @@ class SemanticsDriver(
 
         case DeclareSort(name, arity) => {
           //TODO: global definitions
-          if(currentAssertionLevel.isSortDefined(name)) {
+          if(assertionStack.exists(al => al.isSortDefined(name))) {
             regularOutputChannel(Error("Sort " + name + " already defined"))
           } else {
             currentAssertionLevel.newSortSymbol(name, arity)
@@ -231,7 +239,7 @@ class SemanticsDriver(
         case DefineSort(name, params, body) => {
           //TODO: global definitions
           //TODO: check well defined sort
-          if(currentAssertionLevel.isSortDefined(name)) {
+          if(assertionStack.exists(al => al.isSortDefined(name))) {
             regularOutputChannel(Error("Sort " + name + " already defined"))
           } else {
             currentAssertionLevel.newSortAlias(name, params, body)
