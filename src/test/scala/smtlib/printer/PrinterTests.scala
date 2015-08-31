@@ -153,6 +153,8 @@ class PrinterTests extends FunSuite {
     checkTerm(QualifiedIdentifier(
 """hey there,
 What are you up to man?"""))
+    checkTerm(QualifiedIdentifier("colon:illegal"))
+    checkTerm(QualifiedIdentifier("semi;colon"))
   }
 
   def testComposedTerm(implicit printer: Printer): Unit = {
