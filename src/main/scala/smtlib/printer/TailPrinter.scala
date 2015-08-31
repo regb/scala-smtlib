@@ -91,7 +91,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     case DefineSort(name, params, sort) => {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => printSort(sort, writer, actions))
-      actions.prepend(() => writer.write(params.map(_.name).mkString(" (", " ", ") ")))
+      actions.prepend(() => printNary(writer, params, printSymbol," (", " ", ") ", actions))
       actions.prepend(() => printSymbol(name, writer))
       actions.prepend(() => writer.write("(define-sort "))
     }

@@ -82,7 +82,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case DefineSort(name, params, sort) => {
       writer.write("(define-sort ")
       printSymbol(name, writer)
-      writer.write(params.map(_.name).mkString(" (", " ", ") "))
+      printNary(writer, params, printSymbol, " (", " ", ") ")
       printSort(sort, writer)
       writer.write(")\n")
     }
