@@ -40,6 +40,7 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing composed Terms") { testComposedTerm }
     test(printerName + ": Printing Sorts") { testSorts }
     test(printerName + ": Printing single Commands") { testSingleCommands }
+    test(printerName + ": Printing declarations with weird names") { testDeclarationWeirdNames }
     test(printerName + ": Printing declare-datatypes commands") { testDeclareDatatypes }
     test(printerName + ": Printing set-option commands") { testSetOptionCommand }
     test(printerName + ": Printing set-info commands") { testSetInfoCommand }
@@ -252,6 +253,42 @@ What are you up to man?"""))
     checkCommand(SetLogic(QF_LRA))
     checkCommand(SetLogic(QF_AX))
   }
+
+  def testDeclarationWeirdNames(implicit printer: Printer): Unit = {
+    checkCommand(DeclareConst("<c>", Sort("C")))
+    //checkCommand(DeclareConst(SSymbol("abc def"), Sort("C")))
+    //checkCommand(DeclareConst("c", Sort(SSymbol("C D"))))
+
+    checkCommand(DeclareFun("<xyz>", Seq(Sort("A"), Sort("B")), Sort("C")))
+    //checkCommand(DeclareFun("abc def", Seq(Sort("A"), Sort("B")), Sort("C")))
+    checkCommand(DeclareFun("abc", Seq(Sort("A D"), Sort("B")), Sort("C")))
+
+    checkCommand(DeclareSort("<A>", 0))
+    //checkCommand(DeclareSort("A B", 0))
+    //checkCommand(DeclareSort("A B C", 0))
+
+    checkCommand(DefineFun(FunDef("<f>", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    //checkCommand(DefineFun(FunDef("f g h", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    checkCommand(DefineFun(FunDef("f", Seq(SortedVar("<a>", Sort("A"))), Sort("B"), QualifiedIdentifier("<a>"))))
+    //checkCommand(DefineFun(FunDef("f", Seq(SortedVar("a a a", Sort("A"))), Sort("B"), QualifiedIdentifier("a a a"))))
+    checkCommand(DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A A"))), Sort("B"), QualifiedIdentifier("a"))))
+
+    checkCommand(DefineFunRec(FunDef("<f>", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    //checkCommand(DefineFunRec(FunDef("f g h", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
+    checkCommand(DefineFunRec(FunDef("f", Seq(SortedVar("<a>", Sort("A"))), Sort("B"), QualifiedIdentifier("<a>"))))
+    //checkCommand(DefineFunRec(FunDef("f", Seq(SortedVar("a a a", Sort("A"))), Sort("B"), QualifiedIdentifier("a a a"))))
+    checkCommand(DefineFunRec(FunDef("f", Seq(SortedVar("a", Sort("A A"))), Sort("B"), QualifiedIdentifier("a"))))
+
+    //checkCommand(DefineFunsRec(
+    //  Seq(FunDec("f 1", Seq(SortedVar("a a", Sort("A A"))), Sort("B B")),
+    //      FunDec("g 1", Seq(SortedVar("a a", Sort("A A"))), Sort("B B"))),
+    //  Seq(FunctionApplication(QualifiedIdentifier("g 1"), Seq(QualifiedIdentifier("a a"))),
+    //      FunctionApplication(QualifiedIdentifier("f 1"), Seq(QualifiedIdentifier("a a"))))))
+
+    //checkCommand(DefineSort("A A", Seq("B", "C"), Sort(Identifier("Array"), Seq(Sort("B"), Sort("C")))))
+    //checkCommand(DefineSort("A A", Seq("B B", "C C"), Sort(Identifier("Array"), Seq(Sort("B B"), Sort("C C")))))
+  }
+
 
   def testDeclareDatatypes(implicit printer: Printer): Unit = {
     checkCommand(DeclareDatatypes(Seq(
