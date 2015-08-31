@@ -35,21 +35,21 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
     case DeclareConst(name, sort) => {
       writer.write("(declare-const ")
-      writer.write(name.name)
+      printSymbol(name, writer)
       writer.write(' ')
       printSort(sort, writer)
       writer.write(")\n")
     }
     case DeclareFun(name, paramSorts, returnSort) => {
       writer.write("(declare-fun ")
-      writer.write(name.name)
+      printSymbol(name, writer)
       printNary(writer, paramSorts, printSort, " (", " ", ") ")
       printSort(returnSort, writer)
       writer.write(")\n")
     }
     case DeclareSort(name, arity) => {
       writer.write("(declare-sort ")
-      writer.write(name.name)
+      printSymbol(name, writer)
       writer.write(" ")
       writer.write(arity.toString)
       writer.write(")\n")
@@ -57,7 +57,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
     case DefineFun(FunDef(name, sortedVars, returnSort, body)) => {
       writer.write("(define-fun ")
-      writer.write(name.name)
+      printSymbol(name, writer)
       printNary(writer, sortedVars, printSortedVar, " (", " ", ") ")
       printSort(returnSort, writer)
       writer.write(" ")
@@ -66,7 +66,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     }
     case DefineFunRec(FunDef(name, sortedVars, returnSort, body)) => {
       writer.write("(define-fun-rec ")
-      writer.write(name.name)
+      printSymbol(name, writer)
       printNary(writer, sortedVars, printSortedVar, " (", " ", ") ")
       printSort(returnSort, writer)
       writer.write(" ")
@@ -81,7 +81,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     }
     case DefineSort(name, params, sort) => {
       writer.write("(define-sort ")
-      writer.write(name.name)
+      printSymbol(name, writer)
       writer.write(params.map(_.name).mkString(" (", " ", ") "))
       printSort(sort, writer)
       writer.write(")\n")
@@ -167,7 +167,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
       datatypes.foreach{ case (name, constructors) => {
         writer.write(" (")
-        writer.write(name.name)
+        printSymbol(name, writer)
         constructors.foreach{ 
           case Constructor(sym, Seq()) => {
             writer.write(" (")
@@ -330,7 +330,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
       writer.write(":global-declarations ")
       writer.write(value.toString)
 
-    case InteractiveMode(value) => 
+    case InteractiveMode(value) =>
       writer.write(":interactive-mode ")
       writer.write(value.toString)
     case PrintSuccess(value) => 
@@ -442,7 +442,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
   private def printVarBinding(vb: VarBinding, writer: Writer): Unit = {
     writer.write('(')
-    writer.write(vb.name.name)
+    printSymbol(vb.name, writer)
     writer.write(' ')
     printTerm(vb.term, writer)
     writer.write(')')
@@ -450,7 +450,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
 
   private def printSortedVar(sv: SortedVar, writer: Writer): Unit = {
     writer.write('(')
-    writer.write(sv.name.name)
+    printSymbol(sv.name, writer)
     writer.write(' ')
     printSort(sv.sort, writer)
     writer.write(')')

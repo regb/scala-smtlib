@@ -46,21 +46,21 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => printSort(sort, writer))
       actions.prepend(() => writer.write(' '))
-      actions.prepend(() => writer.write(name.name))
+      actions.prepend(() => printSymbol(name, writer))
       actions.prepend(() => writer.write("(declare-const "))
     }
     case DeclareFun(name, paramSorts, returnSort) => {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => printSort(returnSort, writer, actions))
       actions.prepend(() => printNary(writer, paramSorts, (s: Sort, writer: Writer) => printSort(s, writer, actions), " (", " ", ") ", actions))
-      actions.prepend(() => writer.write(name.name))
+      actions.prepend(() => printSymbol(name, writer))
       actions.prepend(() => writer.write("(declare-fun "))
     }
     case DeclareSort(name, arity) => {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => writer.write(arity.toString))
       actions.prepend(() => writer.write(" "))
-      actions.prepend(() => writer.write(name.name))
+      actions.prepend(() => printSymbol(name, writer))
       actions.prepend(() => writer.write("(declare-sort "))
     }
 
@@ -70,7 +70,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(" "))
       actions.prepend(() => printSort(returnSort, writer, actions))
       actions.prepend(() => printNary(writer, sortedVars, (v: SortedVar, w: Writer) => printSortedVar(v, w, actions), " (", " ", ") ", actions))
-      actions.prepend(() => writer.write(name.name))
+      actions.prepend(() => printSymbol(name, writer))
       actions.prepend(() => writer.write("(define-fun "))
     }
     case DefineFunRec(FunDef(name, sortedVars, returnSort, body)) => {
@@ -79,7 +79,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(" "))
       actions.prepend(() => printSort(returnSort, writer, actions))
       actions.prepend(() => printNary(writer, sortedVars, (v: SortedVar, w: Writer) => printSortedVar(v, w, actions), " (", " ", ") ", actions))
-      actions.prepend(() => writer.write(name.name))
+      actions.prepend(() => printSymbol(name, writer))
       actions.prepend(() => writer.write("(define-fun-rec "))
     }
     case DefineFunsRec(funDecs, bodies) => {
@@ -92,7 +92,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => writer.write(")\n"))
       actions.prepend(() => printSort(sort, writer, actions))
       actions.prepend(() => writer.write(params.map(_.name).mkString(" (", " ", ") ")))
-      actions.prepend(() => writer.write(name.name))
+      actions.prepend(() => printSymbol(name, writer))
       actions.prepend(() => writer.write("(define-sort "))
     }
 
@@ -177,8 +177,8 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
 
       datatypes.foreach{ case (name, constructors) => {
         writer.write(" (")
-        writer.write(name.name)
-        constructors.foreach{ 
+        printSymbol(name, writer)
+        constructors.foreach{
           case Constructor(sym, Seq()) => {
             writer.write(" (")
             writer.write(sym.name)
@@ -211,7 +211,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     doActions(actionsBuffer)
   }
   private def printCommandResponse(response: CommandResponse, writer: Writer, actions: LinkedList[Action]): Unit = response match {
-    case Success => 
+    case Success =>
       actions.prepend(() => writer.write("success\n"))
     case Unsupported =>
       actions.prepend(() => writer.write("unsupported\n"))
@@ -247,7 +247,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     }
 
     case GetInfoResponseSuccess(response, responses) => {
-      printNary(writer, response +: responses, 
+      printNary(writer, response +: responses,
                 (ir: InfoResponse, w: Writer) => actions.prepend(() => printInfoResponse(ir, w, actions)),
                 "(", " ", ")", actions)
     }
@@ -318,7 +318,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => printNary(writer, vbs, (v: VarBinding, w: Writer) => printVarBinding(v, w, actions), "", " ", ") ", actions))
       actions.prepend(() => printVarBinding(vb, writer, actions))
       actions.prepend(() => writer.write("(let ("))
-      
+
     case Forall(sortedVar, sortedVars, t) =>
       actions.prepend(() => writer.write(")"))
       actions.prepend(() => printTerm(t, writer, actions))
@@ -347,10 +347,10 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       actions.prepend(() => printTerm(term, writer, actions))
       actions.prepend(() => writer.write("(! "))
     }
-    case id@QualifiedIdentifier(_, _) => 
+    case id@QualifiedIdentifier(_, _) =>
       actions.prepend(() => printQualifiedId(id, writer, actions))
 
-    case (c: Constant) => 
+    case (c: Constant) =>
       actions.prepend(() => printConstant(c, writer))
   }
 
@@ -369,7 +369,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     actions.prepend(() => writer.write(')'))
     actions.prepend(() => printTerm(vb.term, writer, actions))
     actions.prepend(() => writer.write(' '))
-    actions.prepend(() => writer.write(vb.name.name))
+    actions.prepend(() => printSymbol(vb.name, writer))
     actions.prepend(() => writer.write('('))
   }
 
@@ -377,7 +377,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     actions.prepend(() => writer.write(')'))
     actions.prepend(() => printSort(sv.sort, writer, actions))
     actions.prepend(() => writer.write(' '))
-    actions.prepend(() => writer.write(sv.name.name))
+    actions.prepend(() => printSymbol(sv.name, writer))
     actions.prepend(() => writer.write('('))
   }
 
