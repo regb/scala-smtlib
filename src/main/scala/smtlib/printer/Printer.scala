@@ -19,6 +19,8 @@ trait Printer {
   def printSort(sort: Sort, writer: Writer): Unit
   def printCommandResponse(response: CommandResponse, writer: Writer): Unit
 
+  def printSExpr(sExpr: SExpr, writer: Writer): Unit
+
   def toString(script: Script): String = {
     val output = new StringWriter
     val sWriter = new BufferedWriter(output)

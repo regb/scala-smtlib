@@ -416,7 +416,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     }
   }
 
-  private def printSExpr(sexpr: SExpr, writer: Writer): Unit = sexpr match {
+  override def printSExpr(sexpr: SExpr, writer: Writer): Unit = sexpr match {
     case SList(es) =>
       printNary(writer, es, printSExpr, "(", " ", ")")
     case SKeyword(key) =>

@@ -423,12 +423,12 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
   }
 
 
-  def printSExpr(sexpr: SExpr, writer: Writer): Unit = {
+  override def printSExpr(sexpr: SExpr, writer: Writer): Unit = {
     val actionsBuffer = new LinkedList[Action]
     printSExpr(sexpr, writer, actionsBuffer)
     doActions(actionsBuffer)
   }
-  def printSExpr(sexpr: SExpr, writer: Writer, actions: LinkedList[Action]): Unit = sexpr match {
+  private def printSExpr(sexpr: SExpr, writer: Writer, actions: LinkedList[Action]): Unit = sexpr match {
     case SList(es) =>
       printNary(writer, es, printSExpr, "(", " ", ")", actions)
     case SKeyword(key) =>
@@ -441,7 +441,7 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
   }
 
 
-  def printOption(option: SMTOption, writer: Writer): Unit = option match {
+  private def printOption(option: SMTOption, writer: Writer): Unit = option match {
     case DiagnosticOutputChannel(value) => 
       writer.write(":diagnostic-output-channel ")
       writer.write('"')
