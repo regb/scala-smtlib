@@ -61,4 +61,11 @@ trait Printer {
     output.toString
   }
 
+  def toString(sExpr: SExpr): String = {
+    val output = new StringWriter
+    val sWriter = new BufferedWriter(output)
+    printSExpr(sExpr, sWriter)
+    sWriter.flush()
+    output.toString
+  }
 }
