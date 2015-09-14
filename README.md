@@ -1,4 +1,4 @@
-Scala SMT-LIB
+Scala SMT-LIB [![Build Status](http://laraquad4.epfl.ch:9000/regb/scala-smtlib/status/master)](http://laraquad4.epfl.ch:9000/regb/scala-smtlib)
 =============
 
 Scala SMT-LIB is a lightweight, no dependency, abstraction over the
