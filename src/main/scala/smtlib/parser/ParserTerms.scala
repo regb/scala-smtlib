@@ -297,9 +297,20 @@ trait ParserTerms { this: ParserUtils =>
     SList(exprs.toList)
   }
 
+  /**
+   *
+   * @note This is slighly inconsistent with the fact that Command and Term inherit
+   *       from SExpr, in the sense that this will never return a Command or Term
+   *       but rather returns the equivalent SList representation. So no
+   *       {{{ SetLogic(QF_LIA) }}} but {{{ SList(SSymbol("set-logic"), SSymbol("QF_LIA")) }}}
+   */
   def parseSExpr: SExpr = {
     peekToken.kind match {
       case Tokens.SymbolLitKind => parseSymbol
+      case (word: Tokens.ReservedWord) => {
+        nextToken()
+        SSymbol(Tokens.reservedToSymbol(word))
+      }
       case Tokens.NumeralLitKind => parseNumeral
       case Tokens.BinaryLitKind => parseBinary
       case Tokens.HexadecimalLitKind => parseHexadecimal

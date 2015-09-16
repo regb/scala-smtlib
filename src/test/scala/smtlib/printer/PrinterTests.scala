@@ -51,7 +51,7 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing get-Info responses") { testGetInfoResponses }
     test(printerName + ": Printing get-model responses") { testGetModelResponse }
     test(printerName + ": Printing s-expressions") { testSExprs }
-    //test(printerName + ": Printing s-expressions of specialized trees (commands/terms)") { testSExprsSpecializedTrees }
+    test(printerName + ": Printing s-expressions of specialized trees (commands/terms)") { testSExprsSpecializedTrees }
   }
 
   mkTests(RecursivePrinter)
@@ -106,6 +106,9 @@ class PrinterTests extends FunSuite {
   }
 
   private def checkSExpr(sExpr: SExpr)(implicit printer: Printer): Unit = {
+    //the AST can be different because a command would be printed as a list of symbol and then
+    //parsed back as a list of symbols which is not the same object as the actual command
+    //so we print/parse twice and check only after that
 
     val directPrint: String = printer.toString(sExpr)
 
@@ -113,8 +116,12 @@ class PrinterTests extends FunSuite {
     val parsedAgain: SExpr = parser.parseSExpr
     val printAgain: String = printer.toString(parsedAgain)
 
-    assert(directPrint === printAgain)
-    assert(sExpr === parsedAgain)
+    val parserAgain = Parser.fromString(printAgain)
+    val parsedAgainAgain: SExpr = parserAgain.parseSExpr
+    val printAgainAgain: String = printer.toString(parsedAgainAgain)
+
+    assert(printAgain === printAgainAgain)
+    assert(parsedAgain === parsedAgainAgain)
   }
 
   private def check[A](res: A, printer: (A) => String, parser: (String) => A): Unit = {
@@ -536,6 +543,7 @@ It spans a couple lines""")))))
     checkSExpr(Forall(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
     checkSExpr(Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
 
+    checkSExpr(CheckSatStatus(SatStatus))
   }
 
   test("Printing deep trees with tail printer") {

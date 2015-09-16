@@ -18,7 +18,7 @@ trait ParserUtils {
   private var _lookAhead: Option[Token] = None
 
   //return a next token or throw UnexpectedEOFException if the next token is null
-  protected def nextToken: Token = {
+  protected def nextToken(): Token = {
     _lookAhead match {
       case Some(t) => {
         _lookAhead = None

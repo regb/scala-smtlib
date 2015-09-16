@@ -94,4 +94,50 @@ object Tokens {
 
   case object DeclareDatatypes extends ReservedWord
 
+  def reservedToSymbol(word: ReservedWord): String = word match {
+    case BINARY => "BINARY"
+    case DECIMAL => "DECIMAL"
+    case HEXADECIMAL => "HEXADECIMAl"
+    case NUMERAL => "NUMERAL"
+    case STRING => "STRING"
+    case Underscore => "_"
+    case ExclamationMark => "!"
+    case As => "as"
+    case Let => "let"
+    case Forall => "forall"
+    case Exists => "exists"
+    case Par => "par"
+
+    case Assert => "assert"
+    case CheckSat => "check-sat"
+    case CheckSatAssuming => "check-sat-assuming"
+    case DeclareConst => "declare-const"
+    case DeclareFun => "declare-fun"
+    case DeclareSort => "ddeclare-sort"
+    case DefineFun => "define-fun"
+    case DefineFunRec => "define-fun-rec"
+    case DefineFunsRec => "define-funs-rec"
+    case DefineSort => "define-sort"
+    case Echo => "echo"
+    case Exit => "exit"
+    case GetAssertions => "get-assertions"
+    case GetAssignment => "get-assignment"
+    case GetInfo => "get-info"
+    case GetModel => "get-model"
+    case GetOption => "get-option"
+    case GetProof => "get-proof"
+    case GetUnsatAssumptions => "get-unsat-assumptions"
+    case GetUnsatCore => "get-unsat-core"
+    case GetValue => "get-value"
+    case Pop => "pop"
+    case Push => "push"
+    case Reset => "reset"
+    case ResetAssertions => "reset-assetions"
+    case SetInfo => "set-info"
+    case SetLogic => "set-logic"
+    case SetOption => "set-option"
+
+    case DeclareDatatypes => "declare-datatypes"
+
+  }
 }

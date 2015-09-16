@@ -253,11 +253,10 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     }
 
     case GetModelResponseSuccess(exprs) => {
-      def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit = expr match {
-        case (cmd: Command) => printCommand(cmd, writer, actions)
-        case (term: Term) => printTerm(term, writer, actions)
-        case _ => printSExpr(expr, writer, actions)
-      }
+
+      def printGetModelResponseEntry(expr: SExpr, writer: Writer): Unit =
+        printSExpr(expr, writer, actions)
+
       actions.prepend(() => writer.write(')'))
       actions.prepend(() => printNary(writer, exprs, printGetModelResponseEntry, "", "\n", "", actions))
       actions.prepend(() => writer.write("(model \n"))
@@ -429,6 +428,9 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     doActions(actionsBuffer)
   }
   private def printSExpr(sexpr: SExpr, writer: Writer, actions: LinkedList[Action]): Unit = sexpr match {
+    case (cmd: Command) => printCommand(cmd, writer, actions)
+    case (res: CommandResponse) => printCommandResponse(res, writer, actions)
+    case (term: Term) => printTerm(term, writer, actions)
     case SList(es) =>
       printNary(writer, es, printSExpr, "(", " ", ")", actions)
     case SKeyword(key) =>
@@ -436,8 +438,6 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
       writer.write(key)
     case s@SSymbol(_) =>
       printSymbol(s, writer)
-    case (c: Constant) =>
-      printConstant(c, writer)
   }
 
 

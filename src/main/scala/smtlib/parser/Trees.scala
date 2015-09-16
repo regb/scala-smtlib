@@ -63,7 +63,7 @@ object Terms {
   case class SSymbol(name: String) extends SExpr with AttributeValue with Index
 
   /* SComment is never parsed, only used for pretty printing */
-  case class SComment(s: String) extends SExpr 
+  case class SComment(s: String)
 
   sealed abstract class Term extends Positioned with SExpr {
     override def toString: String = printer.RecursivePrinter.toString(this)
@@ -283,7 +283,7 @@ object Commands {
 object CommandsResponses {
   import Terms._
 
-  sealed abstract class CommandResponse {
+  sealed abstract class CommandResponse extends Positioned with SExpr {
     override def toString: String = printer.RecursivePrinter.toString(this)
   }
 
