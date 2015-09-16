@@ -297,6 +297,8 @@ class SemanticsDriver(
         case SetOption(option) => {
           processSetOption(option)
         }
+
+        case _ => ???
       }
 
     }
