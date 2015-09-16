@@ -322,6 +322,12 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueSExpr("()") === SList())
   }
 
+  test("s-expression can parse reserved words as symbols") {
+    assert(parseUniqueSExpr("(set-logic QF_BV)") === SList(SSymbol("set-logic"), SSymbol("QF_BV")))
+    assert(parseUniqueSExpr("(declare-const)") === SList(SSymbol("declare-const")))
+    assert(parseUniqueSExpr("check-sat") === SSymbol("check-sat"))
+  }
+
   test("simple benchmark") {
     val benchmark = """
       (set-logic QF_UF)
