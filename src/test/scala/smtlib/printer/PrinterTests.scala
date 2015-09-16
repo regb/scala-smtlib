@@ -50,6 +50,8 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing get-assignment response quoted symbols") { testGetAssignmentResponseQuotedSymbol }
     test(printerName + ": Printing get-Info responses") { testGetInfoResponses }
     test(printerName + ": Printing get-model responses") { testGetModelResponse }
+    test(printerName + ": Printing s-expressions") { testSExprs }
+    //test(printerName + ": Printing s-expressions of specialized trees (commands/terms)") { testSExprsSpecializedTrees }
   }
 
   mkTests(RecursivePrinter)
@@ -101,6 +103,18 @@ class PrinterTests extends FunSuite {
 
     assert(directPrint === printAgain)
     assert(script === parsedAgain)
+  }
+
+  private def checkSExpr(sExpr: SExpr)(implicit printer: Printer): Unit = {
+
+    val directPrint: String = printer.toString(sExpr)
+
+    val parser = Parser.fromString(directPrint)
+    val parsedAgain: SExpr = parser.parseSExpr
+    val printAgain: String = printer.toString(parsedAgain)
+
+    assert(directPrint === printAgain)
+    assert(sExpr === parsedAgain)
   }
 
   private def check[A](res: A, printer: (A) => String, parser: (String) => A): Unit = {
@@ -502,6 +516,26 @@ It spans a couple lines""")))))
       printGetModel,
       parseGetModel
     )
+  }
+
+  def testSExprs(implicit printer: Printer): Unit = {
+    checkSExpr(SNumeral(12))
+    checkSExpr(SString("Hey there"))
+    checkSExpr(SSymbol("testsymbol"))
+    checkSExpr(SList(SNumeral(42), SString("hello")))
+    checkSExpr(SList(SList(SSymbol("hello"), SString("hello")), SNumeral(42)))
+  }
+
+  def testSExprsSpecializedTrees(implicit printer: Printer): Unit = {
+    checkSExpr(CheckSat())
+    checkSExpr(SetLogic(AUFLIA))
+    checkSExpr(FunctionApplication(
+               QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
+    checkSExpr(Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))
+
+    checkSExpr(Forall(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
+    checkSExpr(Exists(SortedVar("a", Sort("A")), Seq(), QualifiedIdentifier("a")))
+
   }
 
   test("Printing deep trees with tail printer") {
