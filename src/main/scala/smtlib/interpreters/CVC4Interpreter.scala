@@ -1,6 +1,7 @@
 package smtlib
 package interpreters
 
+import parser.Terms._
 import parser.Commands._
 import parser.CommandsResponses._
 import printer.RecursivePrinter
@@ -12,7 +13,7 @@ class CVC4Interpreter(executable: String, args: Array[String]) extends ProcessIn
   in.flush
   parser.parseGenResponse
 
-  override def parseResponseOf(cmd: Command): CommandResponse = cmd match {
+  override def parseResponseOf(cmd: SExpr): SExpr = cmd match {
     case DefineFunsRec(funs, bodies) =>
       // CVC4 translates definefunsrec in three commands per function,
       // and thus emits 3x (success)

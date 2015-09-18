@@ -3,6 +3,7 @@ package interpreters
 
 import lexer.Lexer
 import parser.Parser
+import parser.Terms._
 import parser.Commands._
 import parser.CommandsResponses._
 import printer._
@@ -21,7 +22,7 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
 
   lazy val parser = new Parser(new Lexer(out))
 
-  def parseResponseOf(cmd: Command): CommandResponse = cmd match {
+  def parseResponseOf(cmd: SExpr): SExpr = cmd match {
     case CheckSat() => parser.parseCheckSatResponse
     case GetAssertions() => parser.parseGetAssertionsResponse
     case GetUnsatCore() => parser.parseGetUnsatCoreResponse
@@ -34,12 +35,16 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
 
     case GetModel() => parser.parseGetModelResponse
 
-    case _ => parser.parseGenResponse
+    case (_: Command) => parser.parseGenResponse
+
+    //in the case the input was not a known command, we assume nothing and 
+    //parse an arbitrary s-expr
+    case _ => parser.parseSExpr
   }
 
-  override def eval(cmd: Command): CommandResponse = {
+  override def eval(cmd: SExpr): SExpr = {
     try {
-      RecursivePrinter.printCommand(cmd, in)
+      RecursivePrinter.printSExpr(cmd, in)
       in.write("\n")
       in.flush
 

@@ -3,6 +3,7 @@ package smtlib
 import parser.Commands.{Script, Command}
 import parser.CommandsResponses.CommandResponse
 import parser.Parser
+import parser.Terms._
 
 /*
  * An interpreter is a stateful object that can eval Commands and returns
@@ -18,7 +19,7 @@ import parser.Parser
  */
 trait Interpreter {
 
-  def eval(cmd: Command): CommandResponse
+  def eval(cmd: SExpr): SExpr
 
   //A free method is kind of justified by the need for the IO streams to be closed, and
   //there seems to be a decent case in general to have such a method for things like solvers
