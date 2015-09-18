@@ -28,11 +28,17 @@ trait TestHelpers {
   def filesInResourceDir(dir : String, filter : String=>Boolean = all) : Iterable[File] = {    
     import scala.collection.JavaConversions._
     val d = this.getClass.getClassLoader.getResource(dir)
+
     val asFile = if(d == null || d.getProtocol != "file") {
       // We are in Eclipse. The only way we are saved is by hard-coding the path               
       new File(resourceDirHard + dir)
     } else new File(d.toURI())
-    asFile.listFiles().filter(f => filter(f.getPath()))
+
+    val files = asFile.listFiles()
+    if(files == null)
+      Nil
+    else
+      files.filter(f => filter(f.getPath()))
   }
   
   def getZ3Interpreter: Interpreter = Z3Interpreter.buildDefault
