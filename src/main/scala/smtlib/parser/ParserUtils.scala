@@ -48,6 +48,17 @@ trait ParserUtils {
   }
 
   /*
+   * Same as peekToken, but expect a token to be present
+   * and result in a UnexpectedEOFException if the token is null
+   */
+  protected def getPeekToken: Token = {
+    val tmp = peekToken
+    if(tmp == null)
+      throw new UnexpectedEOFException(Seq())
+    tmp
+  }
+
+  /*
    * Make sure the next token has the expected kind and read it
    */
   protected def eat(expected: TokenKind): Unit = {

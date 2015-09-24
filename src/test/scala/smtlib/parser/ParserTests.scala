@@ -306,6 +306,21 @@ class ParserTests extends FunSuite with Timeouts {
     }
   }
 
+  test("Parsing terms with eof in middle should throw UnexpectedEOFException") {
+    intercept[UnexpectedEOFException] {
+      parseUniqueTerm("")
+    }
+    intercept[UnexpectedEOFException] {
+      parseUniqueTerm("(")
+    }
+    intercept[UnexpectedEOFException] {
+      parseUniqueTerm("(let")
+    }
+    intercept[UnexpectedEOFException] {
+      parseUniqueTerm("(let ((x t))")
+    }
+  }
+
   test("Parsing s-expressions") {
     assert(parseUniqueSExpr("42") === SNumeral(42))
     assert(parseUniqueSExpr("12.38") === SDecimal(12.38))
@@ -326,6 +341,15 @@ class ParserTests extends FunSuite with Timeouts {
     assert(parseUniqueSExpr("(set-logic QF_BV)") === SList(SSymbol("set-logic"), SSymbol("QF_BV")))
     assert(parseUniqueSExpr("(declare-const)") === SList(SSymbol("declare-const")))
     assert(parseUniqueSExpr("check-sat") === SSymbol("check-sat"))
+  }
+
+  test("eof in middle of s-list should throw UnexpectedEOFException") {
+    intercept[UnexpectedEOFException] {
+      parseUniqueSExpr("")
+    }
+    intercept[UnexpectedEOFException] {
+      parseUniqueSExpr("(a b")
+    }
   }
 
   test("simple benchmark") {

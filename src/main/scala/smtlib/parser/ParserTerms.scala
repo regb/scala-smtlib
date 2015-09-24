@@ -19,9 +19,7 @@ trait ParserTerms { this: ParserUtils =>
     val attributeValuesTokenKinds: Seq[Tokens.TokenKind] = Seq(
       Tokens.NumeralLitKind, Tokens.BinaryLitKind, Tokens.HexadecimalLitKind, 
       Tokens.DecimalLitKind, Tokens.StringLitKind, Tokens.SymbolLitKind, Tokens.OParen)
-    if(peekToken == null) 
-      throw new UnexpectedEOFException(attributeValuesTokenKinds)
-    else peekToken.kind match {
+    getPeekToken.kind match {
       case Tokens.NumeralLitKind => parseNumeral
       case Tokens.BinaryLitKind => parseBinary
       case Tokens.HexadecimalLitKind => parseHexadecimal
@@ -123,10 +121,10 @@ trait ParserTerms { this: ParserUtils =>
   }
 
   def parseSort: Sort = {
-    if(peekToken.kind == Tokens.OParen) {
+    if(getPeekToken.kind == Tokens.OParen) {
       eat(Tokens.OParen)
 
-      if(peekToken.kind == Tokens.Underscore) {
+      if(getPeekToken.kind == Tokens.Underscore) {
         val id = parseUnderscoreIdentifier
         Sort(id)
       } else {
@@ -134,7 +132,7 @@ trait ParserTerms { this: ParserUtils =>
         val name = parseIdentifier
 
         val subSorts = new ListBuffer[Sort]
-        while(peekToken.kind != Tokens.CParen)
+        while(getPeekToken.kind != Tokens.CParen)
           subSorts.append(parseSort)
         eat(Tokens.CParen)
 
@@ -147,7 +145,7 @@ trait ParserTerms { this: ParserUtils =>
   }
 
   def parseIndex: Index = {
-    peekToken.kind match {
+    getPeekToken.kind match {
       case Tokens.SymbolLitKind => parseSymbol
       case Tokens.NumeralLitKind => parseNumeral
       case _ => expected(peekToken, Tokens.SymbolLitKind, Tokens.NumeralLitKind)
@@ -165,10 +163,10 @@ trait ParserTerms { this: ParserUtils =>
   }
 
   def parseQualifiedIdentifier: QualifiedIdentifier = {
-    peekToken.kind match {
+    getPeekToken.kind match {
       case Tokens.OParen => {
         eat(Tokens.OParen)
-        peekToken.kind match {
+        getPeekToken.kind match {
           case Tokens.As => {
             parseAsIdentifier
           }
@@ -191,7 +189,7 @@ trait ParserTerms { this: ParserUtils =>
   }
 
   def parseIdentifier: Identifier = {
-    if(peekToken.kind == Tokens.OParen) {
+    if(getPeekToken.kind == Tokens.OParen) {
       eat(Tokens.OParen)
       parseUnderscoreIdentifier
     } else {
@@ -201,10 +199,10 @@ trait ParserTerms { this: ParserUtils =>
   }
 
   def parseTerm: Term = {
-    if(peekToken.kind == Tokens.OParen) {
+    if(getPeekToken.kind == Tokens.OParen) {
       eat(Tokens.OParen)
 
-      peekToken.kind match {
+      getPeekToken.kind match {
         case Tokens.Let =>
           eat(Tokens.Let)
           val (head, bindings) = parseOneOrMore(parseVarBinding _)
@@ -229,7 +227,7 @@ trait ParserTerms { this: ParserUtils =>
           val term = parseTerm
           val head = parseAttribute
           val attrs = new ListBuffer[Attribute]
-          while(peekToken.kind != Tokens.CParen)
+          while(getPeekToken.kind != Tokens.CParen)
             attrs.append(parseAttribute)
           eat(Tokens.CParen)
           AnnotatedTerm(term, head, attrs)
@@ -245,7 +243,7 @@ trait ParserTerms { this: ParserUtils =>
           val head = parseTerm
 
           val terms = new ListBuffer[Term]
-          while(peekToken != null && peekToken.kind != Tokens.CParen)
+          while(getPeekToken.kind != Tokens.CParen)
             terms.append(parseTerm)
           eat(Tokens.CParen)
 
@@ -273,7 +271,7 @@ trait ParserTerms { this: ParserUtils =>
   }
 
   def tryParseConstant: Option[Constant] = {
-    peekToken.kind match {
+    getPeekToken.kind match {
       case Tokens.NumeralLitKind => Some(parseNumeral)
       case Tokens.HexadecimalLitKind => Some(parseHexadecimal)
       case Tokens.BinaryLitKind => Some(parseBinary)
@@ -291,21 +289,21 @@ trait ParserTerms { this: ParserUtils =>
   //parse s-list assuming the parentheses has been parsed
   protected def parseSListContent: SList = {
     val exprs = new ListBuffer[SExpr]
-    while(peekToken.kind != Tokens.CParen)
+    while(getPeekToken.kind != Tokens.CParen)
       exprs.append(parseSExpr)
     eat(Tokens.CParen)
     SList(exprs.toList)
   }
 
   /**
-   *
-   * @note This is slighly inconsistent with the fact that Command and Term inherit
-   *       from SExpr, in the sense that this will never return a Command or Term
-   *       but rather returns the equivalent SList representation. So no
-   *       {{{ SetLogic(QF_LIA) }}} but {{{ SList(SSymbol("set-logic"), SSymbol("QF_LIA")) }}}
-   */
+    *
+    * @note This is slighly inconsistent with the fact that Command and Term inherit
+    *       from SExpr, in the sense that this will never return a Command or Term
+    *       but rather returns the equivalent SList representation. So no
+    *       {{{ SetLogic(QF_LIA) }}} but {{{ SList(SSymbol("set-logic"), SSymbol("QF_LIA")) }}}
+    */
   def parseSExpr: SExpr = {
-    peekToken.kind match {
+    getPeekToken.kind match {
       case Tokens.SymbolLitKind => parseSymbol
       case (word: Tokens.ReservedWord) => {
         nextToken()
