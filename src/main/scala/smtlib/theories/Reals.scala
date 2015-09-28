@@ -5,6 +5,9 @@ import parser.Terms._
 
 object Reals {
 
+  /*
+   * TODO: how about providing a Rational constructor?
+   */
 
   object RealSort {
 
