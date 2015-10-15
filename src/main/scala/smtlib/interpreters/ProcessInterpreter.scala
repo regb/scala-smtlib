@@ -42,6 +42,10 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
     case _ => parser.parseSExpr
   }
 
+  /*
+   * eval is blocking, and not synchronized. You
+   * should not invoke eval from different threads.
+   */
   override def eval(cmd: SExpr): SExpr = {
     try {
       RecursivePrinter.printSExpr(cmd, in)
@@ -71,15 +75,23 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
       } catch {
         case (io: java.io.IOException) => ()
       } finally {
+        isKilled = true
         try { in.close() } catch { case (io: java.io.IOException) => () }
       }
     }
   }
 
   def kill(): Unit = synchronized {
-    isKilled = true
-    process.destroy()
-    in.close()
+    if(!isKilled) {
+      try {
+        process.destroy()
+        in.close()
+      } catch {
+        case (io: java.io.IOException) => ()
+      } finally {
+        isKilled = true
+      }
+    }
   }
 
   override def interrupt(): Unit = synchronized {
