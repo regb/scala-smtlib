@@ -40,6 +40,7 @@ class PrinterTests extends FunSuite {
     test(printerName + ": Printing composed Terms") { testComposedTerm }
     test(printerName + ": Printing Sorts") { testSorts }
     test(printerName + ": Printing single Commands") { testSingleCommands }
+    test(printerName + ": Printing set-logic commands") { testSetLogic }
     test(printerName + ": Printing declarations with weird names") { testDeclarationWeirdNames }
     test(printerName + ": Printing declare-datatypes commands") { testDeclareDatatypes }
     test(printerName + ": Printing set-option commands") { testSetOptionCommand }
@@ -267,6 +268,10 @@ What are you up to man?"""))
     checkCommand(Reset())
     checkCommand(ResetAssertions())
 
+  }
+
+  def testSetLogic(implicit printer: Printer): Unit = {
+    checkCommand(SetLogic(ALL))
     checkCommand(SetLogic(AUFLIA))
     checkCommand(SetLogic(AUFLIRA))
     checkCommand(SetLogic(AUFNIRA))

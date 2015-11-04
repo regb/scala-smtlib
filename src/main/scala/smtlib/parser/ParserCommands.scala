@@ -142,7 +142,12 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
       case Tokens.SetLogic => {
         val logicSymbol: SSymbol = parseSymbol
         val logic: Logic = 
-          Logic.standardLogicFromString.lift(logicSymbol.name).getOrElse(NonStandardLogic(logicSymbol))
+          Logic.standardLogicFromString.lift(logicSymbol.name).getOrElse({
+            logicSymbol match {
+              case SSymbol("ALL") => ALL
+              case _ => NonStandardLogic(logicSymbol)
+            }
+          })
         SetLogic(logic)
       }
       case Tokens.SetOption => {

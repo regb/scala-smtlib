@@ -64,6 +64,8 @@ trait TerminalTreesPrinter {
       writer.write(logic.toString)
     case NonStandardLogic(symbol) =>
       printSymbol(symbol, writer)
+    case ALL =>
+      writer.write("ALL")
   }
 
   protected def printKeyword(keyword: SKeyword, writer: Writer): Unit = {

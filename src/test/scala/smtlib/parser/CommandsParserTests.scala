@@ -242,9 +242,13 @@ class CommandsParserTests extends FunSuite with Timeouts {
     assert(parseUniqueCmd("(set-logic UFNIA)")  === SetLogic(UFNIA))
   }
 
+  test("Parsing set-logic all command") {
+    assert(parseUniqueCmd("(set-logic ALL)") === SetLogic(ALL))
+  }
+
   test("Parsing non standard set-logic commands") {
-    assert(parseUniqueCmd("(set-logic ALL)") === 
-      SetLogic(NonStandardLogic(SSymbol("ALL"))))
+    assert(parseUniqueCmd("(set-logic UNIQUE_LOGIC)") === 
+      SetLogic(NonStandardLogic(SSymbol("UNIQUE_LOGIC"))))
     assert(parseUniqueCmd("(set-logic MY_COOL_LOGIC)") === 
       SetLogic(NonStandardLogic(SSymbol("MY_COOL_LOGIC"))))
   }
