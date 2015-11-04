@@ -14,7 +14,6 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
   override def printScript(script: Script, writer: Writer): Unit = {
     script.commands.foreach(cmd => {
       printCommand(cmd, writer)
-      writer.write("\n")
     })
   }
 
@@ -30,7 +29,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case CheckSatAssuming(props) => {
       writer.write("(check-sat-assuming ")
       printNary(writer, props, printPropLit _, "(", " ", ")")
-      writer.write(')')
+      writer.write(")\n")
     }
 
     case DeclareConst(name, sort) => {
@@ -90,7 +89,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     case Echo(value) => {
       writer.write("(echo ")
       printConstant(value, writer)
-      writer.write(')')
+      writer.write(")\n")
     }
     case Exit() => {
       writer.write("(exit)\n")
@@ -126,7 +125,7 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     }
     case GetValue(t, ts) => {
       writer.write("(get-value ")
-      printNary(writer, t +: ts, printTerm, "(", " ", "))")
+      printNary(writer, t +: ts, printTerm, "(", " ", "))\n")
     }
 
     case Pop(n) => {
