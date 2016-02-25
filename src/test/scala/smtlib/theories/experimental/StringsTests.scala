@@ -7,10 +7,9 @@ import parser.Terms._
 import Strings._
 import Ints.NumeralLit
 
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{FunSuite, Matchers}
 
-class StringsTests extends FunSuite with ShouldMatchers {
+class StringsTests extends FunSuite with Matchers {
 
   override def suiteName = "Strings theory test suite"
 
@@ -54,7 +53,7 @@ class StringsTests extends FunSuite with ShouldMatchers {
       def shouldParse(f: PartialFunction[Term, Any]) = {
         val term = Parser.fromString(s).parseTerm
         if(f.isDefinedAt(term)) f(term) else {
-          error("Term " + s + " wrongly parsed as " + term)
+          sys.error("Term " + s + " wrongly parsed as " + term)
         }
       }
       def shouldParseTo(p: Term) = {
