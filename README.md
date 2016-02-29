@@ -74,7 +74,7 @@ your PATH (the commands tried are exactly `z3` and `cvc4`). If present in the
 PATH, Scala SMT-LIB will test its interpreter module directly against these SMT
 solvers. You can run those tests with:
 
-    sbt fun:test
+    sbt it:test
 
 Getting Started with Examples
 -----------------------------
