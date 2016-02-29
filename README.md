@@ -9,7 +9,7 @@ and ship them to any SMT-LIB complient solver over a process interface.
 Scala SMT-LIB provides the tools for parsing and printing the SMT-LIB syntax.
 It can help you if you need to communicate with a native SMT solver process via its
 text interface. You can also write a Scala wrapper around an SMT solver and use
-it from a friendlier API. You could even get crazier and use a [pure Scala SMT
+it with a friendlier API. You could even get crazier and use a [pure Scala SMT
 solver](https://github.com/regb/cafesat) that happens to implement the SMT-LIB
 api.
 
