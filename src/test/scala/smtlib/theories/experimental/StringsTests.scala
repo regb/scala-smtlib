@@ -13,7 +13,7 @@ class StringsTests extends FunSuite with Matchers {
 
   override def suiteName = "Strings theory test suite"
 
-  test("String sort") {
+  test("String sort correctly constructed and extracted") {
     StringSort() match {
       case StringSort() => assert(true)
       case _ => assert(false)
@@ -29,20 +29,75 @@ class StringsTests extends FunSuite with Matchers {
     }
   }
 
-  test("literals") {
+  test("literals are correctly constructed and extracted") {
     val l1 = StringLit("abc")
 
     l1 match {
-      case StringLit(n) => assert(n == "abc")
+      case StringLit(n) => assert(n === "abc")
       case _ => assert(false)
     }
     
     val l2 = StringLit("")
 
     l2 match {
-      case StringLit(n) => assert(n == "")
+      case StringLit(n) => assert(n === "")
       case _ => assert(false)
     }
+    
+    val l3 = StringLit("with space")
+
+    l3 match {
+      case StringLit(n) => assert(n === "with space")
+      case _ => assert(false)
+    }
+  }
+
+  test("Length is correctly constructed and extracted") {
+    val l1 = Length(StringLit("abcd"))
+    l1 match {
+      case Length(StringLit("abcd")) => assert(true)
+      case _ => assert(false)
+    }
+
+
+    val l2 = Length(StringLit("aaaa"))
+    l2 match {
+      case Length(StringLit("aaaa")) => assert(true)
+      case _ => assert(false)
+    }
+  }
+
+  test("Concat is correctly constructed and extracted") {
+    val c1 = Concat(StringLit("ab"), StringLit("cd"))
+    c1 match {
+      case Concat(StringLit("ab"), StringLit("cd")) => assert(true)
+      case _ => assert(false)
+    }
+
+    val c2 = Concat(StringLit("ab"), StringLit("cd"), StringLit("ef"))
+    c2 match {
+      case Concat(StringLit("ab"), StringLit("cd"), StringLit("ef")) => assert(true)
+      case _ => assert(false)
+    }
+
+    val c3 = Concat(StringLit("ab"), StringLit("cd"), StringLit("ef"))
+    c3 match {
+      case Concat(StringLit("ab")) => assert(false)
+      case Concat(StringLit("ab"), StringLit("cd")) => assert(false)
+      case Concat(StringLit("ab"), StringLit("cd"), StringLit("ef")) => assert(true)
+      case _ => assert(false)
+    }
+
+    val c4 = Concat(StringLit("ab"), StringLit("cd"), StringLit("ef"))
+    c4 match {
+      case Concat(ts@_*) => {
+        assert(ts(0) === StringLit("ab"))
+        assert(ts(1) === StringLit("cd"))
+        assert(ts(2) === StringLit("ef"))
+      }
+      case _ => assert(false)
+    }
+   
   }
 
 

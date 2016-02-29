@@ -3,7 +3,21 @@ package theories
 
 import parser.Terms._
 
-object Common {
+/** General patterns for building and extracting FunctionApplication in theories.
+  *
+  * Most SMT-LIB theories are a definition of many built-in functions. We do not
+  * wish to extend the core abstract syntax tree of SMT-LIB with theory specific
+  * operations, so a theory definition is simply providing Constructors and Extractors
+  * to build the proper trees out of core SMT-LIB FunctionApplication and Identifier.
+  *
+  * this object provides traits to facilitate the definition of custom 
+  * FunctionApplication with apply and unapply methods. They provide the proper 
+  * signatures for different arities.
+  *
+  * Refer to any theory definition to see examples of how to use these traits.
+  */
+object Operations {
+
   /**
    * Operations with no arguments
    */
@@ -71,7 +85,7 @@ object Common {
     def unapply(t : Term): Option[(Term, Term, Term)] = t match {
       case FunctionApplication(
             QualifiedIdentifier(Identifier(SSymbol(`name`), Seq()), None),
-            Seq(l,r)) => Some((l,m,r))
+            Seq(l,m,r)) => Some((l,m,r))
       case _ => None
     }
   }
@@ -89,12 +103,23 @@ object Common {
       FunctionApplication(QualifiedIdentifier(Identifier(SSymbol(name))), is)
     }
 
-    def unapply(t : Term): Option[Seq[Term]] = t match {
-      case FunctionApplication(
-            QualifiedIdentifier(Identifier(SSymbol(`name`), Seq()), None),
-            is) if is.size >= numRequired => Some(is)
-      case _ => None
+    //TODO: not sure which unapply is better to provide
+    //def unapply(t : Term): Option[Seq[Term]] = t match {
+    //  case FunctionApplication(
+    //        QualifiedIdentifier(Identifier(SSymbol(`name`), Seq()), None),
+    //        is) if is.size >= numRequired => Some(is)
+    //  case _ => None
+    //}
+
+    def unapplySeq(term: Term): Option[Seq[Term]] = term match {    
+      case FunctionApplication(   
+        QualifiedIdentifier(   
+          Identifier(SSymbol(`name`), Seq()),
+          None
+        ), seqTerm) if seqTerm.length >= 2 => Some(seqTerm)
+      case _ => None   
     }
+
   }
 
   /**
@@ -102,14 +127,12 @@ object Common {
    */
   trait OperationN0 extends OperationN {
     override val numRequired: Int = 0
-
-    def apply(is: Term*): Term = apply(is)
   }
 
   /**
    * Operations with variable number of arguments, at least one required
    */
-  trait OperationN1 {
+  trait OperationN1 extends OperationN {
     override val numRequired: Int = 1
 
     def apply(i1: Term, is: Term*): Term = apply(i1 +: is)
@@ -118,16 +141,17 @@ object Common {
   /**
    * Operations with variable number of arguments, at least two required
    */
-  trait OperationN2 {
+  trait OperationN2 extends OperationN {
     override val numRequired: Int = 2
 
     def apply(i1: Term, i2: Term, is: Term*): Term = apply(i1 +: i2 +: is)
+
   }
 
   /**
    * Operations with variable number of arguments, at least three required
    */
-  trait OperationN3 {
+  trait OperationN3 extends OperationN {
     override val numRequired: Int = 3
 
     def apply(i1: Term, i2: Term, i3: Term, is: Term*): Term = apply(i1 +: i2 +: i3 +: is)

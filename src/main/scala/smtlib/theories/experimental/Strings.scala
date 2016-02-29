@@ -3,7 +3,7 @@ package theories
 package experimental
 
 import parser.Terms._
-import Common._
+import theories.Operations._
 
 object Strings {
 
