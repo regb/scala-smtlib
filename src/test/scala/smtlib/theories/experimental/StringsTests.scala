@@ -23,7 +23,7 @@ class StringsTests extends FunSuite with Matchers {
       case FixedSizeBitVectors.BitVectorSort(n) if n == 14 => assert(false)
       case FixedSizeBitVectors.BitVectorSort(n) if n == 32 => assert(false)
       case Ints.IntSort() => assert(false)
-      case Reals.RealSort() => assert(true)
+      case Reals.RealSort() => assert(false)
       case StringSort() => assert(true)
       case _ => assert(false)
     }
@@ -98,6 +98,25 @@ class StringsTests extends FunSuite with Matchers {
       case _ => assert(false)
     }
    
+  }
+
+  test("At is correctly constructed and extracted") {
+    val a = At(StringLit("xxx"), NumeralLit(2))
+    a match {
+      case At(StringLit("xxx"), NumeralLit(two)) => assert(two === 2)
+      case _ => assert(false)
+    }
+  }
+
+  test("Substring is correctly constructed and extracted") {
+    val s = Substring(StringLit("abcdef"), NumeralLit(2), NumeralLit(5))
+    s match {
+      case Substring(StringLit("abcdef"), NumeralLit(two), NumeralLit(five)) => {
+        assert(two === 2)
+        assert(five === 5)
+      }
+      case _ => assert(false)
+    }
   }
 
 
