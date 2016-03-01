@@ -3,6 +3,8 @@ package theories
 
 import parser.Terms._
 
+import Operations._
+
 object Ints {
 
 
@@ -50,207 +52,17 @@ object Ints {
 
   }
 
-  object Neg {
+  object Neg extends Operation1 { override val name = "-" }
+  object Add extends Operation2 { override val name = "+" }
+  object Sub extends Operation2 { override val name = "-" }
+  object Mul extends Operation2 { override val name = "*" }
+  object Div extends Operation2 { override val name = "div" }
+  object Mod extends Operation2 { override val name = "mod" }
+  object Abs extends Operation1 { override val name = "abs" }
 
-    def apply(t: Term): Term = 
-      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("-"))), Seq(t))
-    
-    def unapply(term: Term): Option[Term] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("-"), Seq()),
-          None
-        ), Seq(t)) => Some(t)
-      case _ => None
-    }
-  }
-
-  object Add {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("+"))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("+"), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
-
-  object Sub {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("-"))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("-"), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
-
-
-  object Mul {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("*"))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("*"), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
-
-  object Div {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("div"))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("div"), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
-
-  object Mod {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("mod"))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("mod"), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
-
-  object Abs {
-
-    def apply(t: Term): Term = 
-      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol("abs"))), Seq(t))
-    
-    def unapply(term: Term): Option[Term] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("abs"), Seq()),
-          None
-        ), Seq(t)) => Some(t)
-      case _ => None
-    }
-  }
-
-
-  object LessThan {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("<"))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("<"), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
-
-  object LessEquals {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol("<="))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol("<="), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
-
-  object GreaterThan {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol(">"))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol(">"), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
-
-  object GreaterEquals {
-
-    def apply(t1: Term, t2: Term): Term =
-      FunctionApplication(
-        QualifiedIdentifier(Identifier(SSymbol(">="))),
-        Seq(t1, t2)
-      )
-    
-    def unapply(term: Term): Option[(Term, Term)] = term match {
-      case FunctionApplication(
-        QualifiedIdentifier(
-          Identifier(SSymbol(">="), Seq()),
-          None
-        ), Seq(t1, t2)) => Some((t1, t2))
-      case _ => None
-    }
-
-  }
+  object LessThan extends Operation2 { override val name = "<" }
+  object LessEquals extends Operation2 { override val name = "<=" }
+  object GreaterThan extends Operation2 { override val name = ">" }
+  object GreaterEquals extends Operation2 { override val name = ">=" }
 
 }
