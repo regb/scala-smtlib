@@ -6,6 +6,9 @@ import common._
 
 object FixedSizeBitVectors {
 
+  /*
+   * TODO: refactor using Operations
+   */
 
   object BitVectorSort {
 

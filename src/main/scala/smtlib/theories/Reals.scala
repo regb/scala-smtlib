@@ -7,6 +7,8 @@ object Reals {
 
   /*
    * TODO: how about providing a Rational constructor?
+   *
+   * TODO: refactor using Operations
    */
 
   object RealSort {
