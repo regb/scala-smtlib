@@ -7,16 +7,12 @@ import Operations._
 
 object Core {
 
-
   object BoolSort {
-
     def apply(): Sort = Sort(Identifier(SSymbol("Bool")))
-
     def unapply(sort: Sort): Boolean = sort match {
       case Sort(Identifier(SSymbol("Bool"), Seq()), Seq()) => true
       case _ => false
     }
-
   }
 
   object BoolConst {
@@ -35,4 +31,5 @@ object Core {
   object Equals extends Operation2 { override val name = "=" }
 
   object ITE extends Operation3 { override val name = "ite" }
+
 }
