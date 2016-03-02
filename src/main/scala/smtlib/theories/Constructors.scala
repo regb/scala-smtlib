@@ -3,6 +3,7 @@ package theories
 
 import parser.Terms._
 import Core._
+import Ints._
 
 /** Provide builders functions for all theories, which perform simplifications.
   *
@@ -95,6 +96,23 @@ object Constructors {
       case Seq(t) => t
       case _ => Or(ts)
     }
+  }
+
+  def not(t: Term): Term = t match {
+    case True() => False()
+    case False() => True()
+
+    case Not(s) => s
+    case And(ts@_*) => or(ts map not)
+    case Or(ts@_*) => and(ts map not)
+    case Implies(t1, t2) => and(t1, not(t2))
+
+    case LessThan(t1, t2) => GreaterEquals(t1, t2)
+    case LessEquals(t1, t2) => GreaterThan(t1, t2)
+    case GreaterThan(t1, t2) => LessEquals(t1, t2)
+    case GreaterEquals(t1, t2) => LessThan(t1, t2)
+
+    case _ => Not(t)
   }
 
 }
