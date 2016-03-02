@@ -24,14 +24,10 @@ object Operations {
   trait Operation0 {
     val name: String
 
-    def apply(): Term =
-      FunctionApplication(QualifiedIdentifier(Identifier(SSymbol(name))),
-                            Seq())
+    def apply(): Term = QualifiedIdentifier(Identifier(SSymbol(name)))
 
     def unapply(t : Term): Boolean = t match {
-      case FunctionApplication(
-            QualifiedIdentifier(Identifier(SSymbol(`name`), Seq()), None),
-            Seq()) => true
+      case QualifiedIdentifier(Identifier(SSymbol(`name`), Seq()), None) => true
       case _ => false
     }
   }
@@ -138,9 +134,16 @@ object Operations {
     def apply(i1: Term, is: Term*): Term = apply(i1 +: is)
   }
 
-  /**
-   * Operations with variable number of arguments, at least two required
-   */
+  /** Operations with variable number of arguments, at least two required
+    *
+    * Corresponds to the many operations that are defined for two arguments and
+    * marked as :left-assoc or :pairwise (such as `and` or `distinct`). Note that
+    * the resulting representation in terms of AST will be the n-ary function application,
+    * and not the desugared version (successive binary operation). This choice seems to
+    * make sense for operations such as distinct that would require an exponential
+    * blowup to desugar the expression, while the latest phase of the solvers might
+    * be able to do something smarter with the more concise operation.
+    */
   trait OperationN2 extends OperationN {
     override val numRequired: Int = 2
 
