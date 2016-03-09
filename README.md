@@ -47,34 +47,10 @@ You may want to use Scala SMT-LIB if:
 Setup
 -----
 
-The project is built with [sbt](http://www.scala-sbt.org/). To build the
-library, just type:
+The latest stable release for Scala 2.11 is available on Sonatype, simply add
+the following to your `build.sbt`:
 
-    sbt package
-
-It will produce a jar that you can add to the classpath of your own project.
-
-If you are building your project using sbt, it is possible to setup a reference
-to this github repository in the build system to automatically get the most
-recent build. [Here](https://github.com/regb/cafesat/blob/master/build.sbt) is
-an example of how to do it, you can pick any commit. If you are interested in
-this route, you should check the sbt official documentation.
-
-Optionnaly, you can test Scala SMT-LIB in your environment by running the test
-suite. The tests are organized in unit and functional tests. Tu run the unit
-tests (very fast) you can type:
-
-    sbt test
-
-All tests should pass. Please open an issue if any test is failing. The
-functional tests are testing end-to-end flows of Scala SMT-LIB. They do take a
-bit more time and require some setup in your environment. In particular, they
-will try to use the SMT solvers `z3` and/or `cvc4` if they are available in
-your PATH (the commands tried are exactly `z3` and `cvc4`). If present in the
-PATH, Scala SMT-LIB will test its interpreter module directly against these SMT
-solvers. You can run those tests with:
-
-    sbt it:test
+    libraryDependencies += "com.regblanc" %% "scala-smtlib" % "0.2"
 
 Getting Started with Examples
 -----------------------------
@@ -226,6 +202,37 @@ slower and are meant to pass on each commit.
 In SBT, the command `sbt test` will run the unit test suite, while the command
 `sbt it:test` will run the integration test suite. During developement, it
 should be fine to run in mode `~testQuick`.
+
+###Building the Sources
+
+The project is built with [sbt](http://www.scala-sbt.org/). To build the
+library, just type:
+
+    sbt package
+
+It will produce a jar that you can add to the classpath of your own project.
+
+If you are building your project using sbt, it is possible to setup a reference
+to this github repository in the build system to automatically get the most
+recent build. [Here](https://github.com/regb/cafesat/blob/master/build.sbt) is
+an example of how to do it, you can pick any commit. If you are interested in
+this route, you should check the sbt official documentation.
+
+Optionnaly, you can test Scala SMT-LIB in your environment by running the test
+suite. The tests are organized in unit and functional tests. Tu run the unit
+tests (very fast) you can type:
+
+    sbt test
+
+All tests should pass. Please open an issue if any test is failing. The
+functional tests are testing end-to-end flows of Scala SMT-LIB. They do take a
+bit more time and require some setup in your environment. In particular, they
+will try to use the SMT solvers `z3` and/or `cvc4` if they are available in
+your PATH (the commands tried are exactly `z3` and `cvc4`). If present in the
+PATH, Scala SMT-LIB will test its interpreter module directly against these SMT
+solvers. You can run those tests with:
+
+    sbt it:test
 
 Changelog
 ---------
