@@ -5,6 +5,9 @@ Changelog
 Current
 -------
 
+* Constructors and extractors for the standard theories of SMT-LIB 2.5
+  * Experimental support for non-standardized theories such as Strings and Sets.
+* Bug fixes, mostly small edge cases and weird symbol names.
 
 
 v0.1
