@@ -5,13 +5,19 @@ Changelog
 Current
 -------
 
-* Constructors and extractors for the standard theories of SMT-LIB 2.5
+
+v0.2
+-----------------------
+*Released 9 March 2016*
+
+* Constructors and extractors for the standard theories (except Floating point) of SMT-LIB 2.5
   * Experimental support for non-standardized theories such as Strings and Sets.
+* More robust parser and printers.
 * Bug fixes, mostly small edge cases and weird symbol names.
 
 
 v0.1
-----------------------
+-----------------------
 *Released 2 April 2015*
 
 Initial version of Scala SmtLib.
