@@ -84,7 +84,7 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
   def kill(): Unit = synchronized {
     if(!isKilled) {
       try {
-        process.destroy()
+        process.destroyForcibly()
         in.close()
       } catch {
         case (io: java.io.IOException) => ()
