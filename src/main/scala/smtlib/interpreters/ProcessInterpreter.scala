@@ -70,7 +70,7 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
         in.write("\n")
         in.flush
 
-        process.destroy()
+        process.destroyForcibly()
         in.close()
       } catch {
         case (io: java.io.IOException) => ()
@@ -97,4 +97,17 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
   override def interrupt(): Unit = synchronized {
     kill()
   }
+
+  /*
+   * Manos, greatest hack:
+   * Process.destroyForcibly is only available on java8,
+   * Using the implicit conversion, if compiled with java7
+   * we will fallback to Process.destroy. If compiled on java8,
+   * it will ignore the implicit conversion as the method exists,
+   * and call the native Process.destroyForcibly.
+   */
+  private implicit class Java8Process(process: Process) {
+    def destroyForcibly() = process.destroy
+  }
+
 }
