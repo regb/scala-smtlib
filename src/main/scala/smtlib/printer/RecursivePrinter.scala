@@ -465,6 +465,23 @@ object RecursivePrinter extends Printer with TerminalTreesPrinter {
     writer.write(')')
   }
 
+  protected def printId(id: Identifier, writer: Writer): Unit = {
+    if(!id.isIndexed)
+      printSymbol(id.symbol, writer)
+    else {
+      writer.write("(_ ")
+      printSymbol(id.symbol, writer)
+      writer.write(' ')
+      printSExpr(id.indices.head, writer)
+      id.indices.tail.foreach(n => {
+        writer.write(' ')
+        printSExpr(n, writer) 
+      })
+      writer.write(")")
+    }
+  }
+
+
   private def printNary[A](
     writer: Writer, as: Seq[A], printer: (A, Writer) => Unit,
     pre: String, op: String, post: String): Unit = {

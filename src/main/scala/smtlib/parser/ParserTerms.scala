@@ -156,8 +156,8 @@ trait ParserTerms { this: ParserUtils =>
     eat(Tokens.Underscore)
     val sym = parseSymbol
 
-    val head = parseIndex
-    val indices = parseUntil(Tokens.CParen)(parseIndex _)
+    val head = parseSExpr
+    val indices = parseUntil(Tokens.CParen)(parseSExpr _)
 
     Identifier(sym, head +: indices)
   }

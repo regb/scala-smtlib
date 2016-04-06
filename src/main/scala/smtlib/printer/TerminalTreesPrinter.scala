@@ -43,22 +43,6 @@ trait TerminalTreesPrinter {
     case sym@SSymbol(_) => printSymbol(sym, writer)
   }
 
-  protected def printId(id: Identifier, writer: Writer): Unit = {
-    if(!id.isIndexed)
-      printSymbol(id.symbol, writer)
-    else {
-      writer.write("(_ ")
-      printSymbol(id.symbol, writer)
-      writer.write(' ')
-      printIndex(id.indices.head, writer)
-      id.indices.tail.foreach(n => {
-        writer.write(' ')
-        printIndex(n, writer) 
-      })
-      writer.write(")")
-    }
-  }
-
   protected def printLogic(logic: Logic, writer: Writer): Unit = logic match {
     case (logic: StandardLogic) =>
       writer.write(logic.toString)

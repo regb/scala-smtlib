@@ -179,6 +179,14 @@ What are you up to man?"""))
     checkTerm(QualifiedIdentifier("semi;colon"))
   }
 
+  def testIndexedIdentifiers(implicit printer: Printer): Unit = {
+    checkTerm(QualifiedIdentifier(Identifier("id", Seq(1))))
+    checkTerm(QualifiedIdentifier(Identifier("id", Seq(1, 2, 3))))
+    checkTerm(QualifiedIdentifier(Identifier("id", Seq(SSymbol("index1")))))
+    checkTerm(QualifiedIdentifier(Identifier("id", Seq(SSymbol("index1"), SSymbol("index2")))))
+    checkTerm(QualifiedIdentifier(Identifier("id", Seq(SList(3, SList(4, 2), SSymbol("end"))))))
+  }
+
   def testComposedTerm(implicit printer: Printer): Unit = {
     checkTerm(
       FunctionApplication(

@@ -297,10 +297,10 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
   private def printSort(sort: Sort, writer: Writer, actions: LinkedList[Action]): Unit = {
     val id = sort.id
     if(sort.subSorts.isEmpty)
-      actions.prepend(() => printId(id, writer))
+      actions.prepend(() => printId(id, writer, actions))
     else {
       actions.prepend(() => printNary(writer, sort.subSorts, (s: Sort, w: Writer) => printSort(s, w, actions), " ", " ", ")", actions))
-      actions.prepend(() => printId(id, writer))
+      actions.prepend(() => printId(id, writer, actions))
       actions.prepend(() => writer.write("("))
     }
   }
@@ -355,12 +355,12 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
 
   private def printQualifiedId(qi: QualifiedIdentifier, writer: Writer, actions: LinkedList[Action]): Unit = qi.sort match {
     case None =>
-      actions.prepend(() => printId(qi.id, writer))
+      actions.prepend(() => printId(qi.id, writer, actions))
     case Some(sort) =>
       actions.prepend(() => writer.write(")"))
       actions.prepend(() => printSort(sort, writer, actions))
       actions.prepend(() => writer.write(" "))
-      actions.prepend(() => printId(qi.id, writer))
+      actions.prepend(() => printId(qi.id, writer, actions))
       actions.prepend(() => writer.write("(as "))
   }
 
@@ -506,6 +506,30 @@ object TailPrinter extends Printer with TerminalTreesPrinter {
     actions.prepend(() => printSymbol(funDec.name, writer))
     actions.prepend(() => writer.write('('))
   }
+
+  protected def printId(id: Identifier, writer: Writer, actions: LinkedList[Action]): Unit = {
+    if(!id.isIndexed)
+      actions.prepend(() => printSymbol(id.symbol, writer))
+    else {
+      val newActions = new scala.collection.mutable.ListBuffer[Action]()
+      newActions.append(() => writer.write("(_ "))
+      newActions.append(() => printSymbol(id.symbol, writer))
+      newActions.append(() => writer.write(' '))
+      newActions.append(() => printSExpr(id.indices.head, writer, actions))
+      id.indices.tail.foreach(n => {
+        newActions.append(() => {
+          writer.write(' ')
+          printSExpr(n, writer, actions)
+        })
+      })
+      newActions.append(() => writer.write(")"))
+
+      newActions.toList.reverse.foreach(action =>
+        actions.prepend(action)
+      )
+    }
+  }
+
 
   private def printNary[A](
     writer: Writer, as: Seq[A], printer: (A, Writer) => Unit,

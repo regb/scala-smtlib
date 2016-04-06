@@ -6,8 +6,14 @@ import common._
 
 object Terms {
 
+  /*
+   * Identifier used to be indexed with Index type, that could be either SSymbol or SNumeral.
+   * This is actually the current (2.5) SMT-LIB standard.
+   * But in order to support some extensions in Z3, we use full SExpr as index.
+   */
   sealed trait Index
-  case class Identifier(symbol: SSymbol, indices: Seq[Index] = Seq()) {
+
+  case class Identifier(symbol: SSymbol, indices: Seq[SExpr] = Seq()) {
 
     def isIndexed: Boolean = indices.nonEmpty
 
