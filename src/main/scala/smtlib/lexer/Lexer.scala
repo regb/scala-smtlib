@@ -289,9 +289,8 @@ object Lexer {
   class IllegalTokenException(val token: String, val position: Position, msg: String) extends Exception(s"Illegal token [$token] at $position: $msg")
 
 
-  private val extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&', '_',
-                                     '!', '?', '[', ']', '{', '}', '=', '<', '>', '~', '.')
-
+  private val extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&',
+                                     '_', '!', '?', '=', '<', '>', '~', '.')
   def isSymbolChar(c: Char): Boolean =
     c.isDigit || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || extraSymbolChars.contains(c)
 
