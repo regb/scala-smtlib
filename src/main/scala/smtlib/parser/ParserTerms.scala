@@ -124,23 +124,19 @@ trait ParserTerms { this: ParserUtils =>
     if(getPeekToken.kind == Tokens.OParen) {
       eat(Tokens.OParen)
 
-      if(getPeekToken.kind == Tokens.Underscore) {
-        val id = parseUnderscoreIdentifier
-        Sort(id)
+      val res = if(getPeekToken.kind == Tokens.Underscore) {
+        Sort(parseUnderscoreIdentifier)
       } else {
-
         val name = parseIdentifier
 
-        val subSorts = new ListBuffer[Sort]
-        while(getPeekToken.kind != Tokens.CParen)
-          subSorts.append(parseSort)
-        eat(Tokens.CParen)
+        val subSorts = parseUntil(Tokens.CParen, eatEnd = false)(parseSort _)
 
         Sort(name, subSorts.toList)
       }
+      eat(Tokens.CParen)
+      res
     } else {
-      val id = parseIdentifier
-      Sort(id)
+      Sort(parseIdentifier)
     }
   }
 
@@ -157,7 +153,7 @@ trait ParserTerms { this: ParserUtils =>
     val sym = parseSymbol
 
     val head = parseSExpr
-    val indices = parseUntil(Tokens.CParen)(parseSExpr _)
+    val indices = parseUntil(Tokens.CParen, eatEnd = false)(parseSExpr _)
 
     Identifier(sym, head +: indices)
   }
@@ -166,7 +162,7 @@ trait ParserTerms { this: ParserUtils =>
     getPeekToken.kind match {
       case Tokens.OParen => {
         eat(Tokens.OParen)
-        getPeekToken.kind match {
+        val res = getPeekToken.kind match {
           case Tokens.As => {
             parseAsIdentifier
           }
@@ -175,6 +171,8 @@ trait ParserTerms { this: ParserUtils =>
           }
           case _ => expected(peekToken, Tokens.As, Tokens.Underscore)
         }
+        eat(Tokens.CParen)
+        res
       }
       case _ => QualifiedIdentifier(parseIdentifier)
     }
@@ -184,71 +182,59 @@ trait ParserTerms { this: ParserUtils =>
     eat(Tokens.As)
     val id = parseIdentifier
     val sort = parseSort
-    eat(Tokens.CParen)
     QualifiedIdentifier(id, Some(sort))
   }
 
   def parseIdentifier: Identifier = {
     if(getPeekToken.kind == Tokens.OParen) {
-      eat(Tokens.OParen)
-      parseUnderscoreIdentifier
+      parseWithin(Tokens.OParen, Tokens.CParen)(parseUnderscoreIdentifier _)
     } else {
-      val sym = parseSymbol
-      Identifier(sym)
+      Identifier(parseSymbol)
     }
+  }
+
+  protected def parseTermWithoutParens: Term = getPeekToken.kind match {
+    case Tokens.Let =>
+      eat(Tokens.Let)
+      val (head, bindings) = parseOneOrMore(parseVarBinding _)
+      val term = parseTerm
+      Let(head, bindings, term)
+
+    case Tokens.Forall =>
+      eat(Tokens.Forall)
+      val (head, vars) = parseOneOrMore(parseSortedVar _)
+      val term = parseTerm
+      Forall(head, vars, term)
+
+    case Tokens.Exists =>
+      eat(Tokens.Exists)
+      val (head, vars) = parseOneOrMore(parseSortedVar _)
+      val term = parseTerm
+      Exists(head, vars, term)
+
+    case Tokens.ExclamationMark =>
+      eat(Tokens.ExclamationMark)
+      val term = parseTerm
+      val head = parseAttribute
+      val attrs = parseUntil(Tokens.CParen, eatEnd = false)(parseAttribute _)
+      AnnotatedTerm(term, head, attrs)
+
+    case Tokens.As =>
+      parseAsIdentifier
+
+    case Tokens.Underscore =>
+      QualifiedIdentifier(parseUnderscoreIdentifier)
+
+    case _ => //should be function application
+      val id = parseQualifiedIdentifier 
+      val head = parseTerm
+      val terms = parseUntil(Tokens.CParen, eatEnd = false)(parseTerm _)
+      FunctionApplication(id, head::terms.toList)
   }
 
   def parseTerm: Term = {
     if(getPeekToken.kind == Tokens.OParen) {
-      eat(Tokens.OParen)
-
-      getPeekToken.kind match {
-        case Tokens.Let =>
-          eat(Tokens.Let)
-          val (head, bindings) = parseOneOrMore(parseVarBinding _)
-          val term = parseTerm
-          eat(Tokens.CParen)
-          Let(head, bindings, term)
-        case Tokens.Forall =>
-          eat(Tokens.Forall)
-          val (head, vars) = parseOneOrMore(parseSortedVar _)
-          val term = parseTerm
-          eat(Tokens.CParen)
-          Forall(head, vars, term)
-        case Tokens.Exists =>
-          eat(Tokens.Exists)
-          val (head, vars) = parseOneOrMore(parseSortedVar _)
-          val term = parseTerm
-          eat(Tokens.CParen)
-          Exists(head, vars, term)
-
-        case Tokens.ExclamationMark =>
-          eat(Tokens.ExclamationMark)
-          val term = parseTerm
-          val head = parseAttribute
-          val attrs = new ListBuffer[Attribute]
-          while(getPeekToken.kind != Tokens.CParen)
-            attrs.append(parseAttribute)
-          eat(Tokens.CParen)
-          AnnotatedTerm(term, head, attrs)
-
-        case Tokens.As =>
-          parseAsIdentifier
-        case Tokens.Underscore =>
-          QualifiedIdentifier(parseUnderscoreIdentifier)
-
-        case _ => //should be function application
-          val id = parseQualifiedIdentifier 
-
-          val head = parseTerm
-
-          val terms = new ListBuffer[Term]
-          while(getPeekToken.kind != Tokens.CParen)
-            terms.append(parseTerm)
-          eat(Tokens.CParen)
-
-          FunctionApplication(id, head::terms.toList)
-      }
+      parseWithin(Tokens.OParen, Tokens.CParen)(parseTermWithoutParens _)
     } else {
       val cst = tryParseConstant
       cst.getOrElse(QualifiedIdentifier(parseIdentifier))
@@ -281,19 +267,7 @@ trait ParserTerms { this: ParserUtils =>
     }
   }
 
-  def parseSList: SList = {
-    eat(Tokens.OParen)
-    parseSListContent
-  }
-
-  //parse s-list assuming the parentheses has been parsed
-  protected def parseSListContent: SList = {
-    val exprs = new ListBuffer[SExpr]
-    while(getPeekToken.kind != Tokens.CParen)
-      exprs.append(parseSExpr)
-    eat(Tokens.CParen)
-    SList(exprs.toList)
-  }
+  def parseSList: SList = SList(parseMany(parseSExpr _).toList)
 
   /**
     *

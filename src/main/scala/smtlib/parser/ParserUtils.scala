@@ -84,6 +84,17 @@ trait ParserUtils {
     }
   }
 
+  protected def parseBefore[A](endKind: TokenKind)(parseFun: () => A): A = {
+    val res = parseFun()
+    eat(endKind)
+    res
+  }
+
+  protected def parseWithin[A](startKind: TokenKind, endKind: TokenKind)(parseFun: () => A): A = {
+    eat(startKind)
+    parseBefore(endKind)(parseFun)
+  }
+
   protected def parseUntil[A](endKind: TokenKind, eatEnd: Boolean = true)(parseFun: () => A): Seq[A] = {
     val items = new ListBuffer[A]
     while(peekToken != null && peekToken.kind != endKind)

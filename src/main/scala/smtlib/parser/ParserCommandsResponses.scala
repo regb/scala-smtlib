@@ -91,7 +91,7 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
             check(t, Tokens.OParen)
             peekToken match {
               case Tokens.SymbolLit("error") => parseErrorResponse
-              case _ => GetOptionResponseSuccess(parseSListContent)
+              case _ => GetOptionResponseSuccess(SList(parseUntil(Tokens.CParen)(parseSExpr _).toList))
             }
           }
         }
@@ -111,7 +111,7 @@ trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCo
             check(t, Tokens.OParen)
             peekToken match {
               case Tokens.SymbolLit("error") => parseErrorResponse
-              case _ => GetProofResponseSuccess(parseSListContent)
+              case _ => GetProofResponseSuccess(SList(parseUntil(Tokens.CParen)(parseSExpr _).toList))
             }
           }
         }
