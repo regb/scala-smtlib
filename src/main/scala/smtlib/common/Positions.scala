@@ -33,4 +33,6 @@ trait Positioned {
   def getPos: Position = {
     _pos.get
   }
+
+  def optPos: Option[Position] = _pos
 }
