@@ -13,59 +13,40 @@ trait Printer {
 
   val name: String
 
-  def printScript(script: Script, writer: Writer): Unit
-  def printCommand(command: Command, writer: Writer): Unit
-  def printTerm(term: Term, writer: Writer): Unit
-  def printSort(sort: Sort, writer: Writer): Unit
-  def printCommandResponse(response: CommandResponse, writer: Writer): Unit
+  protected def newContext(writer: Writer): PrintingContext
 
-  def printSExpr(sExpr: SExpr, writer: Writer): Unit
+  private def print(tree: Tree, writer: Writer): Unit = newContext(writer).output(tree)
+
+  def printTerm(term: Term, writer: Writer): Unit = print(term, writer)
+  def printSort(sort: Sort, writer: Writer): Unit = print(sort, writer)
+  def printCommand(cmd: Command, writer: Writer): Unit = print(cmd, writer)
+  def printCommandResponse(resp: CommandResponse, writer: Writer): Unit = print(resp, writer)
+  def printSExpr(sexpr: SExpr, writer: Writer): Unit = print(sexpr, writer)
+
+  def printScript(script: Script, writer: Writer): Unit = {
+    for (cmd <- script.commands) printCommand(cmd, writer)
+  }
+
+  private def treeToString(tree: Tree): String = {
+    val output = new StringWriter
+    val writer = new BufferedWriter(output)
+    print(tree, writer)
+    writer.flush()
+    output.toString
+  }
+
+  def toString(term: Term): String = treeToString(term)
+  def toString(sort: Sort): String = treeToString(sort)
+  def toString(command: Command): String = treeToString(command)
+  def toString(response: CommandResponse): String = treeToString(response)
+  def toString(sexpr: SExpr): String = treeToString(sexpr)
 
   def toString(script: Script): String = {
     val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printScript(script, sWriter)
-    sWriter.flush()
+    val writer = new BufferedWriter(output)
+    for (cmd <- script.commands) printCommand(cmd, writer)
+    writer.flush()
     output.toString
   }
 
-  def toString(command: Command): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printCommand(command, sWriter)
-    sWriter.flush()
-    output.toString
-  }
-
-  def toString(term: Term): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printTerm(term, sWriter)
-    sWriter.flush()
-    output.toString
-  }
-
-  def toString(sort: Sort): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printSort(sort, sWriter)
-    sWriter.flush()
-    output.toString
-  }
-
-  def toString(response: CommandResponse): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printCommandResponse(response, sWriter)
-    sWriter.flush()
-    output.toString
-  }
-
-  def toString(sExpr: SExpr): String = {
-    val output = new StringWriter
-    val sWriter = new BufferedWriter(output)
-    printSExpr(sExpr, sWriter)
-    sWriter.flush()
-    output.toString
-  }
 }

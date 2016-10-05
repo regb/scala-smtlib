@@ -3,8 +3,9 @@ package parser
 
 import common._
 
-
 object Terms {
+
+  sealed trait Tree
 
   /*
    * Identifier used to be indexed with Index type, that could be either SSymbol or SNumeral.
@@ -13,10 +14,8 @@ object Terms {
    */
   sealed trait Index
 
-  case class Identifier(symbol: SSymbol, indices: Seq[SExpr] = Seq()) {
-
+  case class Identifier(symbol: SSymbol, indices: Seq[SExpr] = Seq()) extends Tree {
     def isIndexed: Boolean = indices.nonEmpty
-
   }
 
   object SimpleIdentifier {
@@ -26,7 +25,6 @@ object Terms {
       case _ => None
     }
   }
-
 
   //(_ map or)
   object ExtendedIdentifier {
@@ -39,9 +37,10 @@ object Terms {
     }
   }
 
-  case class Sort(id: Identifier, subSorts: Seq[Sort]) {
+  case class Sort(id: Identifier, subSorts: Seq[Sort]) extends Tree {
     override def toString: String = printer.RecursivePrinter.toString(this)
   }
+
   object Sort {
     def apply(id: Identifier): Sort = Sort(id, Seq())
   }
@@ -49,17 +48,16 @@ object Terms {
   /* TODO
      Should we have an abstract class attribute and a bunch of predefined 
      attributes along with a default non-standard attribute? */
-  case class Attribute(keyword: SKeyword, value: Option[AttributeValue])
+  case class Attribute(keyword: SKeyword, value: Option[AttributeValue]) extends Tree
   object Attribute {
     def apply(key: SKeyword): Attribute = Attribute(key, None)
   }
   sealed trait AttributeValue extends SExpr
 
-  case class SortedVar(name: SSymbol, sort: Sort)
-  case class VarBinding(name: SSymbol, term: Term)
+  case class SortedVar(name: SSymbol, sort: Sort) extends Tree
+  case class VarBinding(name: SSymbol, term: Term) extends Tree
 
-
-  sealed trait SExpr extends Positioned
+  sealed trait SExpr extends Tree with Positioned
 
   case class SList(sexprs: List[SExpr]) extends SExpr with AttributeValue
   object SList {
@@ -69,7 +67,8 @@ object Terms {
   case class SSymbol(name: String) extends SExpr with AttributeValue with Index
 
   /* SComment is never parsed, only used for pretty printing */
-  case class SComment(s: String)
+  // @nv XXX: this is actually never used...
+  //case class SComment(s: String)
 
   sealed abstract class Term extends Positioned with SExpr {
     override def toString: String = printer.RecursivePrinter.toString(this)
@@ -168,7 +167,7 @@ object Commands {
    * flags. Additional solver-specific flags are supported via the general
    * KeywordInfoFlag
    */
-  sealed abstract class InfoFlag
+  sealed abstract class InfoFlag extends Tree
   case object AllStatisticsInfoFlag extends InfoFlag
   case object AssertionStackLevelsInfoFlag extends InfoFlag
   case object AuthorsInfoFlag extends InfoFlag
@@ -183,7 +182,7 @@ object Commands {
    * A bunch of standard option (defined by the SMT-LIB standard) and
    * a generic syntax via attribute allows for solver-specific options
    */
-  sealed abstract class SMTOption
+  sealed abstract class SMTOption extends Tree
   case class DiagnosticOutputChannel(value: String) extends SMTOption
   case class GlobalDeclarations(value: Boolean) extends SMTOption
   case class PrintSuccess(value: Boolean) extends SMTOption
@@ -199,7 +198,7 @@ object Commands {
   case class Verbosity(value: Int) extends SMTOption
   case class AttributeOption(attribute: Attribute) extends SMTOption
 
-  @deprecated("The solver option :iteractive-mode has been renamed :produce-assertions. Use ProduceAssertions instead", "SMT-LIB 2.5")
+  @deprecated("The solver option :interactive-mode has been renamed :produce-assertions. Use ProduceAssertions instead", "SMT-LIB 2.5")
   class InteractiveMode(val value: Boolean) extends SMTOption {
 
     override def equals(o: Any): Boolean = o != null && (o match {
@@ -210,7 +209,7 @@ object Commands {
     override def hashCode = value.hashCode
   }
 
-  @deprecated("The solver option :iteractive-mode has been renamed :produce-assertions. Use ProduceAssertions instead", "SMT-LIB 2.5")
+  @deprecated("The solver option :interactive-mode has been renamed :produce-assertions. Use ProduceAssertions instead", "SMT-LIB 2.5")
   object InteractiveMode {
     def apply(value: Boolean) = new InteractiveMode(value)
     def unapply(opt: SMTOption): Option[Boolean] = opt match {

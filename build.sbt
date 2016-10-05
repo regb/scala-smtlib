@@ -1,4 +1,4 @@
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Ypatmat-exhaust-depth", "40")
 
 javaOptions in IntegrationTest ++= Seq("-Xss10M")
 
