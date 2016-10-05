@@ -2,6 +2,7 @@ package smtlib
 package parser
 
 import common._
+import printer._
 
 object Terms {
 
@@ -102,6 +103,9 @@ object Terms {
   case class SDecimal(value: BigDecimal) extends Literal[BigDecimal]
   case class SString(value: String) extends Literal[String]
 
+  abstract class TermExtension extends Term {
+    def print(ctx: PrintingContext): Unit
+  }
 }
 
 object Commands {
@@ -282,6 +286,10 @@ object Commands {
     }
   }
 
+  abstract class CommandExtension extends Command {
+    def print(ctx: PrintingContext): Unit
+  }
+
 }
 
 
@@ -381,6 +389,9 @@ object CommandsResponses {
   case class GetValueResponseSuccess(valuationPairs: Seq[(Term, Term)]) extends 
     GetValueResponse with SuccessfulResponse
 
+  abstract class CommandResponseExtension extends CommandResponse {
+    def print(ctx: PrintingContext): Unit
+  }
 
 
   /*

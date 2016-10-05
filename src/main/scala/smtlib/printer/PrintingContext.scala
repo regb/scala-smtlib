@@ -164,6 +164,8 @@ class PrintingContext(writer: Writer) {
     case SBinary(value) => print("#b" + value.map(if(_) "1" else "0").mkString)
     case SDecimal(value) => print(value.toString)
     case SString(value) => printString(value)
+
+    case ext: TermExtension => ext.print(this)
   }
 
   private def printCommand(command: Command): Unit = command match {
@@ -341,6 +343,8 @@ class PrintingContext(writer: Writer) {
         print(")")
       }, "(", " ", ")")
       print(")\n")
+
+    case ext: CommandExtension => ext.print(this)
   }
 
   private def printSort(sort: Sort): Unit = {
@@ -420,6 +424,8 @@ class PrintingContext(writer: Writer) {
         print(pair._2)
         print(")")
       }, "(", " ", ")")
+
+    case ext: CommandResponseExtension => ext.print(this)
   }
 
   protected def printInfoFlag(flag: InfoFlag): Unit = flag match {
