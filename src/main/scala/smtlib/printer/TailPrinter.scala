@@ -21,11 +21,11 @@ object TailPrinter extends Printer {
     var actions = new LinkedList[() => Unit]
     val actionStack = new Stack[LinkedList[() => Unit]]
 
-    override protected def print(tree: Tree): Unit = {
+    override def print(tree: Tree): Unit = {
       actions.append(() => super.print(tree))
     }
 
-    override protected def print(str: String): Unit = {
+    override def print(str: String): Unit = {
       actions.append(() => super.print(str))
     }
 

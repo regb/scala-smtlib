@@ -5,7 +5,7 @@ import common._
 
 object Tokens {
 
-  class Token(val kind: TokenKind) extends Positioned {
+  sealed class Token(val kind: TokenKind) extends Positioned {
     override def toString = kind.toString
   }
 
@@ -37,7 +37,7 @@ object Tokens {
     override def toString = content.toString
   }
 
-  sealed abstract class TokenKind
+  sealed trait TokenKind
 
   case object OParen extends TokenKind /* ( */
   case object CParen extends TokenKind /* ) */
@@ -50,7 +50,7 @@ object Tokens {
   case object BinaryLitKind extends TokenKind /* #b0101 */ 
   case object HexadecimalLitKind extends TokenKind /* #xFF1D */
 
-  sealed trait ReservedWord extends TokenKind
+  trait ReservedWord extends TokenKind
   case object BINARY extends ReservedWord
   case object DECIMAL extends ReservedWord
   case object HEXADECIMAL extends ReservedWord

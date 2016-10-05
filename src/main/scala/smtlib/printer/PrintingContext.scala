@@ -15,7 +15,7 @@ class PrintingContext(writer: Writer) {
     finish()
   }
 
-  protected def print(tree: Tree): Unit = tree match {
+  def print(tree: Tree): Unit = tree match {
     case term: Term => printTerm(term)
     case sort: Sort => printSort(sort)
     case cmd: Command => printCommand(cmd)
@@ -65,16 +65,16 @@ class PrintingContext(writer: Writer) {
       print(")")
   }
 
-  protected def print(str: String): Unit = writer.write(str)
+  def print(str: String): Unit = writer.write(str)
 
   protected def start(): Unit = ()
   protected def finish(): Unit = ()
 
-  protected def printNary(trees: Seq[Tree], start: String, sep: String, end: String): Unit = {
+  def printNary(trees: Seq[Tree], start: String, sep: String, end: String): Unit = {
     printNary(trees, print(_: Tree), start, sep, end)
   }
 
-  protected def printNary[T](ts: Seq[T], p: T => Unit, start: String, sep: String, end: String): Unit = {
+  def printNary[T](ts: Seq[T], p: T => Unit, start: String, sep: String, end: String): Unit = {
     print(start)
 
     var c = 0
@@ -337,12 +337,9 @@ class PrintingContext(writer: Writer) {
             print(" ")
             print(field._2)
             print(")")
-          }, " ", " ", "")
-          print(")")
-        }, " ", " ", "")
-        print(")")
-      }, "(", " ", ")")
-      print(")\n")
+          }, " ", " ", ")")
+        }, " ", " ", ")")
+      }, "(", " ", "))\n")
 
     case ext: CommandExtension => ext.print(this)
   }

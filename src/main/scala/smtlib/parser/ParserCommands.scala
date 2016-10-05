@@ -32,7 +32,6 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
       CheckSatAssuming(props)
     }
 
-
     case Tokens.DeclareConst => {
       val name = parseSymbol
       val sort = parseSort
