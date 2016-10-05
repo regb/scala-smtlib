@@ -217,6 +217,7 @@ class Lexer(reader: java.io.Reader) {
     }
     res.toList
   }
+
   private def readHexadecimal(): Hexadecimal = {
     var res = ""
     if(peek == -1 || !isHexa(peek.toChar))
@@ -228,7 +229,7 @@ class Lexer(reader: java.io.Reader) {
   }
 
 
-  private def toReserved(s: String): Option[Token] = {
+  protected def toReserved(s: String): Option[Token] = {
     val str2tok: PartialFunction[String, Token] = {
       case "BINARY" => Token(BINARY)
       case "DECIMAL" => Token(DECIMAL)
@@ -291,6 +292,7 @@ object Lexer {
 
   private val extraSymbolChars = Set('+', '-', '*', '/', '@', '$', '%', '^', '&',
                                      '_', '!', '?', '=', '<', '>', '~', '.')
+
   def isSymbolChar(c: Char): Boolean =
     c.isDigit || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || extraSymbolChars.contains(c)
 

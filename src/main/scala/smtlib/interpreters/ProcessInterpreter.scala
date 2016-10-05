@@ -20,7 +20,8 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
   lazy val in = new BufferedWriter(new OutputStreamWriter(process.getOutputStream))
   lazy val out = new BufferedReader(new InputStreamReader(process.getInputStream))
 
-  lazy val parser = new Parser(new Lexer(out))
+  lazy val parser: Parser = new Parser(new Lexer(out))
+  lazy val printer: Printer = RecursivePrinter
 
   def parseResponseOf(cmd: SExpr): SExpr = cmd match {
     case CheckSat() => parser.parseCheckSatResponse
@@ -48,7 +49,7 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
    */
   override def eval(cmd: SExpr): SExpr = {
     try {
-      RecursivePrinter.printSExpr(cmd, in)
+      printer.printSExpr(cmd, in)
       in.write("\n")
       in.flush
 
@@ -66,7 +67,7 @@ abstract class ProcessInterpreter(protected val process: Process) extends Interp
   override def free(): Unit = synchronized {
     if(!isKilled) {
       try {
-        RecursivePrinter.printCommand(Exit(), in)
+        printer.printCommand(Exit(), in)
         in.write("\n")
         in.flush
 

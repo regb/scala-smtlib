@@ -4,11 +4,10 @@ package interpreters
 import parser.Terms._
 import parser.Commands._
 import parser.CommandsResponses._
-import printer.RecursivePrinter
 
 class CVC4Interpreter(executable: String, args: Array[String]) extends ProcessInterpreter(executable, args) {
 
-  RecursivePrinter.printCommand(SetOption(PrintSuccess(true)), in)
+  printer.printCommand(SetOption(PrintSuccess(true)), in)
   in.write("\n")
   in.flush
   parser.parseGenResponse

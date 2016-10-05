@@ -5,9 +5,10 @@ import common._
 
 object Tokens {
 
-  sealed class Token(val kind: TokenKind) extends Positioned {
+  class Token(val kind: TokenKind) extends Positioned {
     override def toString = kind.toString
   }
+
   object Token {
     def apply(kind: TokenKind): Token = new Token(kind)
     def unapply(token: Token): Option[TokenKind] = Some(token.kind)

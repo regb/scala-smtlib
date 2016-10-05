@@ -6,7 +6,7 @@ import printer.RecursivePrinter
 
 class Z3Interpreter(executable: String, args: Array[String]) extends ProcessInterpreter(executable, args) {
 
-  RecursivePrinter.printCommand(SetOption(PrintSuccess(true)), in)
+  printer.printCommand(SetOption(PrintSuccess(true)), in)
   in.write("\n")
   in.flush
   parser.parseGenResponse
