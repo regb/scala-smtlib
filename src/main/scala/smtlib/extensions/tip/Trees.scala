@@ -140,7 +140,7 @@ object Commands {
       ctx.printNary(datatypes, (datatype: (SSymbol, Seq[Constructor])) => {
         ctx.print("(")
         ctx.print(datatype._1.name)
-        ctx.printNary(datatype._2, (constructor: Constructor) => {
+        if (datatype._2.nonEmpty) ctx.printNary(datatype._2, (constructor: Constructor) => {
           ctx.print("(")
           ctx.print(constructor.sym.name)
           if (constructor.fields.nonEmpty) ctx.printNary(constructor.fields, (field: (SSymbol, Sort)) => {
@@ -149,8 +149,10 @@ object Commands {
             ctx.print(" ")
             ctx.print(field._2)
             ctx.print(")")
-          }, " ", " ", ")")
-        }, " ", " ", ")")
+          }, " ", " ", "")
+          ctx.print(")")
+        }, " ", " ", "")
+        ctx.print(")")
       }, "(", " ", "))\n")
     }
   }
