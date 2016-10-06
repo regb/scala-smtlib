@@ -43,13 +43,14 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
 
     case Tokens.At =>
       eat(Tokens.At)
-      val (caller, args) = parseOneOrMore(parseTerm _)
+      val (caller +: args) = parseUntil(LT.CParen, eatEnd = false)(parseTerm _)
       Application(caller, args)
 
     case Tokens.Match =>
       eat(Tokens.Match)
       val scrut = parseTerm
-      val (caseHead, caseRest) = parseOneOrMore { () =>
+      val cases = parseUntil(LT.CParen, eatEnd = false) { () =>
+        eat(LT.OParen)
         eat(Tokens.Case)
         val pattern = getPeekToken.kind match {
           case Tokens.Default =>
@@ -57,7 +58,6 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
             Default
 
           case LT.OParen =>
-            eat(LT.OParen)
             val (sym, binders) = parseOneOrMore(parseSymbol _)
             CaseClass(sym, binders)
 
@@ -66,9 +66,10 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
             CaseObject(sym)
         }
         val rhs = parseTerm
+        eat(LT.CParen)
         Case(pattern, rhs)
       }
-      Match(scrut, caseHead +: caseRest)
+      Match(scrut, cases)
 
     case _ => super.parseTermWithoutParens
   }

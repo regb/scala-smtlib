@@ -5,7 +5,8 @@ import parser.Terms._
 import parser.Commands._
 import parser.CommandsResponses._
 
-class CVC4Interpreter(executable: String, args: Array[String]) extends ProcessInterpreter(executable, args) {
+class CVC4Interpreter(executable: String, args: Array[String], tailPrinter: Boolean = false)
+  extends ProcessInterpreter(executable, args, tailPrinter) {
 
   printer.printCommand(SetOption(PrintSuccess(true)), in)
   in.write("\n")

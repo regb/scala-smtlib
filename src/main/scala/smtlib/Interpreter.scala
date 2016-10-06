@@ -4,6 +4,7 @@ import parser.Commands.{Script, Command}
 import parser.CommandsResponses.CommandResponse
 import parser.Parser
 import parser.Terms._
+import printer.Printer
 
 /*
  * An interpreter is a stateful object that can eval Commands and returns
@@ -18,6 +19,9 @@ import parser.Terms._
          seems just wrong. Need to clarify that.
  */
 trait Interpreter {
+
+  val printer: Printer
+  val parser: Parser
 
   def eval(cmd: SExpr): SExpr
 

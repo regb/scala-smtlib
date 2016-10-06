@@ -10,18 +10,17 @@ import printer._
 
 import java.io._
 
-abstract class ProcessInterpreter(protected val process: Process) extends Interpreter {
+abstract class ProcessInterpreter(protected val process: Process, tailPrinter: Boolean) extends Interpreter {
 
-  def this(executable: String, args: Array[String]) = {
-    this(java.lang.Runtime.getRuntime.exec((executable :: args.toList).mkString(" ")))
+  def this(executable: String, args: Array[String], tailPrinter: Boolean = false) = {
+    this(java.lang.Runtime.getRuntime.exec((executable :: args.toList).mkString(" ")), tailPrinter)
   }
-
 
   lazy val in = new BufferedWriter(new OutputStreamWriter(process.getOutputStream))
   lazy val out = new BufferedReader(new InputStreamReader(process.getInputStream))
 
   lazy val parser: Parser = new Parser(new Lexer(out))
-  lazy val printer: Printer = RecursivePrinter
+  lazy val printer: Printer = if (tailPrinter) TailPrinter else RecursivePrinter
 
   def parseResponseOf(cmd: SExpr): SExpr = cmd match {
     case CheckSat() => parser.parseCheckSatResponse

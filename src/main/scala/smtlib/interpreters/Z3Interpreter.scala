@@ -4,7 +4,8 @@ package interpreters
 import parser.Commands._
 import printer.RecursivePrinter
 
-class Z3Interpreter(executable: String, args: Array[String]) extends ProcessInterpreter(executable, args) {
+class Z3Interpreter(executable: String, args: Array[String], tailPrinter: Boolean = false)
+  extends ProcessInterpreter(executable, args, tailPrinter) {
 
   printer.printCommand(SetOption(PrintSuccess(true)), in)
   in.write("\n")
