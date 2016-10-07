@@ -61,17 +61,19 @@ trait ParserUtils {
   /*
    * Make sure the next token has the expected kind and read it
    */
-  protected def eat(expected: TokenKind): Unit = {
+  protected def eat(expected: TokenKind): Token = {
     val token = nextToken
     check(token, expected)
+    token
   }
   /*
    * Make sure the next token is exactly ``expected`` (usually a symbol lit)
    */
-  protected def eat(expected: Token): Unit = {
+  protected def eat(expected: Token): Token = {
     val token = nextToken
     if(token != expected)
       throw new UnexpectedTokenException(token, Seq(expected.kind))
+    token
   }
 
 

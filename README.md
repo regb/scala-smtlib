@@ -218,7 +218,7 @@ recent build. [Here](https://github.com/regb/cafesat/blob/master/build.sbt) is
 an example of how to do it, you can pick any commit. If you are interested in
 this route, you should check the sbt official documentation.
 
-Optionnaly, you can test Scala SMT-LIB in your environment by running the test
+Optionally, you can test Scala SMT-LIB in your environment by running the test
 suite. The tests are organized in unit and functional tests. Tu run the unit
 tests (very fast) you can type:
 

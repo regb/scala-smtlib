@@ -260,7 +260,7 @@ What are you up to man?"""))
 
     checkCommand(GetAssertions())
     checkCommand(GetAssignment())
-    checkCommand(GetInfo(AuthorsInfoFlag))
+    checkCommand(GetInfo(AuthorsInfoFlag()))
     checkCommand(GetModel())
     checkCommand(GetOption("keyword"))
     checkCommand(GetProof())
@@ -279,15 +279,15 @@ What are you up to man?"""))
   }
 
   def testSetLogic(implicit printer: Printer): Unit = {
-    checkCommand(SetLogic(ALL))
-    checkCommand(SetLogic(AUFLIA))
-    checkCommand(SetLogic(AUFLIRA))
-    checkCommand(SetLogic(AUFNIRA))
-    checkCommand(SetLogic(LRA))
-    checkCommand(SetLogic(QF_UF))
-    checkCommand(SetLogic(QF_LIA))
-    checkCommand(SetLogic(QF_LRA))
-    checkCommand(SetLogic(QF_AX))
+    checkCommand(SetLogic(ALL()))
+    checkCommand(SetLogic(AUFLIA()))
+    checkCommand(SetLogic(AUFLIRA()))
+    checkCommand(SetLogic(AUFNIRA()))
+    checkCommand(SetLogic(LRA()))
+    checkCommand(SetLogic(QF_UF()))
+    checkCommand(SetLogic(QF_LIA()))
+    checkCommand(SetLogic(QF_LRA()))
+    checkCommand(SetLogic(QF_AX()))
   }
 
   def testDeclarationWeirdNames(implicit printer: Printer): Unit = {
@@ -384,18 +384,18 @@ It spans a couple lines""")))))
   }
 
   def testGetInfoCommand(implicit printer: Printer): Unit = {
-    checkCommand(GetInfo(ErrorBehaviorInfoFlag))
-    checkCommand(GetInfo(NameInfoFlag))
-    checkCommand(GetInfo(AuthorsInfoFlag))
-    checkCommand(GetInfo(VersionInfoFlag))
-    checkCommand(GetInfo(ReasonUnknownInfoFlag))
-    checkCommand(GetInfo(AllStatisticsInfoFlag))
+    checkCommand(GetInfo(ErrorBehaviorInfoFlag()))
+    checkCommand(GetInfo(NameInfoFlag()))
+    checkCommand(GetInfo(AuthorsInfoFlag()))
+    checkCommand(GetInfo(VersionInfoFlag()))
+    checkCommand(GetInfo(ReasonUnknownInfoFlag()))
+    checkCommand(GetInfo(AllStatisticsInfoFlag()))
     checkCommand(GetInfo(KeywordInfoFlag("custom")))
   }
 
   def testSimpleScript(implicit printer: Printer): Unit = {
     val script = Script(List(
-      SetLogic(QF_UF),
+      SetLogic(QF_UF()),
       DeclareSort("MySort", 0),
       Push(1),
       Assert(FunctionApplication(QualifiedIdentifier("<"), Seq(SNumeral(3), SNumeral(1)))),
@@ -548,7 +548,7 @@ It spans a couple lines""")))))
 
   def testSExprsSpecializedTrees(implicit printer: Printer): Unit = {
     checkSExpr(CheckSat())
-    checkSExpr(SetLogic(AUFLIA))
+    checkSExpr(SetLogic(AUFLIA()))
     checkSExpr(FunctionApplication(
                QualifiedIdentifier("f"), Seq(QualifiedIdentifier("a"), QualifiedIdentifier("b"))))
     checkSExpr(Let(VarBinding("a", QualifiedIdentifier("x")), Seq(), QualifiedIdentifier("a")))

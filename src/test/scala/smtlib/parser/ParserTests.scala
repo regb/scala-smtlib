@@ -360,7 +360,7 @@ class ParserTests extends FunSuite with Timeouts {
       (assert (= (f a) a))
       (check-sat)
     """
-    val cmd1 = SetLogic(QF_UF)
+    val cmd1 = SetLogic(QF_UF())
     val cmd2 = DeclareFun("f", Seq(Sort("Int")), Sort("Int"))
     val cmd3 = DeclareFun("a", Seq(), Sort("Int"))
     val cmd4 =
@@ -397,7 +397,7 @@ class ParserTests extends FunSuite with Timeouts {
     val parser = failAfter(3 seconds) { new Parser(lexer) }
 
     pis.write("(set-logic QF_LRA)")
-    assert(parser.parseCommand === SetLogic(QF_LRA))
+    assert(parser.parseCommand === SetLogic(QF_LRA()))
 
     pis.write("(assert (< 1 3))")
     assert(parser.parseCommand === 

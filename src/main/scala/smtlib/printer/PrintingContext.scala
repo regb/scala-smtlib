@@ -317,9 +317,9 @@ class PrintingContext(writer: Writer) {
     case SetLogic(logic) =>
       print("(set-logic ")
       logic match {
-        case std: StandardLogic => print(std.toString)
+        case (std: StandardLogic) => print(Logic.asString(std))
         case NonStandardLogic(sym) => print(sym)
-        case ALL => print("ALL")
+        case ALL() => print("ALL")
       }
       print(")\n")
 
@@ -428,13 +428,13 @@ class PrintingContext(writer: Writer) {
   }
 
   protected def printInfoFlag(flag: InfoFlag): Unit = flag match {
-    case AllStatisticsInfoFlag => print(":all-statistics")
-    case AssertionStackLevelsInfoFlag => print(":assertion-stack-level")
-    case AuthorsInfoFlag => print(":authors")
-    case ErrorBehaviorInfoFlag => print(":error-behavior")
-    case NameInfoFlag => print(":name")
-    case ReasonUnknownInfoFlag => print(":reason-unknown")
-    case VersionInfoFlag => print(":version")
+    case AllStatisticsInfoFlag() => print(":all-statistics")
+    case AssertionStackLevelsInfoFlag() => print(":assertion-stack-level")
+    case AuthorsInfoFlag() => print(":authors")
+    case ErrorBehaviorInfoFlag() => print(":error-behavior")
+    case NameInfoFlag() => print(":name")
+    case ReasonUnknownInfoFlag() => print(":reason-unknown")
+    case VersionInfoFlag() => print(":version")
     case KeywordInfoFlag(keyword) =>
       print(":")
       print(keyword)

@@ -9,13 +9,22 @@ object Terms {
   sealed trait Tree
 
   /*
+   * Many terms are case class X() with empty parameters list instead of being
+   * the more usual case object X. The reason is that they eventually all inherit
+   * from Positioned, which means they have a hidden Position attribute, and hence
+   * we cannot share a unique global object for each syntax element.
+   * Of course, I'm not happy with that solution, but I'm not sure what better
+   * options we have.
+   */
+
+  /*
    * Identifier used to be indexed with Index type, that could be either SSymbol or SNumeral.
    * This is actually the current (2.5) SMT-LIB standard.
    * But in order to support some extensions in Z3, we use full SExpr as index.
    */
   sealed trait Index
 
-  case class Identifier(symbol: SSymbol, indices: Seq[SExpr] = Seq()) extends Tree {
+  case class Identifier(symbol: SSymbol, indices: Seq[SExpr] = Seq()) extends Tree with Positioned {
     def isIndexed: Boolean = indices.nonEmpty
   }
 
@@ -38,7 +47,7 @@ object Terms {
     }
   }
 
-  case class Sort(id: Identifier, subSorts: Seq[Sort]) extends Tree {
+  case class Sort(id: Identifier, subSorts: Seq[Sort]) extends Tree with Positioned {
     override def toString: String = printer.RecursivePrinter.toString(this)
   }
 
@@ -49,14 +58,14 @@ object Terms {
   /* TODO
      Should we have an abstract class attribute and a bunch of predefined 
      attributes along with a default non-standard attribute? */
-  case class Attribute(keyword: SKeyword, value: Option[AttributeValue]) extends Tree
+  case class Attribute(keyword: SKeyword, value: Option[AttributeValue]) extends Tree with Positioned
   object Attribute {
     def apply(key: SKeyword): Attribute = Attribute(key, None)
   }
   sealed trait AttributeValue extends SExpr
 
-  case class SortedVar(name: SSymbol, sort: Sort) extends Tree
-  case class VarBinding(name: SSymbol, term: Term) extends Tree
+  case class SortedVar(name: SSymbol, sort: Sort) extends Tree with Positioned
+  case class VarBinding(name: SSymbol, term: Term) extends Tree with Positioned
 
   sealed trait SExpr extends Tree with Positioned
 
@@ -145,6 +154,7 @@ object Commands {
   case class GetUnsatCore() extends Command
   case class GetValue(term: Term, terms: Seq[Term]) extends Command
 
+  //TODO: should n be an SNumeral so that we can have a Position?
   case class Pop(n: Int) extends Command
   case class Push(n: Int) extends Command
 
@@ -161,7 +171,8 @@ object Commands {
 
   case class FunDec(name: SSymbol, params: Seq[SortedVar], returnSort: Sort)
   case class FunDef(name: SSymbol, params: Seq[SortedVar], returnSort: Sort, body: Term)
-  case class PropLiteral(symbol: SSymbol, polarity: Boolean)
+  //TODO: cannot get exact position of the polarity
+  case class PropLiteral(symbol: SSymbol, polarity: Boolean) extends Positioned
 
   case class Constructor(sym: SSymbol, fields: Seq[(SSymbol, Sort)])
 
@@ -171,14 +182,14 @@ object Commands {
    * flags. Additional solver-specific flags are supported via the general
    * KeywordInfoFlag
    */
-  sealed abstract class InfoFlag extends Tree
-  case object AllStatisticsInfoFlag extends InfoFlag
-  case object AssertionStackLevelsInfoFlag extends InfoFlag
-  case object AuthorsInfoFlag extends InfoFlag
-  case object ErrorBehaviorInfoFlag extends InfoFlag
-  case object NameInfoFlag extends InfoFlag
-  case object ReasonUnknownInfoFlag extends InfoFlag
-  case object VersionInfoFlag extends InfoFlag
+  sealed abstract class InfoFlag extends Tree with Positioned
+  case class AllStatisticsInfoFlag() extends InfoFlag
+  case class AssertionStackLevelsInfoFlag() extends InfoFlag
+  case class AuthorsInfoFlag() extends InfoFlag
+  case class ErrorBehaviorInfoFlag() extends InfoFlag
+  case class NameInfoFlag() extends InfoFlag
+  case class ReasonUnknownInfoFlag() extends InfoFlag
+  case class VersionInfoFlag() extends InfoFlag
   case class KeywordInfoFlag(keyword: String) extends InfoFlag
 
   /*
@@ -186,7 +197,7 @@ object Commands {
    * A bunch of standard option (defined by the SMT-LIB standard) and
    * a generic syntax via attribute allows for solver-specific options
    */
-  sealed abstract class SMTOption extends Tree
+  sealed abstract class SMTOption extends Tree with Positioned
   case class DiagnosticOutputChannel(value: String) extends SMTOption
   case class GlobalDeclarations(value: Boolean) extends SMTOption
   case class PrintSuccess(value: Boolean) extends SMTOption
@@ -223,66 +234,94 @@ object Commands {
   }
 
 
-  trait Logic 
+  trait Logic extends Positioned
 
   /** A standard logic language */
   trait StandardLogic extends Logic
 
-  case object AUFLIA extends StandardLogic
-  case object AUFLIRA extends StandardLogic
-  case object AUFNIRA extends StandardLogic
-  case object LRA extends StandardLogic
-  case object QF_ABV extends StandardLogic
-  case object QF_AUFBV extends StandardLogic
-  case object QF_AUFLIA extends StandardLogic
-  case object QF_AX extends StandardLogic
-  case object QF_BV extends StandardLogic
-  case object QF_IDL extends StandardLogic
-  case object QF_LIA extends StandardLogic
-  case object QF_LRA extends StandardLogic
-  case object QF_NIA extends StandardLogic
-  case object QF_NRA extends StandardLogic
-  case object QF_RDL extends StandardLogic
-  case object QF_UF extends StandardLogic
-  case object QF_UFBV extends StandardLogic
-  case object QF_UFIDL extends StandardLogic
-  case object QF_UFLIA extends StandardLogic
-  case object QF_UFLRA extends StandardLogic
-  case object QF_UFNRA extends StandardLogic
-  case object UFLRA extends StandardLogic
-  case object UFNIA extends StandardLogic
+  case class AUFLIA() extends StandardLogic
+  case class AUFLIRA() extends StandardLogic
+  case class AUFNIRA() extends StandardLogic
+  case class LRA() extends StandardLogic
+  case class QF_ABV() extends StandardLogic
+  case class QF_AUFBV() extends StandardLogic
+  case class QF_AUFLIA() extends StandardLogic
+  case class QF_AX() extends StandardLogic
+  case class QF_BV() extends StandardLogic
+  case class QF_IDL() extends StandardLogic
+  case class QF_LIA() extends StandardLogic
+  case class QF_LRA() extends StandardLogic
+  case class QF_NIA() extends StandardLogic
+  case class QF_NRA() extends StandardLogic
+  case class QF_RDL() extends StandardLogic
+  case class QF_UF() extends StandardLogic
+  case class QF_UFBV() extends StandardLogic
+  case class QF_UFIDL() extends StandardLogic
+  case class QF_UFLIA() extends StandardLogic
+  case class QF_UFLRA() extends StandardLogic
+  case class QF_UFNRA() extends StandardLogic
+  case class UFLRA() extends StandardLogic
+  case class UFNIA() extends StandardLogic
 
   /** Most general logic supported by the solver */
-  case object ALL extends Logic
+  case class ALL() extends Logic
 
   /** A non-standard logic symbol supported by the solver */
   case class NonStandardLogic(sym: SSymbol) extends Logic
 
   object Logic {
     val standardLogicFromString: PartialFunction[String, StandardLogic] = {
-      case "AUFLIA" => AUFLIA
-      case "AUFLIRA" => AUFLIRA
-      case "AUFNIRA" => AUFNIRA
-      case "LRA" => LRA
-      case "QF_ABV" => QF_ABV
-      case "QF_AUFBV" => QF_AUFBV
-      case "QF_AUFLIA" => QF_AUFLIA
-      case "QF_AX" => QF_AX
-      case "QF_BV" => QF_BV
-      case "QF_IDL" => QF_IDL
-      case "QF_LIA" => QF_LIA
-      case "QF_LRA" => QF_LRA
-      case "QF_NIA" => QF_NIA
-      case "QF_NRA" => QF_NRA
-      case "QF_RDL" => QF_RDL
-      case "QF_UF" => QF_UF
-      case "QF_UFBV" => QF_UFBV
-      case "QF_UFIDL" => QF_UFIDL
-      case "QF_UFLIA" => QF_UFLIA
-      case "QF_UFLRA" => QF_UFLRA
-      case "QF_UFNRA" => QF_UFNRA
-      case "UFLRA" => UFLRA
-      case "UFNIA" => UFNIA
+      case "AUFLIA" => AUFLIA()
+      case "AUFLIRA" => AUFLIRA()
+      case "AUFNIRA" => AUFNIRA()
+      case "LRA" => LRA()
+      case "QF_ABV" => QF_ABV()
+      case "QF_AUFBV" => QF_AUFBV()
+      case "QF_AUFLIA" => QF_AUFLIA()
+      case "QF_AX" => QF_AX()
+      case "QF_BV" => QF_BV()
+      case "QF_IDL" => QF_IDL()
+      case "QF_LIA" => QF_LIA()
+      case "QF_LRA" => QF_LRA()
+      case "QF_NIA" => QF_NIA()
+      case "QF_NRA" => QF_NRA()
+      case "QF_RDL" => QF_RDL()
+      case "QF_UF" => QF_UF()
+      case "QF_UFBV" => QF_UFBV()
+      case "QF_UFIDL" => QF_UFIDL()
+      case "QF_UFLIA" => QF_UFLIA()
+      case "QF_UFLRA" => QF_UFLRA()
+      case "QF_UFNRA" => QF_UFNRA()
+      case "UFLRA" => UFLRA()
+      case "UFNIA" => UFNIA()
+    }
+
+    def asString(logic: Logic): String = logic match {
+      case AUFLIA() => "AUFLIA"
+      case AUFLIRA() => "AUFLIRA"
+      case AUFNIRA() => "AUFNIRA"
+      case LRA() => "LRA"
+      case QF_ABV() => "QF_ABV"
+      case QF_AUFBV() => "QF_AUFBV"
+      case QF_AUFLIA() => "QF_AUFLIA"
+      case QF_AX() => "QF_AX"
+      case QF_BV() => "QF_BV"
+      case QF_IDL() => "QF_IDL"
+      case QF_LIA() => "QF_LIA"
+      case QF_LRA() => "QF_LRA"
+      case QF_NIA() => "QF_NIA"
+      case QF_NRA() => "QF_NRA"
+      case QF_RDL() => "QF_RDL"
+      case QF_UF() => "QF_UF"
+      case QF_UFBV() => "QF_UFBV"
+      case QF_UFIDL() => "QF_UFIDL"
+      case QF_UFLIA() => "QF_UFLIA"
+      case QF_UFLRA() => "QF_UFLRA"
+      case QF_UFNRA() => "QF_UFNRA"
+      case UFLRA() => "UFLRA"
+      case UFNIA() => "UFNIA"
+      case ALL() => "ALL"
+      case NonStandardLogic(sym) => sym.name
     }
   }
 

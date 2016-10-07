@@ -338,7 +338,7 @@ See you!"""))
     assert(lexer.nextToken === StringLit("abcd"))
   }
 
-  test("Positions of tokens") {
+  test("Tokens have proper positions") {
     val reader1 = new StringReader("12")
     val lexer1 = new Lexer(reader1)
     val token1 = lexer1.nextToken
@@ -382,7 +382,7 @@ See you!"""))
     assert(token43.getPos === Position(3,2))
   }
 
-  test("Positions of parenthesis") {
+  test("Parenthesis have proper positions") {
     val reader = new StringReader("()()()")
     val lexer = new Lexer(reader)
     val token1 = lexer.nextToken
@@ -405,7 +405,7 @@ See you!"""))
     assert(token6.getPos == Position(1, 6))
   }
 
-  test("Reserved words") {
+  test("Reserved keywords are properly lexed") {
     assert(lexUniqueToken("BINARY").kind === BINARY)
     assert(lexUniqueToken("DECIMAL").kind === DECIMAL)
     assert(lexUniqueToken("HEXADECIMAL").kind === HEXADECIMAL)

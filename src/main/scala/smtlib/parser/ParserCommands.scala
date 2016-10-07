@@ -137,11 +137,11 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
       val logic: Logic = 
         Logic.standardLogicFromString.lift(logicSymbol.name).getOrElse({
           logicSymbol match {
-            case SSymbol("ALL") => ALL
+            case SSymbol("ALL") => ALL()
             case _ => NonStandardLogic(logicSymbol)
           }
         })
-      SetLogic(logic)
+      SetLogic(logic.setPos(logicSymbol))
     }
     case Tokens.SetOption => {
       SetOption(parseOption)
@@ -173,14 +173,15 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
   def parsePropLit: PropLiteral = {
     peekToken.kind match {
       case Tokens.SymbolLitKind => {
-        PropLiteral(parseSymbol, true)
+        val sym = parseSymbol
+        PropLiteral(sym, true).setPos(sym)
       }
       case Tokens.OParen => {
-        eat(Tokens.OParen)
+        val start = eat(Tokens.OParen)
         eat(Tokens.SymbolLit("not"))
         val sym = parseSymbol
         eat(Tokens.CParen)
-        PropLiteral(sym, false)
+        PropLiteral(sym, false).setPos(start)
       }
       case _ => {
         expected(peekToken, Tokens.SymbolLitKind, Tokens.OParen)
@@ -240,22 +241,25 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
 
 
   def parseInfoFlag: InfoFlag = {
-    nextToken match {
-      case Tokens.Keyword("all-statistics") => AllStatisticsInfoFlag
-      case Tokens.Keyword("assertion-stack-levels") => AssertionStackLevelsInfoFlag
-      case Tokens.Keyword("authors") => AuthorsInfoFlag
-      case Tokens.Keyword("error-behavior") => ErrorBehaviorInfoFlag
-      case Tokens.Keyword("name") => NameInfoFlag
-      case Tokens.Keyword("reason-unknown") => ReasonUnknownInfoFlag
-      case Tokens.Keyword("version") => VersionInfoFlag
+    val t = nextToken
+    val flag = t match {
+      case Tokens.Keyword("all-statistics") => AllStatisticsInfoFlag()
+      case Tokens.Keyword("assertion-stack-levels") => AssertionStackLevelsInfoFlag()
+      case Tokens.Keyword("authors") => AuthorsInfoFlag()
+      case Tokens.Keyword("error-behavior") => ErrorBehaviorInfoFlag()
+      case Tokens.Keyword("name") => NameInfoFlag()
+      case Tokens.Keyword("reason-unknown") => ReasonUnknownInfoFlag()
+      case Tokens.Keyword("version") => VersionInfoFlag()
       case Tokens.Keyword(keyword) => KeywordInfoFlag(keyword)
       case t => expected(t, Tokens.KeywordKind)
     }
+    flag.setPos(t)
   }
 
 
   def parseOption: SMTOption = {
-    peekToken match {
+    val peekPosition = peekToken.getPos
+    val opt = peekToken match {
       case Tokens.Keyword("diagnostic-output-channel") => 
         nextToken
         DiagnosticOutputChannel(parseString.value)
@@ -308,6 +312,7 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
       case _ => 
         AttributeOption(parseAttribute)
     }
+    opt.setPos(peekPosition)
   }
 
 }

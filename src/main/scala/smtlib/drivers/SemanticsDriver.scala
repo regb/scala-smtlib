@@ -135,19 +135,19 @@ class SemanticsDriver(
   }
 
   protected def processGetInfo(infoFlag: InfoFlag): Unit = infoFlag match {
-    case AllStatisticsInfoFlag =>
+    case AllStatisticsInfoFlag() =>
       regularOutputChannel(Unsupported)
-    case AssertionStackLevelsInfoFlag =>
+    case AssertionStackLevelsInfoFlag() =>
       regularOutputChannel(Unsupported)
-    case AuthorsInfoFlag =>
+    case AuthorsInfoFlag() =>
       regularOutputChannel(Unsupported)
-    case ErrorBehaviorInfoFlag =>
+    case ErrorBehaviorInfoFlag() =>
       regularOutputChannel(Unsupported)
-    case NameInfoFlag =>
+    case NameInfoFlag() =>
       regularOutputChannel(Unsupported)
-    case ReasonUnknownInfoFlag =>
+    case ReasonUnknownInfoFlag() =>
       regularOutputChannel(Unsupported)
-    case VersionInfoFlag =>
+    case VersionInfoFlag() =>
       regularOutputChannel(Unsupported)
     case KeywordInfoFlag(keyword) =>
       regularOutputChannel(Unsupported)

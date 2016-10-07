@@ -12,7 +12,7 @@ trait ParserTerms { this: ParserUtils =>
   def parseAttribute: Attribute = {
     val keyword = parseKeyword
     val attributeValue = tryParseAttributeValue
-    Attribute(keyword, attributeValue)
+    Attribute(keyword, attributeValue).setPos(keyword)
   }
 
   def parseAttributeValue: AttributeValue = {
@@ -136,7 +136,8 @@ trait ParserTerms { this: ParserUtils =>
       eat(Tokens.CParen)
       res
     } else {
-      Sort(parseIdentifier)
+      val id = parseIdentifier
+      Sort(id).setPos(id)
     }
   }
 
@@ -174,7 +175,10 @@ trait ParserTerms { this: ParserUtils =>
         eat(Tokens.CParen)
         res
       }
-      case _ => QualifiedIdentifier(parseIdentifier)
+      case _ => {
+        val id = parseIdentifier
+        QualifiedIdentifier(id).setPos(id)
+      }
     }
   }
 
@@ -189,7 +193,8 @@ trait ParserTerms { this: ParserUtils =>
     if(getPeekToken.kind == Tokens.OParen) {
       parseWithin(Tokens.OParen, Tokens.CParen)(parseUnderscoreIdentifier _)
     } else {
-      Identifier(parseSymbol)
+      val sym = parseSymbol
+      Identifier(sym).setPos(sym)
     }
   }
 
@@ -234,26 +239,31 @@ trait ParserTerms { this: ParserUtils =>
 
   def parseTerm: Term = {
     if(getPeekToken.kind == Tokens.OParen) {
-      parseWithin(Tokens.OParen, Tokens.CParen)(parseTermWithoutParens _)
+      val startPos = getPeekToken.getPos
+      val t = parseWithin(Tokens.OParen, Tokens.CParen)(parseTermWithoutParens _)
+      t.setPos(startPos)
     } else {
       val cst = tryParseConstant
-      cst.getOrElse(QualifiedIdentifier(parseIdentifier))
+      cst.getOrElse({
+        val id = parseIdentifier
+        QualifiedIdentifier(id).setPos(id)
+      })
     }
   }
 
   def parseVarBinding: VarBinding = {
-    eat(Tokens.OParen)
+    val start = eat(Tokens.OParen)
     val sym = parseSymbol
     val term = parseTerm
     eat(Tokens.CParen)
-    VarBinding(sym, term)
+    VarBinding(sym, term).setPos(start)
   }
   def parseSortedVar: SortedVar = {
-    eat(Tokens.OParen)
+    val start = eat(Tokens.OParen)
     val sym = parseSymbol
     val sort = parseSort
     eat(Tokens.CParen)
-    SortedVar(sym, sort)
+    SortedVar(sym, sort).setPos(start)
   }
 
   def tryParseConstant: Option[Constant] = {
