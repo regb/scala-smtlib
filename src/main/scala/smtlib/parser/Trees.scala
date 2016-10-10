@@ -102,6 +102,16 @@ object Terms {
 
   sealed trait Constant extends Term with AttributeValue
 
+  /*
+   * Literal do not necessarly have an associated expected meaning (SNumeral as an
+   * integer or SBinary as a 2-complement integer). They are just syntactic units,
+   * and each local theory gives them a semantics.
+   *
+   * For example, it means that
+   * the decision that an SHexadecimal represents an bit-vector of 4*length(hexa) is
+   * really up to the theory (in that case, the bit-vector theory), and each theory
+   * could use hexadecimals as a different meaning.
+   */
   sealed trait Literal[T] extends Constant {
     val value: T
   }

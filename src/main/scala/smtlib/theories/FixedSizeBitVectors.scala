@@ -21,7 +21,15 @@ object FixedSizeBitVectors {
 
   object BitVectorLit {
     def apply(content: List[Boolean]): Term = SBinary(content)
+
+    /** Construct a bit-vector literal from an hexadecimal
+      *
+      * The bitvector theory interprets the hexadecimal literals
+      * as a bit vector of size 4 times the length of the hexadecimal
+      * representation
+      */
     def apply(content: Hexadecimal): Term = SHexadecimal(content)
+
     def unapply(term: Term): Option[List[Boolean]] = term match {
       case SBinary(content) => Some(content)
       case SHexadecimal(hexa) => Some(hexa.toBinary)
