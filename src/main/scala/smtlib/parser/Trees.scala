@@ -4,9 +4,9 @@ package parser
 import common._
 import printer._
 
-object Terms {
+sealed trait Tree
 
-  sealed trait Tree
+object Terms {
 
   /*
    * Many terms are case class X() with empty parameters list instead of being

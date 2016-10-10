@@ -5,7 +5,7 @@ import lexer.Tokens
 import Tokens.{Token, TokenKind}
 import lexer.Lexer
 
-class Parser(val lexer: Lexer) extends ParserUtils with ParserTerms with ParserCommands with ParserCommandsResponses
+class Parser(val lexer: Lexer) extends ParserCommon with ParserTerms with ParserCommands with ParserCommandsResponses
 
 object Parser {
 

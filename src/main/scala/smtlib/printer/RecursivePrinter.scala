@@ -4,6 +4,7 @@ package printer
 import parser.Commands._
 import parser.CommandsResponses._
 import parser.Terms._
+import parser.Tree
 
 import java.io.Writer
 

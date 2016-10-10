@@ -7,7 +7,7 @@ import Commands._
 
 import scala.collection.mutable.ListBuffer
 
-trait ParserCommands { this: ParserUtils with ParserTerms =>
+trait ParserCommands { this: ParserCommon with ParserTerms =>
 
   import Parser._
 
@@ -314,5 +314,14 @@ trait ParserCommands { this: ParserUtils with ParserTerms =>
     }
     opt.setPos(peekPosition)
   }
+
+  def parseBool: Boolean = {
+    nextToken match {
+      case Tokens.SymbolLit("true") => true
+      case Tokens.SymbolLit("false") => false
+      case t => expected(t) //TODO: not sure how to tell we were expecting one of two specific symbols
+    }
+  }
+
 
 }

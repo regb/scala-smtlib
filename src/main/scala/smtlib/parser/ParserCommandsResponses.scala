@@ -7,7 +7,7 @@ import CommandsResponses._
 
 import scala.collection.mutable.ListBuffer
 
-trait ParserCommandsResponses { this: ParserUtils with ParserTerms with ParserCommands =>
+trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserCommands =>
 
   import Parser._
 
