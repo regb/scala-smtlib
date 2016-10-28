@@ -122,6 +122,10 @@ object Terms {
   case class SDecimal(value: BigDecimal) extends Literal[BigDecimal]
   case class SString(value: String) extends Literal[String]
 
+  /*
+   * Special parent class for all non-standard terms.
+   * See {{extensions/tip}} for an example.
+   */
   abstract class TermExtension extends Term {
     def print(ctx: PrintingContext): Unit
   }
