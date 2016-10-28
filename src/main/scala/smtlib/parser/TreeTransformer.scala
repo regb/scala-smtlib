@@ -97,6 +97,15 @@ abstract class TreeTransformer {
 
 }
 
+/** A tree transformer with pre/post transformation
+  *
+  * This extends the generic TreeTransformer by adding pre and
+  * post transformation to be applied before and after the
+  * recursive transformations. The core transform becomes final,
+  * as it cannot be extended easily due to the wrapping of pre/post
+  * around it. Most basic transformation will work by implementing
+  * either of pre or post.
+  */
 abstract class PrePostTreeTransformer extends TreeTransformer {
 
   /** a pre-transformation to be applied to the term
@@ -123,6 +132,14 @@ abstract class PrePostTreeTransformer extends TreeTransformer {
     post(postTerm, postContext)
   }
 
+  def pre(sort: Sort, context: C): (Sort, C)
+  def post(sort: Sort, context: C): (Sort, C)
+  final override def transform(sort: Sort, context: C): (Sort, C) = {
+    val (preSort, preContext) = pre(sort, context)
+    val (postSort, postContext) = super.transform(preSort, preContext)
+    post(postSort, postContext)
+  }
+
 }
 
 /** a tree transformer without carrying a context */
@@ -131,25 +148,27 @@ abstract class SimpleTreeTransformer extends PrePostTreeTransformer {
 
   def pre(term: Term): Term
   def post(term: Term): Term
+  def pre(sort: Sort): Sort
+  def post(sort: Sort): Sort
 
-  override final def combine(tree: Tree, c: C, cs: Seq[C]): C = ()
-  
-  override final def pre(term: Term, c: C): (Term, C) = (pre(term), ())
-  override final def post(term: Term, c: C): (Term, C) = (post(term), ())
+  final override def combine(tree: Tree, c: C, cs: Seq[C]): C = ()
 
-  def transform(term: Term): Term = transform(term, ())._1
+  final override def pre(term: Term, c: C): (Term, C) = (pre(term), ())
+  final override def post(term: Term, c: C): (Term, C) = (post(term), ())
+  final override def pre(sort: Sort, c: C): (Sort, C) = (pre(sort), ())
+  final override def post(sort: Sort, c: C): (Sort, C) = (post(sort), ())
 
-  override final def transform(sort: Sort, c: C): (Sort, C) = super.transform(sort, c)
-  def transform(sort: Sort): Sort = transform(sort, ())._1
+  final def transform(term: Term): Term = transform(term, ())._1
+  final def transform(sort: Sort): Sort = transform(sort, ())._1
 
   override final def transform(id: Identifier, c: C): (Identifier, C) = transform(id, c)
-  def transform(id: Identifier): Identifier = transform(id, ())._1
+  final def transform(id: Identifier): Identifier = transform(id, ())._1
 
   override final def transform(varBinding: VarBinding, c: C): (VarBinding, C) = transform(varBinding, c)
-  def transform(varBinding: VarBinding): VarBinding = transform(varBinding, ())._1
+  final def transform(varBinding: VarBinding): VarBinding = transform(varBinding, ())._1
 
   override final def transform(sortedVar: SortedVar, c: C): (SortedVar, C) = transform(sortedVar, c)
-  def transform(sortedVar: SortedVar): SortedVar = transform(sortedVar, ())._1
+  final def transform(sortedVar: SortedVar): SortedVar = transform(sortedVar, ())._1
 
 }
 
@@ -192,6 +211,14 @@ abstract class TreeTraverser extends PrePostTreeTransformer {
   override final def post(term: Term, c: C): (Term, C) = {
     post(term)
     (term, ())
+  }
+  override final def pre(sort: Sort, c: C): (Sort, C) = {
+    pre(sort)
+    (sort, ())
+  }
+  override final def post(sort: Sort, c: C): (Sort, C) = {
+    post(sort)
+    (sort, ())
   }
 
   final def traverse(tree: Tree): Unit = tree match {
