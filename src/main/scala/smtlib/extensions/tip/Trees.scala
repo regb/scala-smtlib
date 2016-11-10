@@ -66,10 +66,11 @@ object Commands {
     def print(ctx: PrintingContext): Unit = {
       ctx.print("(declare-const (par ")
       ctx.printNary(tps, "(", " ", ") ")
+      ctx.print("(")
       ctx.print(sym)
       ctx.print(" ")
       ctx.print(sort)
-      ctx.print("))\n")
+      ctx.print(")))\n")
     }
   }
 
@@ -77,10 +78,11 @@ object Commands {
     def print(ctx: PrintingContext): Unit = {
       ctx.print("(declare-fun (par ")
       ctx.printNary(tps, "(", " ", ") ")
+      ctx.print("(")
       ctx.print(sym)
       ctx.printNary(argSorts, " (", " ", ") ")
       ctx.print(returnSort)
-      ctx.print("))\n")
+      ctx.print(")))\n")
     }
   }
 
@@ -88,12 +90,13 @@ object Commands {
     def print(ctx: PrintingContext): Unit = {
       ctx.print("(define-fun (par ")
       ctx.printNary(tps, "(", " ", ") ")
+      ctx.print("(")
       ctx.print(fd.name)
       ctx.printNary(fd.params, " (", " ", ") ")
       ctx.print(fd.returnSort)
       ctx.print(" ")
       ctx.print(fd.body)
-      ctx.print("))\n")
+      ctx.print(")))\n")
     }
   }
 
@@ -101,12 +104,13 @@ object Commands {
     def print(ctx: PrintingContext): Unit = {
       ctx.print("(define-fun-rec (par ")
       ctx.printNary(tps, "(", " ", ") ")
+      ctx.print("(")
       ctx.print(fd.name)
       ctx.printNary(fd.params, " (", " ", ") ")
       ctx.print(fd.returnSort)
       ctx.print(" ")
       ctx.print(fd.body)
-      ctx.print("))\n")
+      ctx.print(")))\n")
     }
   }
 
