@@ -1,7 +1,28 @@
 package smtlib
 package common
 
-class Hexadecimal private(val repr: String) {
+
+/** Hexadecimal number value
+  *
+  * This provides a type safe way to manipulate hexadecimal number.
+  * The main constructor is private, but the companion object provides
+  * a number of way to produce an Hexadecimal representation, from a
+  * string or from any integer type.
+  *
+  * An hexadecimal number value really depends on the context in which
+  * it is considered. It can always be interpreted as an unsigned, infinite
+  * precision integer, or as a negative number in two-complement. A value
+  * like 'F' could either be 16 or -1, depending if it is interpreted as an
+  * unsigned value on an integral type of more than 4 bits, or if it is sign
+  * extended in the corresponding integral representation. You should consider
+  * the Hexadecimal as a concise syntax to represent a sequence of bytes, with
+  * convenient methods to convert to and from integers, and not as an actual
+  * number.
+  */
+class Hexadecimal private(
+  /** The string representation, using upper cases */
+  val repr: String
+) {
   //should be normalized to upper cases
   require(repr.forall(c =>
     (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')
