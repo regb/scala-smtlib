@@ -7,11 +7,15 @@ class Hexadecimal private(val repr: String) {
     (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F')
   ))
 
-  /* 
-   * Returns the Int value represented by this hexadecimal number.
-   * Assumes the hexadecimal represents 32 bits, by padding 0 in
-   * front if necessary. It can return negative numbers.
-   */
+  /** extract the Int represented by this hexadecimal
+    * 
+    * Returns the Int value represented by this hexadecimal number.
+    * Assumes the hexadecimal represents 32 bits, by padding 0 in
+    * front if necessary, and by ignoring extra digits.
+    *
+    * It returns the Int encoded with the exact 32 bits, meaning
+    * it could return negative number.
+    */
   def toInt: Int = {
     val padding = repr.reverse.drop(16)
     require(padding.forall(c => c == '0'))
@@ -70,9 +74,7 @@ object Hexadecimal {
     if(error) None else Some(new Hexadecimal(repr))
   }
 
-  /*
-   * return a 32-bits hexadecimal integer
-   */
+  /** return a 32-bits hexadecimal integer */
   def fromInt(n: Int): Hexadecimal = {
     if(n < 0) {
       val res = "00000000".toArray
@@ -98,12 +100,71 @@ object Hexadecimal {
     }
   }
 
+  def fromByte(b: Byte): Hexadecimal = fromBigInt(BigInt(b), 2)
+
+  def fromShort(s: Short): Hexadecimal = fromBigInt(BigInt(s), 4)
+
+  def fromLong(l: Long): Hexadecimal = fromBigInt(BigInt(l), 16)
+
+
+  /** convert a BigInt to an Hexadecimal
+    *
+    * The resulting hexadecimal will always be of size specified
+    * by digits. The conversion always truncates the theoretical
+    * representation, which could have the effect of changing
+    * a positive integer into a negative value.
+    *
+    * Negative numbers are converted by taking the theoretical
+    * two complement representation, with an infinite number of
+    * 1s in front, and then we simply truncate for the correct length.
+    * It has the effect that it could change a negative number into
+    * a positive number in the corresponding length.
+    */
+  def fromBigInt(bi: BigInt, digits: Int): Hexadecimal = {
+    val isPositive = bi >= 0
+    val absolute = bi.abs
+    val absoluteRepr: String = absolute.toString(16)
+
+    if(isPositive) {
+      fromString(absoluteRepr.reverse.take(digits).padTo(digits, '0').reverse).get
+    } else {
+
+      val bytes: Array[Byte] = bi.toByteArray
+      val fullHexa: String = bytes.map(b => byteToHexString(b)).mkString
+
+      fromString(fullHexa.reverse.take(digits).padTo(digits, 'F').reverse).get
+    }
+
+  }
+
   def toDigit(n: Int): Char = {
     require(n >= 0 && n < 16)
     if(n >= 0 && n < 10) (n + '0').toChar else ('A' + (n - 10)).toChar
   }
 
+  /** convert a digit byte to corresponding char
+    *
+    * Only works for bytes between 0 and 16
+    */
+  def toDigit(n: Byte): Char = {
+    require(n >= 0 && n < 16)
+    if(n >= 0 && n < 10) (n + '0').toChar else ('A' + (n - 10)).toChar
+  }
+
+
   def isDigit(c: Char): Boolean =
     c.isDigit || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
+
+  /* generate a two-digit (0-f) hex string for the given byte. */
+  private def byteToHexString(b: Byte): String = {
+    val h = Integer.toHexString(b)
+    if (b >= 0) {
+      val missing = 2 - h.length
+      ("0" * missing) + h
+    } else {
+      val extra = h.length - 2
+      h.drop(extra)
+    }
+  }
 
 }
