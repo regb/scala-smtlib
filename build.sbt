@@ -1,10 +1,16 @@
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Ypatmat-exhaust-depth", "40")
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+
+scalacOptions ++= {
+  val Seq(_, major, minor) = (scalaVersion in ThisBuild).value.split("\\.").toSeq.map(_.toInt)
+  if (major <= 10 || (major == 11 && minor < 5)) Seq.empty
+  else Seq("-Ypatmat-exhaust-depth", "40")
+}
 
 javaOptions in IntegrationTest ++= Seq("-Xss10M")
 
 fork in IntegrationTest := true
 
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.1" % "test,it"
+libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test,it"
 
 logBuffered in IntegrationTest := false
 
@@ -15,15 +21,13 @@ lazy val commonSettings = Seq(
   name := "scala-smtlib",
   version := "0.2",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.4", "2.11.2", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8")
+  crossScalaVersions := Seq("2.10.4", "2.11.2", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.12.0", "2.12.1")
 )
 
 lazy val root = (project in file(".")).
   configs(IntegrationTest).
   settings(commonSettings: _*).
   settings(Defaults.itSettings: _*)
-
-
 
 publishMavenStyle := true
 
