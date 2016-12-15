@@ -371,6 +371,8 @@ What are you up to man?"""))
 
     checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key")))))
     checkCommand(SetOption(AttributeOption(Attribute(SKeyword("key"), Some(SString("value"))))))
+    checkCommand(SetOption(AttributeOption(Attribute(SKeyword("custom-flag"), Some(SSymbol("true"))))))
+    checkCommand(SetOption(AttributeOption(Attribute(SKeyword("custom-flag"), Some(SSymbol("false"))))))
   }
 
   def testSetInfoCommand(implicit printer: Printer): Unit = {
