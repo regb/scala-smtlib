@@ -297,6 +297,10 @@ class CommandsParserTests extends FunSuite with Timeouts {
       Attribute(SKeyword("my-option"), None))))
     assert(parseUniqueCmd("""(set-option :custom "abcd")""") === SetOption(AttributeOption(
       Attribute(SKeyword("custom"), Some(SString("abcd"))))))
+    assert(parseUniqueCmd("""(set-option :custom-flag true)""") === SetOption(AttributeOption(
+      Attribute(SKeyword("custom-flag"), Some(SSymbol("true"))))))
+    assert(parseUniqueCmd("""(set-option :custom-flag false)""") === SetOption(AttributeOption(
+      Attribute(SKeyword("custom-flag"), Some(SSymbol("false"))))))
   }
 
   test("Attribute value cannot be a kewyord. Should throw UnexpectedTokenException") {

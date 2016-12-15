@@ -239,6 +239,7 @@ See you!"""))
     assert(lexUniqueToken("""<abc>""") === SymbolLit("<abc>"))
     assert(lexUniqueToken(""".42""") === SymbolLit(".42"))
     assert(lexUniqueToken("""*$s&6""") === SymbolLit("*$s&6"))
+    assert(lexUniqueToken("""abc.def""") === SymbolLit("abc.def"))
   }
 
   test("Digits with leading +/- are actually symbols") {

@@ -62,6 +62,16 @@ object Terms {
   object Attribute {
     def apply(key: SKeyword): Attribute = Attribute(key, None)
   }
+  /*
+   * An attribute value can either be
+   *   - a list of SExpr
+   *   - a SSymbol
+   *   - a Constant
+   * Note that if you want to create a Boolean (true/false) attribute value, you must
+   * use SSymbol("true") or SSymbol("false"), due to the fact that boolean are not
+   * considered syntactic constants in the SMT-LIB standard, but are represented by
+   * symbols.
+   */
   sealed trait AttributeValue extends SExpr
 
   case class SortedVar(name: SSymbol, sort: Sort) extends Tree with Positioned
@@ -111,6 +121,9 @@ object Terms {
    * the decision that an SHexadecimal represents an bit-vector of 4*length(hexa) is
    * really up to the theory (in that case, the bit-vector theory), and each theory
    * could use hexadecimals as a different meaning.
+   *
+   * This is also why booleans are not considered literals. true/false are syntactically
+   * simply symbols (SSymbol), and they don't need a particular syntax to represent them.
    */
   sealed trait Literal[T] extends Constant {
     val value: T
