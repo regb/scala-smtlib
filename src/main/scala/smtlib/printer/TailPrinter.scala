@@ -21,7 +21,7 @@ object TailPrinter extends Printer {
 
 class TailContext(writer: Writer) extends PrintingContext(writer) {
   var actions = new LinkedList[() => Unit]
-  val actionStack = new Stack[LinkedList[() => Unit]]
+  var actionStack = List[LinkedList[() => Unit]]()
 
   override def print(tree: Tree): Unit = {
     actions.append(() => super.print(tree))
@@ -34,10 +34,11 @@ class TailContext(writer: Writer) extends PrintingContext(writer) {
   override protected def finish(): Unit = {
     while (!actions.isEmpty || !actionStack.isEmpty) {
       if (actions.isEmpty) {
-        actions = actionStack.pop()
+        actions = actionStack.head
+        actionStack = actionStack.tail
       } else {
         val action = actions.pop()
-        actionStack.push(actions)
+        actionStack ::= actions
         actions = new LinkedList[() => Unit]
         action()
       }

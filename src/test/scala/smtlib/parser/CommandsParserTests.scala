@@ -10,11 +10,11 @@ import common._
 import java.io.StringReader
 
 import org.scalatest.FunSuite
-import org.scalatest.concurrent.Timeouts
+import org.scalatest.concurrent.TimeLimits
 
 import scala.language.implicitConversions
 
-class CommandsParserTests extends FunSuite with Timeouts {
+class CommandsParserTests extends FunSuite with TimeLimits {
 
   override def suiteName = "SMT-LIB commands Parser suite"
 

@@ -10,12 +10,12 @@ import Parser._
 import java.io.StringReader
 
 import org.scalatest.FunSuite
-import org.scalatest.concurrent.Timeouts
+import org.scalatest.concurrent.TimeLimits
 import org.scalatest.time.SpanSugar._
 
 import scala.language.implicitConversions
 
-class ParserTests extends FunSuite with Timeouts {
+class ParserTests extends FunSuite with TimeLimits {
 
   override def suiteName = "SMT-LIB Parser suite"
 
