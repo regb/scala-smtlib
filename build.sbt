@@ -6,7 +6,7 @@ scalacOptions ++= {
   else Seq("-Ypatmat-exhaust-depth", "40")
 }
 
-javaOptions in IntegrationTest ++= Seq("-Xss10M")
+javaOptions in IntegrationTest ++= Seq("-Xss128M")
 
 fork in IntegrationTest := true
 
@@ -19,9 +19,9 @@ parallelExecution in Test := true
 lazy val commonSettings = Seq(
   organization := "com.regblanc",
   name := "scala-smtlib",
-  version := "0.2",
+  version := "0.2.1",
   scalaVersion := "2.11.8",
-  crossScalaVersions := Seq("2.10.4", "2.11.2", "2.11.3", "2.11.4", "2.11.5", "2.11.6", "2.11.7", "2.11.8", "2.12.0", "2.12.1")
+  crossScalaVersions := Seq("2.10.4", "2.11.8", "2.12.1")
 )
 
 lazy val root = (project in file(".")).
@@ -44,7 +44,7 @@ publishTo := {
 pomIncludeRepository := { _ => false }
 
 pomExtra := (
-  <url>http://jsuereth.com/scala-arm</url>
+  <url>https://github.com/regb/scala-smtlib</url>
     <licenses>
       <license>
         <name>MIT-style</name>

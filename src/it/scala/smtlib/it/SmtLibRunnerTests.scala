@@ -53,19 +53,17 @@ class SmtLibRunnerTests extends FunSuite with TestHelpers {
   }
 
   
-  def compareWithInterpreter(executable: (File) => Stream[String])
+  def compareWithInterpreter(executable: (File) => (String => Unit) => Unit)
                             (interpreter: Interpreter, file: File) = {
 
-    val output = executable(file)
+    val lexer = new Lexer(new FileReader(file))
+    val parser = new Parser(lexer)
 
-    val l = new Lexer(new FileReader(file))
-    val p = new Parser(l)
-
-    output.foreach((expected: String) => {
-      val res: String = interpreter.eval(p.parseCommand).toString
+    executable(file) { (expected: String) =>
+      val res: String = interpreter.eval(parser.parseCommand).toString
       assert(expected.trim === res.trim)
-    })
-    assert(p.parseCommand === null)
+    }
+    assert(parser.parseCommand === null)
   }
 
 }

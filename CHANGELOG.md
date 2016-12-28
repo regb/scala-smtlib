@@ -5,6 +5,13 @@ Changelog
 Current
 -------
 
+* TIP extensions
+* Tree Transformers API
+* Cross compilation and deployment to Maven Sonatype
+* Bug fixes
+  * Remove erroneous symbol characters
+  * Positions always maintained
+
 
 v0.2
 -----------------------
