@@ -1,7 +1,7 @@
 package smtlib.parser
 
 
-/** Generic and useful operation on entire trees
+/** Generic and useful operations on entire trees
   *
   * This contains most traversal operations that can be
   * simply described as applying some function over the whole
@@ -13,21 +13,38 @@ object TreesOps {
 
   def count(p: (Tree) => Boolean)(t: Tree): Int = {
     val folder = new TreeFolder {
-      type C = Int
-      override def combine(node: Tree, c: Int, counts: Seq[Int]) = 
+      type R = Int
+      override def combine(node: Tree, counts: Seq[Int]) = 
         counts.sum + (if(p(node)) 1 else 0)
     }
-    folder.fold(t, 0)
+    folder.fold(t)
   }
 
-  //TODO: how to implement fold without a starting value ?
-  //def fold[T](f: (Tree, Seq[T]) => T)(t: Tree): T = {
-  //  val folder = new TreeFolder {
-  //    type C = T
-  //    override def combine(node: Tree, c: T, cs: Seq[T]): T = f(node, cs)
-  //  }
-  //  folder.fold(t, ???)
-  //}
+  def exists(p: (Tree) => Boolean)(t: Tree): Boolean = {
+    val folder = new TreeFolder {
+      type R = Boolean
+      override def combine(node: Tree, cs: Seq[Boolean]) = 
+        cs.exists(b => b) || p(node)
+    }
+    folder.fold(t)
+  }
+
+  def forall(p: (Tree) => Boolean)(t: Tree): Boolean = {
+    val folder = new TreeFolder {
+      type R = Boolean
+      override def combine(node: Tree, cs: Seq[Boolean]) = 
+        cs.forall(b => b) && p(node)
+    }
+    folder.fold(t)
+  }
+
+  def fold[T](f: (Tree, Seq[T]) => T)(t: Tree): T = {
+    val folder = new TreeFolder {
+      type R = T
+      override def combine(node: Tree, cs: Seq[T]): T = f(node, cs)
+    }
+    folder.fold(t)
+  }
 
 
   def foreach(f: (Tree) => Unit)(t: Tree): Unit = {
