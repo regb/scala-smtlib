@@ -209,7 +209,7 @@ object Commands {
    * flags. Additional solver-specific flags are supported via the general
    * KeywordInfoFlag
    */
-  sealed abstract class InfoFlag extends Tree with Positioned
+  sealed abstract class InfoFlag extends Positioned
   case class AllStatisticsInfoFlag() extends InfoFlag
   case class AssertionStackLevelsInfoFlag() extends InfoFlag
   case class AuthorsInfoFlag() extends InfoFlag

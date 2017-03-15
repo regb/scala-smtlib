@@ -6,11 +6,10 @@ import CommandsResponses._
 
 /** Transformer for any tree
   *
-  * This is the most general transformer for trees, it
-  * can be extended for the exact implementation needed by
-  * overriding the context type C and the pre/post methods
-  * for transforming the tree before and after the traversal
-  * for each node.
+  * This is our most general transformer for trees, it
+  * can be extended for specific needs by
+  * overriding the context type C and the result type R, along with
+  * the combine and transform methods.
   */
 abstract class TreeTransformer {
 
@@ -118,7 +117,13 @@ abstract class TreeTransformer {
     (SortedVar(sv.name, ns), nc)
   }
 
-  def transform(sexpr: SExpr, context: C): (SExpr, R) = ???
+  def transform(sexpr: SExpr, context: C): (SExpr, R) = sexpr match {
+    case SList(sexprs) =>
+      val (nses, res) = sexprs.map(se => transform(se, context)).unzip
+      (SList(nses), combine(sexpr, context, res))
+    case (sym: SSymbol) => transformSymbol(sym, context)
+    case _ => (sexpr, combine(sexpr, context, Seq()))
+  }
 
   //some tree elements need their own transform name, because they
   //are a subtype of existing trees so overload won't work, and they
@@ -328,9 +333,6 @@ abstract class TreeFolder extends TreeTransformer {
   override final def combine(tree: Tree, context: Unit, results: Seq[R]): R = {
     combine(tree, results)
   }
-  //  require(cs.nonEmpty)
-  //  if(cs.size == 1) cs.head else cs.reduce((c1, c2) => combine(c1, c2))
-  //}
 
   final def fold(tree: Tree): R = tree match {
     case (term: Term) => transform(term, ())._2
@@ -339,10 +341,10 @@ abstract class TreeFolder extends TreeTransformer {
     case (vb: VarBinding) => transform(vb, ())._2
     case (sv: SortedVar) => transform(sv, ())._2
     case (cmd: Command) => transform(cmd, ())._2
-    case (cmd: CommandResponse) => ???
-    case (attr: Attribute) => ???
-    case (flag: InfoFlag) => ???
-    case (opt: SMTOption) => ???
+    case (cmdResp: CommandResponse) => ???
+    //TODO: these two cases might need to define additional transform methods
+    case (attr: Attribute) => combine(attr, Seq())
+    case (opt: SMTOption) => combine(opt, Seq())
     case (e: SExpr) => transform(e, ())._2
   }
 }
