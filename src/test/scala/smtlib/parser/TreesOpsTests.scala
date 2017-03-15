@@ -44,4 +44,16 @@ class TreesOpsTests extends FunSuite {
     assert(count(t => t == v1)(Assert(FunctionApplication(f1, Seq(FunctionApplication(f2, Seq(v1, v2)), v1, v2, v1)))) === 3)
   }
 
+  test("count function finds and count literals just once") {
+    assert(count(t => t == SNumeral(42))(FunctionApplication(f1, Seq(SNumeral(42)))) === 1)
+    assert(count(t => t == SNumeral(42))(FunctionApplication(f1, Seq(SNumeral(42), SNumeral(17)))) === 1)
+    assert(count(t => t == SNumeral(42))(FunctionApplication(f1, Seq(SNumeral(0), SNumeral(42)))) === 1)
+  }
+  test("count function finds and count literals several times") {
+    assert(count(t => t == SNumeral(42))(FunctionApplication(f1, Seq(SNumeral(42)))) === 1)
+    assert(count(t => t == SNumeral(42))(FunctionApplication(f1, Seq(SNumeral(42), SNumeral(42)))) === 2)
+    assert(count(t => t == SNumeral(42))(FunctionApplication(f1, Seq(SNumeral(42), SNumeral(17), SNumeral(42)))) === 2)
+    assert(count(t => t == SNumeral(42))(FunctionApplication(f1, Seq(FunctionApplication(f2, Seq(SNumeral(42), v2)), SNumeral(42), v2, SNumeral(42)))) === 3)
+  }
+
 }

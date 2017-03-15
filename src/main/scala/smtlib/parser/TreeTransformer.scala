@@ -107,6 +107,16 @@ abstract class TreeTransformer {
     (Identifier(id.symbol, newIdx), combine(id, context, cs))
   }
 
+  def transform(attr: Attribute, context: C): (Attribute, R) = {
+    //TODO: maybe recurse into AttributeValue?
+    (attr, combine(attr, context, Seq()))
+  }
+
+  def transform(option: SMTOption, context: C): (SMTOption, R) = {
+    //TODO: should recurse into all options
+    (option, combine(option, context, Seq()))
+  }
+
 
   def transform(vb: VarBinding, context: C): (VarBinding, R) = {
     val (nt, nc) = transform(vb.term, context)
@@ -227,6 +237,10 @@ abstract class TreeTransformer {
   //case class DeclareDatatypes(datatypes: Seq[(SSymbol, Seq[Constructor])]) extends Command
   }
 
+  def transform(resp: CommandResponse, context: C): (CommandResponse, R) = resp match {
+    case _ => ???
+  }
+
   //this transforms the fundef with recursive calls, but does not combine the result
   //as we do not consider FunDef to be a tree
   private def transformFunDef(fd: FunDef, context: C): (FunDef, Seq[R]) = {
@@ -341,10 +355,9 @@ abstract class TreeFolder extends TreeTransformer {
     case (vb: VarBinding) => transform(vb, ())._2
     case (sv: SortedVar) => transform(sv, ())._2
     case (cmd: Command) => transform(cmd, ())._2
-    case (cmdResp: CommandResponse) => ???
-    //TODO: these two cases might need to define additional transform methods
-    case (attr: Attribute) => combine(attr, Seq())
-    case (opt: SMTOption) => combine(opt, Seq())
+    case (resp: CommandResponse) => transform(resp, ())._2
+    case (attr: Attribute) => transform(attr, ())._2
+    case (opt: SMTOption) => transform(opt, ())._2
     case (e: SExpr) => transform(e, ())._2
   }
 }
@@ -382,11 +395,10 @@ abstract class TreeTraverser extends PrePostTreeTransformer {
     case (id: Identifier) => transform(id, ())
     case (vb: VarBinding) => transform(vb, ())
     case (sv: SortedVar) => transform(sv, ())
-    case (cmd: Command) => ???
-    case (cmd: CommandResponse) => ???
-    case (attr: Attribute) => ???
-    case (flag: InfoFlag) => ???
-    case (opt: SMTOption) => ???
+    case (cmd: Command) => transform(cmd, ())
+    case (resp: CommandResponse) => transform(resp, ())
+    case (attr: Attribute) => transform(attr, ())
+    case (opt: SMTOption) => transform(opt, ())
     case (e: SExpr) => transform(e, ())
   }
 
