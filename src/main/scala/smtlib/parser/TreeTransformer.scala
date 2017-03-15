@@ -80,9 +80,9 @@ abstract class TreeTransformer {
         (AnnotatedTerm(rt, attribute, attributes), combine(term, context, Seq(rc)))
 
       case FunctionApplication(fun, ts) =>
-        //TODO: how to transform the qualified identifier properly?
+        val (funNew, funRes) = transformQualifiedIdentifier(fun, context)
         val (rts, cs) = ts.map(t => transform(t, context)).unzip
-        (FunctionApplication(fun, rts), combine(term, context, cs))
+        (FunctionApplication(funNew, rts), combine(term, context, funRes +: cs))
 
       case (cst: Constant) => (cst, combine(cst, context, Seq()))
 
@@ -124,8 +124,14 @@ abstract class TreeTransformer {
   //are a subtype of existing trees so overload won't work, and they
   //still need their own specific transformation for rebuilding
   //the tree properly
-  def transformSymbol(symbol: SSymbol, context: C): (SSymbol, R) = ???
-  def transfromQualifiedIdentifier(qid: QualifiedIdentifier, context: C): (QualifiedIdentifier, R) = ???
+  def transformSymbol(symbol: SSymbol, context: C): (SSymbol, R) = (symbol, combine(symbol, context, Seq()))
+
+  def transformQualifiedIdentifier(qid: QualifiedIdentifier, context: C): (QualifiedIdentifier, R) = {
+    val (newId, res1) = transform(qid.id, context)
+    val (newSort, res2) = qid.sort.map(s => transform(s, context)).map(p => (Some(p._1), Some(p._2))).getOrElse((None, None))
+
+    (QualifiedIdentifier(newId, newSort), combine(qid, context, res1 +: res2.toSeq))
+  }
 
   def transform(cmd: Command, context: C): (Command, R) = cmd match {
     case Assert(term) =>
@@ -157,11 +163,21 @@ abstract class TreeTransformer {
       val (nameNew, nameRes) = transformSymbol(name, context)
       (DeclareSort(nameNew, arity), combine(cmd, context, Seq(nameRes)))
 
-  //case class DefineFun(funDef: FunDef) extends Command
-  //case class DefineFunRec(funDef: FunDef) extends Command
-  //case class DefineFunsRec(funDecls: Seq[FunDec], bodies: Seq[Term]) extends Command {
-  //  require(funDecls.nonEmpty && funDecls.size == bodies.size)
-  //}
+    case DefineFun(fd) =>
+      val (nfd, subRes) = transformFunDef(fd, context)
+      val ndf = DefineFun(nfd)
+      (ndf, combine(cmd, context, subRes))
+
+    case DefineFunRec(fd) =>
+      val (nfd, subRes) = transformFunDef(fd, context)
+      val ndfr = DefineFunRec(nfd)
+      (ndfr, combine(cmd, context, subRes))
+
+    case DefineFunsRec(funDecls: Seq[FunDec], bodies: Seq[Term]) =>
+      val (nfds, subRes1) = funDecls.map(fd => transformFunDec(fd, context)).unzip
+      val (nbs, subRes2) = bodies.map(b => transform(b, context)).unzip
+      val ndfrs = DefineFunsRec(nfds, nbs)
+      (ndfrs, combine(cmd, context, subRes1.flatten ++ subRes2))
 
     case DefineSort(name, params, sort) =>
       val (nameNew, nameRes) = transformSymbol(name, context)
@@ -178,30 +194,52 @@ abstract class TreeTransformer {
     case GetAssertions() => (cmd, combine(cmd, context, Seq()))
     case GetAssignment() => (cmd, combine(cmd, context, Seq()))
 
-  //case class GetInfo(flag: InfoFlag) extends Command
-  //case class GetModel() extends Command
-  //case class GetOption(key: SKeyword) extends Command
-  //case class GetProof() extends Command
-  //case class GetUnsatAssumptions() extends Command
-  //case class GetUnsatCore() extends Command
-  //case class GetValue(term: Term, terms: Seq[Term]) extends Command
+    case GetInfo(_) => (cmd, combine(cmd, context, Seq()))
+    case GetModel() => (cmd, combine(cmd, context, Seq()))
+    case GetOption(_) => (cmd, combine(cmd, context, Seq()))
+    case GetProof() => (cmd, combine(cmd, context, Seq()))
+    case GetUnsatAssumptions() => (cmd, combine(cmd, context, Seq()))
+    case GetUnsatCore() => (cmd, combine(cmd, context, Seq()))
 
-  ////TODO: should n be an SNumeral so that we can have a Position?
-  //case class Pop(n: Int) extends Command
-  //case class Push(n: Int) extends Command
+    case GetValue(term: Term, terms: Seq[Term]) =>
+      val (nt, res1) = transform(term, context)
+      val (nts, res2) = terms.map(t => transform(t, context)).unzip
+      (GetValue(nt, nts), combine(cmd, context, res1 +: res2))
 
-  //case class Reset() extends Command
-  //case class ResetAssertions() extends Command
+    case Pop(_) => (cmd, combine(cmd, context, Seq()))
+    case Push(_) => (cmd, combine(cmd, context, Seq()))
 
-  //case class SetInfo(attribute: Attribute) extends Command
-  //case class SetLogic(logic: Logic) extends Command
-  //case class SetOption(option: SMTOption) extends Command
+    case Reset() => (cmd, combine(cmd, context, Seq()))
+    case ResetAssertions() => (cmd, combine(cmd, context, Seq()))
+
+    case SetInfo(_) => (cmd, combine(cmd, context, Seq()))
+    case SetLogic(_) => (cmd, combine(cmd, context, Seq()))
+    case SetOption(_) => (cmd, combine(cmd, context, Seq()))
 
     case _ => ???
 
   ////non standard declare-datatypes (no support for parametric types)
   //case class DeclareDatatypes(datatypes: Seq[(SSymbol, Seq[Constructor])]) extends Command
+  }
 
+  //this transforms the fundef with recursive calls, but does not combine the result
+  //as we do not consider FunDef to be a tree
+  private def transformFunDef(fd: FunDef, context: C): (FunDef, Seq[R]) = {
+    val FunDef(name, params, sort, body) = fd
+    val (nameNew, nameRes) = transformSymbol(name, context)
+    val (paramsNew, paramsRes) = params.map(s => transform(s, context)).unzip
+    val (sortNew, sortRes) = transform(sort, context)
+    val (bodyNew, bodyRes) = transform(body, context)
+    (FunDef(nameNew, paramsNew, sortNew, bodyNew), nameRes +: paramsRes :+ sortRes :+ bodyRes)
+  }
+
+  //for same reasons, FunDec is not a tree, just a syntactic wrapper
+  private def transformFunDec(fd: FunDec, context: C): (FunDec, Seq[R]) = {
+    val FunDec(name, params, sort) = fd
+    val (nameNew, nameRes) = transformSymbol(name, context)
+    val (paramsNew, paramsRes) = params.map(sortedVar => transform(sortedVar, context)).unzip
+    val (sortNew, sortRes) = transform(sort, context)
+    (FunDec(nameNew, paramsNew, sortNew), nameRes +: paramsRes :+ sortRes)
   }
 
 }
