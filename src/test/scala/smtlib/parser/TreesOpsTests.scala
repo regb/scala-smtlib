@@ -56,4 +56,15 @@ class TreesOpsTests extends FunSuite {
     assert(count(t => t == SNumeral(42))(FunctionApplication(f1, Seq(FunctionApplication(f2, Seq(SNumeral(42), v2)), SNumeral(42), v2, SNumeral(42)))) === 3)
   }
 
+  test("exists function finds a variable that appears once") {
+    assert(exists(t => t == v1)(FunctionApplication(f1, Seq(v1))) === true)
+    assert(exists(t => t == v1)(FunctionApplication(f1, Seq(v1, v2))) === true)
+    assert(exists(t => t == v2)(FunctionApplication(f1, Seq(v1, v2))) === true)
+  }
+  test("exists function does not find a variable that does not appears once") {
+    assert(exists(t => t == v2)(FunctionApplication(f1, Seq(v1))) === false)
+    assert(exists(t => t == v3)(FunctionApplication(f1, Seq(v1, v2))) === false)
+    assert(exists(t => t == v3)(FunctionApplication(f1, Seq(v1, v2))) === false)
+  }
+
 }
