@@ -231,7 +231,7 @@ abstract class TreeTransformer {
     case SetLogic(_) => (cmd, combine(cmd, context, Seq()))
     case SetOption(_) => (cmd, combine(cmd, context, Seq()))
 
-    case _ => ???
+    case (ext: CommandExtension) => ext.transform(this)(context)
 
   ////non standard declare-datatypes (no support for parametric types)
   //case class DeclareDatatypes(datatypes: Seq[(SSymbol, Seq[Constructor])]) extends Command
@@ -367,10 +367,15 @@ abstract class TreeTraverser extends PrePostTreeTransformer {
   type C = Unit
   type R = Unit
 
-  def pre(term: Tree): Unit
-  def post(term: Tree): Unit
+  def pre(term: Term): Unit = ()
+  def post(term: Term): Unit = ()
 
-  override final def combine(tree: Tree, c: Unit, cs: Seq[Unit]): Unit = ()
+  def pre(sort: Sort): Unit = ()
+  def post(sort: Sort): Unit = ()
+
+  def combine(tree: Tree): Unit
+
+  override final def combine(tree: Tree, c: Unit, cs: Seq[Unit]): Unit = combine(tree)
 
   override final def pre(term: Term, c: C): (Term, C) = {
     pre(term)

@@ -49,8 +49,7 @@ object TreesOps {
 
   def foreach(f: (Tree) => Unit)(t: Tree): Unit = {
     val traverser = new TreeTraverser {
-      override def pre(tree: Tree): Unit = f(tree)
-      override def post(tree: Tree): Unit = ()
+      override def combine(tree: Tree): Unit = f(tree)
     }
     traverser.traverse(t)
   }

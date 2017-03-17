@@ -4,6 +4,7 @@ package extensions.tip
 import printer._
 import parser.Terms._
 import parser.Commands._
+import parser.TreeTransformer
 
 object Terms {
   case class Lambda(args: Seq[SortedVar], body: Term) extends TermExtension {
@@ -60,6 +61,7 @@ object Commands {
       ctx.print(term)
       ctx.print("))\n")
     }
+    def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R) = ???
   }
 
   case class DeclareConstPar(tps: Seq[SSymbol], sym: SSymbol, sort: Sort) extends CommandExtension {
@@ -72,6 +74,7 @@ object Commands {
       ctx.print(sort)
       ctx.print(")))\n")
     }
+    def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R) = ???
   }
 
   case class DeclareFunPar(tps: Seq[SSymbol], sym: SSymbol, argSorts: Seq[Sort], returnSort: Sort) extends CommandExtension {
@@ -84,6 +87,7 @@ object Commands {
       ctx.print(returnSort)
       ctx.print(")))\n")
     }
+    def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R) = ???
   }
 
   case class DefineFunPar(tps: Seq[SSymbol], fd: FunDef) extends CommandExtension {
@@ -98,6 +102,7 @@ object Commands {
       ctx.print(fd.body)
       ctx.print(")))\n")
     }
+    def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R) = ???
   }
 
   case class DefineFunRecPar(tps: Seq[SSymbol], fd: FunDef) extends CommandExtension {
@@ -112,6 +117,7 @@ object Commands {
       ctx.print(fd.body)
       ctx.print(")))\n")
     }
+    def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R) = ???
   }
 
   case class DefineFunsRecPar(fds: Seq[Either[FunDecPar, FunDec]], bodies: Seq[Term]) extends CommandExtension {
@@ -135,6 +141,7 @@ object Commands {
       }, "(", " ", ") ")
       ctx.printNary(bodies, "(", " ", "))\n")
     }
+    def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R) = ???
   }
 
   case class DeclareDatatypesPar(tps: Seq[SSymbol], datatypes: Seq[(SSymbol, Seq[Constructor])]) extends CommandExtension {
@@ -159,6 +166,7 @@ object Commands {
         ctx.print(")")
       }, "(", " ", "))\n")
     }
+    def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R) = ???
   }
 }
 

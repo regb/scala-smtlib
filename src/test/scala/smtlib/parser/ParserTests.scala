@@ -19,23 +19,13 @@ class ParserTests extends FunSuite with TimeLimits {
 
   override def suiteName = "SMT-LIB Parser suite"
 
-  //parse the string for a single command and asserts no more commands
-  private def parseUniqueCmd(str: String): Command = {
-    val reader = new StringReader(str)
-    val lexer = new Lexer(reader)
-    val parser = new Parser(lexer)
-    val cmd = parser.parseCommand
-    assert(lexer.nextToken == null)
-    cmd
-  }
-
-
   def parseUniqueTerm(str: String): Term = {
     val reader = new StringReader(str)
     val lexer = new Lexer(reader)
     val parser = new Parser(lexer)
     val term = parser.parseTerm
     assert(lexer.nextToken == null)
+    assertEachNodeHasPos(term)
     term
   }
 
@@ -150,13 +140,16 @@ class ParserTests extends FunSuite with TimeLimits {
     assert(parseUniqueTerm("abc") === QualifiedIdentifier("abc"))
     assert(parseUniqueTerm("eee") === QualifiedIdentifier("eee"))
 
-    assert(parseUniqueTerm("(as abc A)") === QualifiedIdentifier("abc", Some(Sort("A"))))
-    assert(parseUniqueTerm("(as aaaa AB)") === QualifiedIdentifier("aaaa", Some(Sort("AB"))))
-    assert(parseUniqueTerm("(as aaaa (A B C))") === QualifiedIdentifier("aaaa", Some(Sort("A", Seq(Sort("B"), Sort("C"))))))
-
     assert(parseUniqueTerm("(_ abc 42)") === QualifiedIdentifier(Identifier("abc", Seq(42))))
     assert(parseUniqueTerm("(_ efg 12)") === QualifiedIdentifier(Identifier("efg", Seq(12))))
   }
+
+  test("Correctly parsing as-identifier terms") {
+    assert(parseUniqueTerm("(as abc A)") === QualifiedIdentifier("abc", Some(Sort("A"))))
+    assert(parseUniqueTerm("(as aaaa AB)") === QualifiedIdentifier("aaaa", Some(Sort("AB"))))
+    assert(parseUniqueTerm("(as aaaa (A B C))") === QualifiedIdentifier("aaaa", Some(Sort("A", Seq(Sort("B"), Sort("C"))))))
+  }
+
 
   test("Test weird syntax combination of as/_ for identifier") {
     assert(parseUniqueTerm("(as (_ abc 42) A)") === QualifiedIdentifier(Identifier("abc", Seq(42)), Some(Sort("A"))))
@@ -441,6 +434,10 @@ class ParserTests extends FunSuite with TimeLimits {
         assert(b === ext)
     }
 
+  }
+
+  private def assertEachNodeHasPos(t: Tree): Unit = {
+    TreesOps.foreach((t: Tree) => assert(t.hasPos, "node [" + t + "] does not have a position"))(t)
   }
 
 }

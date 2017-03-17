@@ -4,6 +4,7 @@ package parser
 import lexer.Tokens
 import Terms._
 import Parser._
+import common.Position
 
 import scala.collection.mutable.ListBuffer
 
@@ -12,13 +13,14 @@ trait ParserTerms { this: ParserCommon =>
   private def parseQualifiedIdentifier: QualifiedIdentifier = {
     getPeekToken.kind match {
       case Tokens.OParen => {
+        val pos = getPeekToken.getPos
         eat(Tokens.OParen)
         val res = getPeekToken.kind match {
           case Tokens.As => {
-            parseAsIdentifier
+            parseAsIdentifier.setPos(pos)
           }
           case Tokens.Underscore => {
-            QualifiedIdentifier(parseUnderscoreIdentifier)
+            QualifiedIdentifier(parseUnderscoreIdentifier.setPos(pos)).setPos(pos)
           }
           case _ => expected(peekToken, Tokens.As, Tokens.Underscore)
         }
@@ -32,7 +34,7 @@ trait ParserTerms { this: ParserCommon =>
     }
   }
 
-  protected def parseTermWithoutParens: Term = getPeekToken.kind match {
+  protected def parseTermWithoutParens(startPos: Position): Term = getPeekToken.kind match {
     case Tokens.Let =>
       eat(Tokens.Let)
       val (head, bindings) = parseOneOrMore(parseVarBinding _)
@@ -62,7 +64,7 @@ trait ParserTerms { this: ParserCommon =>
       parseAsIdentifier
 
     case Tokens.Underscore =>
-      QualifiedIdentifier(parseUnderscoreIdentifier)
+      QualifiedIdentifier(parseUnderscoreIdentifier.setPos(startPos)).setPos(startPos)
 
     case _ => //should be function application
       val id = parseQualifiedIdentifier 
@@ -74,7 +76,7 @@ trait ParserTerms { this: ParserCommon =>
   def parseTerm: Term = {
     if(getPeekToken.kind == Tokens.OParen) {
       val startPos = getPeekToken.getPos
-      val t = parseWithin(Tokens.OParen, Tokens.CParen)(parseTermWithoutParens _)
+      val t = parseWithin(Tokens.OParen, Tokens.CParen)(() => parseTermWithoutParens(startPos))
       t.setPos(startPos)
     } else {
       val cst = tryParseConstant

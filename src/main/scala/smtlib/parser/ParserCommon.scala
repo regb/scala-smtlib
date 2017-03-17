@@ -192,16 +192,18 @@ trait ParserCommon {
 
   def parseSort: Sort = {
     if(getPeekToken.kind == Tokens.OParen) {
+      val startPos = getPeekToken.getPos
       eat(Tokens.OParen)
 
       val res = if(getPeekToken.kind == Tokens.Underscore) {
-        Sort(parseUnderscoreIdentifier)
+        val qid = parseUnderscoreIdentifier.setPos(startPos)
+        Sort(qid).setPos(startPos)
       } else {
         val name = parseIdentifier
 
         val subSorts = parseUntil(Tokens.CParen, eatEnd = false)(parseSort _)
 
-        Sort(name, subSorts.toList)
+        Sort(name, subSorts.toList).setPos(startPos)
       }
       eat(Tokens.CParen)
       res
@@ -222,6 +224,7 @@ trait ParserCommon {
     }
   }
 
+  //the caller should set the position of the id to be the OParen
   def parseUnderscoreIdentifier: Identifier = {
     eat(Tokens.Underscore)
     val sym = parseSymbol
@@ -241,7 +244,8 @@ trait ParserCommon {
 
   def parseIdentifier: Identifier = {
     if(getPeekToken.kind == Tokens.OParen) {
-      parseWithin(Tokens.OParen, Tokens.CParen)(parseUnderscoreIdentifier _)
+      val pos = getPeekToken.getPos
+      parseWithin(Tokens.OParen, Tokens.CParen)(parseUnderscoreIdentifier _).setPos(pos)
     } else {
       val sym = parseSymbol
       Identifier(sym).setPos(sym)

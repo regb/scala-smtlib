@@ -324,26 +324,6 @@ class PrintingContext(writer: Writer) {
       }
       print(")\n")
 
-    case DeclareDatatypes(datatypes) =>
-      print("(declare-datatypes () ")
-      printNary(datatypes, (datatype: (SSymbol, Seq[Constructor])) => {
-        print("(")
-        print(datatype._1.name)
-        if (datatype._2.nonEmpty) printNary(datatype._2, (constructor: Constructor) => {
-          print("(")
-          print(constructor.sym.name)
-          if (constructor.fields.nonEmpty) printNary(constructor.fields, (field: (SSymbol, Sort)) => {
-            print("(")
-            print(field._1.name)
-            print(" ")
-            print(field._2)
-            print(")")
-          }, " ", " ", "")
-          print(")")
-        }, " ", " ", "")
-        print(")")
-      }, "(", " ", "))\n")
-
     case ext: CommandExtension => ext.print(this)
   }
 

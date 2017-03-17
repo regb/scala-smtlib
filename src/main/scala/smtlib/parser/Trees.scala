@@ -4,7 +4,7 @@ package parser
 import common._
 import printer._
 
-sealed trait Tree
+sealed trait Tree extends Positioned
 
 object Terms {
 
@@ -192,9 +192,64 @@ object Commands {
   case class SetLogic(logic: Logic) extends Command
   case class SetOption(option: SMTOption) extends Command
 
+  /*
+   * Special parent class for all non-standard commands.
+   * See {{extensions/tip}} for an example.
+   */
+  abstract class CommandExtension extends Command {
+    def print(ctx: PrintingContext): Unit
+
+    def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R)
+  }
 
   //non standard declare-datatypes (no support for parametric types)
-  case class DeclareDatatypes(datatypes: Seq[(SSymbol, Seq[Constructor])]) extends Command
+  case class DeclareDatatypes(datatypes: Seq[(SSymbol, Seq[Constructor])]) extends CommandExtension {
+    override def print(ctx: PrintingContext): Unit = {
+      ctx.print("(declare-datatypes () ")
+      ctx.printNary(datatypes, (datatype: (SSymbol, Seq[Constructor])) => {
+        ctx.print("(")
+        ctx.print(datatype._1.name)
+        if (datatype._2.nonEmpty) ctx.printNary(datatype._2, (constructor: Constructor) => {
+          ctx.print("(")
+          ctx.print(constructor.sym.name)
+          if (constructor.fields.nonEmpty) ctx.printNary(constructor.fields, (field: (SSymbol, Sort)) => {
+            ctx.print("(")
+            ctx.print(field._1.name)
+            ctx.print(" ")
+            ctx.print(field._2)
+            ctx.print(")")
+          }, " ", " ", "")
+          ctx.print(")")
+        }, " ", " ", "")
+        ctx.print(")")
+      }, "(", " ", "))\n")
+    }
+
+    override def transform(tt: TreeTransformer)(context: tt.C): (Command, tt.R) = {
+      val (nds, rds) = datatypes.map(dt => transformDatatype(tt)(dt, context)).unzip
+      (DeclareDatatypes(nds), tt.combine(this, context, rds.flatten))
+    }
+
+    private def transformDatatype(tt: TreeTransformer)
+                  (datatype: (SSymbol, Seq[Constructor]), context: tt.C)
+        : ((SSymbol, Seq[Constructor]), Seq[tt.R]) = {
+      val (nameNew, nameRes) = tt.transformSymbol(datatype._1, context)
+      val (constrsNew, constrsRes) = datatype._2.map(constr => {
+        val (ns, rs) = tt.transformSymbol(constr.sym, context)
+        val (nfs, rf) = constr.fields.map(field => {
+          val (id, sort) = field
+          val (nid, rid) = tt.transformSymbol(id, context)
+          val (ns, rs) = tt.transform(sort, context)
+          val newField = (nid, ns)
+          (newField, Seq(rid, rs))
+        }).unzip
+        val newConstructor = Constructor(ns, nfs)
+        (newConstructor, rs +: rf.flatten)
+      }).unzip
+      val newDatatype = (nameNew, constrsNew)
+      (newDatatype, nameRes +: constrsRes.flatten)
+    }
+  }
 
   case class FunDec(name: SSymbol, params: Seq[SortedVar], returnSort: Sort)
   case class FunDef(name: SSymbol, params: Seq[SortedVar], returnSort: Sort, body: Term)
@@ -350,10 +405,6 @@ object Commands {
       case ALL() => "ALL"
       case NonStandardLogic(sym) => sym.name
     }
-  }
-
-  abstract class CommandExtension extends Command {
-    def print(ctx: PrintingContext): Unit
   }
 
 }

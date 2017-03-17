@@ -26,6 +26,7 @@ class CommandsParserTests extends FunSuite with TimeLimits {
     val parser = new Parser(lexer)
     val cmd = parser.parseCommand
     assert(lexer.nextToken == null)
+    assertEachNodeHasPos(cmd)
     cmd
   }
 
@@ -73,8 +74,9 @@ class CommandsParserTests extends FunSuite with TimeLimits {
     assert(parseUniqueCmd("(declare-const a A)") ===
            DeclareConst(SSymbol("a"), Sort("A")))
     assert(parseUniqueCmd("(declare-const comp (A B))") ===
-           DeclareConst(SSymbol("comp"), 
-                        Sort("A", Seq(Sort("B")))))
+           DeclareConst(SSymbol("comp"), Sort("A", Seq(Sort("B")))))
+    assert(parseUniqueCmd("(declare-const b (_ A 32))") ===
+           DeclareConst(SSymbol("b"), Sort(Identifier("A", Seq(32)))))
   }
 
 
@@ -525,4 +527,9 @@ class CommandsParserTests extends FunSuite with TimeLimits {
   }
 
   //TODO: sort position tests, maybe need to introduce a ParseCommon object
+
+
+  private def assertEachNodeHasPos(t: Tree): Unit = {
+    TreesOps.foreach((t: Tree) => assert(t.hasPos, "node [" + t + "] does not have a position"))(t)
+  }
 }

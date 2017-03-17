@@ -4,6 +4,7 @@ package extensions.tip
 import smtlib.lexer.{Tokens => LT}
 import smtlib.parser.Terms._
 import smtlib.parser.Commands._
+import smtlib.common.Position
 
 object Tokens {
   import LT.ReservedWord
@@ -34,7 +35,7 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
   import Terms._
   import Commands._
 
-  override protected def parseTermWithoutParens: Term = getPeekToken.kind match {
+  override protected def parseTermWithoutParens(startPos: Position): Term = getPeekToken.kind match {
     case Tokens.Lambda =>
       eat(Tokens.Lambda)
       val args = parseMany(parseSortedVar _)
@@ -71,11 +72,12 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
       }
       Match(scrut, cases)
 
-    case _ => super.parseTermWithoutParens
+    case _ => super.parseTermWithoutParens(startPos)
   }
 
   private def parseParTerm: (Option[Seq[SSymbol]], Term) = getPeekToken.kind match {
     case LT.OParen =>
+      val startPos = getPeekToken.getPos
       eat(LT.OParen)
       getPeekToken.kind match {
         case LT.Par =>
@@ -86,7 +88,7 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
           (Some(tps), res)
 
         case _ =>
-          val res = parseTermWithoutParens
+          val res = parseTermWithoutParens(startPos)
           eat(LT.CParen)
           (None, res)
       }
