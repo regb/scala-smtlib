@@ -8,6 +8,8 @@ Current
 * TIP extensions
 * Tree Transformers API
 * Cross compilation and deployment to Maven Sonatype
+* Add standard theory of floating points
+* DSL wrapper
 * Bug fixes
   * Remove erroneous symbol characters
   * Positions always maintained
