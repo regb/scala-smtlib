@@ -2,8 +2,8 @@ package smtlib
 package extensions.tip
 
 import smtlib.lexer.{Tokens => LT}
-import smtlib.parser.Terms._
-import smtlib.parser.Commands._
+import smtlib.trees.Terms._
+import smtlib.trees.Commands._
 import smtlib.common.Position
 
 object Tokens {

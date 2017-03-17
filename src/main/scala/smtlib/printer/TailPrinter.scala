@@ -3,10 +3,10 @@ package printer
 
 import common.LinkedList
 
-import parser.Commands._
-import parser.CommandsResponses._
-import parser.Terms._
-import parser.Tree
+import trees.Commands._
+import trees.CommandsResponses._
+import trees.Terms._
+import trees.Tree
 
 import java.io.Writer
 

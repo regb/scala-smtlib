@@ -2,7 +2,7 @@ package smtlib
 package theories
 package experimental
 
-import parser.Terms._
+import trees.Terms._
 
 import Sets._
 import Ints.{IntSort, NumeralLit}

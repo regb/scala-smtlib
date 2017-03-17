@@ -2,8 +2,8 @@ package smtlib
 package theories
 package experimental
 
-import parser.Terms._
-import theories.Operations._
+import trees.Terms._
+import Operations._
 
 /* Experimental support for the theory of sets in CVC4
  * Based on the operations in http://cvc4.cs.nyu.edu/wiki/Sets

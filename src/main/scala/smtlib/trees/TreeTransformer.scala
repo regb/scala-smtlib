@@ -1,4 +1,4 @@
-package smtlib.parser
+package smtlib.trees
 
 import Terms._
 import Commands._

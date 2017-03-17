@@ -4,7 +4,7 @@ package parser
 import lexer.Tokens
 import Tokens.{Token, TokenKind}
 import lexer.Lexer
-import Terms._
+import trees.Terms._
 
 import scala.collection.mutable.ListBuffer
 

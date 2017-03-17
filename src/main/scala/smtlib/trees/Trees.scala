@@ -1,5 +1,5 @@
 package smtlib
-package parser
+package trees
 
 import common._
 import printer._

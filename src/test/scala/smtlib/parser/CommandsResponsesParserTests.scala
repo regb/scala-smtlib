@@ -1,11 +1,11 @@
 package smtlib
 package parser
 
-import Commands._
-import CommandsResponses._
-import Terms._
 import Parser._
 import common._
+import trees.Commands._
+import trees.CommandsResponses._
+import trees.Terms._
 
 import org.scalatest.FunSuite
 

@@ -2,10 +2,12 @@ package smtlib
 package parser
 
 import lexer._
-import Commands._
-import Terms._
 import Parser._
 import common._
+import trees.Tree
+import trees.Commands._
+import trees.Terms._
+import trees.TreesOps
 
 import java.io.StringReader
 

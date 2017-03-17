@@ -1,7 +1,7 @@
 package smtlib
 package theories
 
-import parser.Terms._
+import trees.Terms._
 
 /** General patterns for building and extracting FunctionApplication in theories.
   *

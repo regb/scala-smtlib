@@ -3,9 +3,9 @@ package interpreters
 
 import lexer.Lexer
 import parser.Parser
-import parser.Terms._
-import parser.Commands._
-import parser.CommandsResponses._
+import trees.Terms._
+import trees.Commands._
+import trees.CommandsResponses._
 import printer._
 
 import java.io._

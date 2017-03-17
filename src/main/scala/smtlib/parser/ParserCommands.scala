@@ -2,8 +2,8 @@ package smtlib
 package parser
 
 import lexer.Tokens
-import Terms._
-import Commands._
+import trees.Terms._
+import trees.Commands._
 
 import scala.collection.mutable.ListBuffer
 

@@ -1,9 +1,9 @@
 package smtlib
 
-import parser.Commands.{Script, Command}
-import parser.CommandsResponses.CommandResponse
 import parser.Parser
-import parser.Terms._
+import trees.Commands.{Script, Command}
+import trees.CommandsResponses.CommandResponse
+import trees.Terms._
 import printer.Printer
 
 /*

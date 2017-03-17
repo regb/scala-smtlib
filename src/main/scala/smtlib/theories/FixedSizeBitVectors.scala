@@ -1,7 +1,7 @@
 package smtlib
 package theories
 
-import parser.Terms._
+import trees.Terms._
 import common._
 
 import Operations._

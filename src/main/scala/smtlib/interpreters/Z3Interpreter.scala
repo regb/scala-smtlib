@@ -1,7 +1,7 @@
 package smtlib
 package interpreters
 
-import parser.Commands._
+import trees.Commands._
 import printer.RecursivePrinter
 
 class Z3Interpreter(executable: String, args: Array[String], tailPrinter: Boolean = false)

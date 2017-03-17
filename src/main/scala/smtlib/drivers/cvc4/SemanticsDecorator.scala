@@ -2,7 +2,7 @@ package smtlib
 package drivers
 package cvc4
 
-import parser.Commands._
+import trees.Commands._
 
 
 trait SemanticsDecorator extends SemanticsDriver {

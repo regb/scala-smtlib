@@ -2,9 +2,9 @@ package smtlib
 package extensions.tip
 
 import printer._
-import parser.Terms._
-import parser.Commands._
-import parser.TreeTransformer
+import trees.Terms._
+import trees.Commands._
+import trees.TreeTransformer
 
 object Terms {
   case class Lambda(args: Seq[SortedVar], body: Term) extends TermExtension {

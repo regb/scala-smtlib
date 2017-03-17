@@ -6,6 +6,7 @@ import java.io.FileReader
 import interpreters._
 import lexer._
 import parser._
+import trees._
 
 /** Provides an entry point to run a command line wrapper on a driver */
 object Main {

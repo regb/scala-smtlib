@@ -1,4 +1,4 @@
-package smtlib.parser
+package smtlib.trees
 
 
 /** Generic and useful operations on entire trees

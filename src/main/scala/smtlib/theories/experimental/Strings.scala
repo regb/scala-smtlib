@@ -2,8 +2,8 @@ package smtlib
 package theories
 package experimental
 
-import parser.Terms._
-import theories.Operations._
+import trees.Terms._
+import Operations._
 
 object Strings {
 
