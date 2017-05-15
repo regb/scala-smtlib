@@ -10,9 +10,9 @@ import java.io.FileReader
 
 import interpreters._
 
-import parser.Terms._
-import parser.Commands._
-import parser.CommandsResponses._
+import trees.Terms._
+import trees.Commands._
+import trees.CommandsResponses._
 
 
 /** Checks that formula build with theories module are correctly handled by solvers */

@@ -23,8 +23,8 @@ class ProcessInterpreterTests extends FunSuite with TestHelpers {
     //TODO: check against all interpreters
     val z3Interpreter = getZ3Interpreter
 
-    z3Interpreter.eval(parser.Commands.SetLogic(parser.Commands.AUFLIA()))
-    z3Interpreter.eval(parser.Commands.CheckSat())
+    z3Interpreter.eval(trees.Commands.SetLogic(trees.Commands.AUFLIA()))
+    z3Interpreter.eval(trees.Commands.CheckSat())
     z3Interpreter.free()
     z3Interpreter.interrupt()
   }
@@ -33,8 +33,8 @@ class ProcessInterpreterTests extends FunSuite with TestHelpers {
     //TODO: check against all interpreters
     val z3Interpreter = getZ3Interpreter
 
-    z3Interpreter.eval(parser.Commands.SetLogic(parser.Commands.AUFLIA()))
-    z3Interpreter.eval(parser.Commands.CheckSat())
+    z3Interpreter.eval(trees.Commands.SetLogic(trees.Commands.AUFLIA()))
+    z3Interpreter.eval(trees.Commands.CheckSat())
     z3Interpreter.interrupt()
     z3Interpreter.interrupt()
     z3Interpreter.interrupt()
