@@ -19,7 +19,7 @@ parallelExecution in Test := true
 lazy val commonSettings = Seq(
   organization := "com.regblanc",
   name := "scala-smtlib",
-  version := "0.2.1",
+  version := "0.2.2",
   scalaVersion := "2.11.8",
   crossScalaVersions := Seq("2.10.4", "2.11.8", "2.12.1")
 )
