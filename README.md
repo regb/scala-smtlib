@@ -108,7 +108,7 @@ library, so if that fits your needs you should be able to safely use it. It come
 with a relatively extensive test suite to make sure it is working as expected.
 
 
-###Lexing
+### Lexing
 
 The [`lexer`](/src/main/scala/smtlib/lexer) package implements low level
 parsing of [`Tokens`](/src/main/scala/smtlib/lexer/Tokens.scala), The 
@@ -139,7 +139,7 @@ such as `stdin`). The following two exceptions can be thrown by the lexer:
   the EOF.
 
 
-###Parsing
+### Parsing
 
 Usually one does not need to work on a token by token basis, and is only
 interested in fully formated SMT-LIB expressions. The
@@ -168,13 +168,13 @@ the corresponding SMT-LIB command. It is defined
 parameter a `Term`, whose AST is defined
 [here](/src/main/scala/smtlib/parser/Terms.scala).
 
-###Printing
+### Printing
 
 The [`printer`](/src/main/scala/smtlib/printer) helps with printing out SMT-LIB
 complient commands. This means that the output of a printer can be send
 directly to an SMT solver.
 
-###Standard Theories
+### Standard Theories
 
 Finally the [`theories`](/src/main/scala/smtlib/theories) module provides tree
 builders to create theory-specific formulas. Each theory module provides
@@ -190,7 +190,7 @@ and has been made standalone in order for the
 [Leon](https://github.com/epfl-lara/leon) project to rely on it.
 Hopefully, it can be useful to other people as well.
 
-###Testing
+### Testing
 
 In order to attain a decent level of quality, there is a relatively strict policy for testing.
 Testing is separated in two levels of testing: unit tests and integration tests. Unit test
@@ -203,7 +203,7 @@ In SBT, the command `sbt test` will run the unit test suite, while the command
 `sbt it:test` will run the integration test suite. During developement, it
 should be fine to run in mode `~testQuick`.
 
-###Building the Sources
+### Building the Sources
 
 The project is built with [sbt](http://www.scala-sbt.org/). To build the
 library, just type:
