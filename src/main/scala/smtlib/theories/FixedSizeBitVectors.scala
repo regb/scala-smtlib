@@ -45,12 +45,12 @@ object FixedSizeBitVectors {
       QualifiedIdentifier(Identifier(SSymbol("bv" + x), Seq(SNumeral(n))))
     //TODO: BigInt is not the best data representation for a bitvector, we should probably use a list of boolean kind of representation
     def unapply(term: Term): Option[(BigInt, BigInt)] = term match {
-      case QualifiedIdentifier(Identifier(SSymbol(name), Seq(SNumeral(n))), None) => {
-        if(name.startsWith("bv")) {
-          val value = name.substring(2)
-          scala.util.Try(BigInt(value).toInt).toOption.map(v => (v, n))
-        } else None
-      }
+      case QualifiedIdentifier(
+        Identifier(SSymbol(cst), Seq(SNumeral(size))),
+        None
+      ) if cst startsWith "bv" =>
+        Some(BigInt(cst drop 2) -> size)
+
       case _ => None
     }
   }
