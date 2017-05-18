@@ -50,6 +50,14 @@ class FixedSizeBitVectorsTests extends FunSuite {
       case BitVectorConstant(x, n) if x == 11 && n == 17 => assert(true)
       case _ => assert(false)
     }
+    Parser.fromString("(_ bv10242 77)").parseTerm match {
+      case BitVectorConstant(x, n) if x == 10242 && n == 77 => assert(true)
+      case _ => assert(false)
+    }
+    Parser.fromString("(_ bv1234567891234 200)").parseTerm match {
+      case BitVectorConstant(x, n) if x == BigInt("1234567891234") && n == 200 => assert(true)
+      case _ => assert(false)
+    }
 
     val cst = BitVectorConstant(13, 32)
     cst match {
