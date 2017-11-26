@@ -26,6 +26,7 @@ abstract class ProcessInterpreter(protected val process: Process, tailPrinter: B
     case CheckSat() => parser.parseCheckSatResponse
     case GetAssertions() => parser.parseGetAssertionsResponse
     case GetUnsatCore() => parser.parseGetUnsatCoreResponse
+    case GetUnsatAssumptions() => parser.parseGetUnsatAssumptionsResponse
     case GetProof() => parser.parseGetProofResponse
     case GetValue(_, _) => parser.parseGetValueResponse
     case GetAssignment() => parser.parseGetAssignmentResponse
