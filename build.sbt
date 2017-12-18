@@ -1,3 +1,5 @@
+enablePlugins(GitVersioning)
+
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
 scalacOptions ++= {
