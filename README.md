@@ -50,7 +50,7 @@ Setup
 The latest stable release for Scala 2.11 is available on Sonatype, simply add
 the following to your `build.sbt`:
 
-    libraryDependencies += "com.regblanc" %% "scala-smtlib" % "0.2"
+    libraryDependencies += "com.regblanc" %% "scala-smtlib" % "0.2.2"
 
 Getting Started with Examples
 -----------------------------
