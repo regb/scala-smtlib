@@ -163,10 +163,9 @@ failed, the expected tokens, and the position in the input (the position is an
 attribute of the token and can be accessed through it).
 
 A `Command` is the root of a complex abstract syntax tree (AST) representing
-the corresponding SMT-LIB command. It is defined
-[here](/src/main/scala/smtlib/parser/Commands.scala). A few commands take as
-parameter a `Term`, whose AST is defined
-[here](/src/main/scala/smtlib/parser/Terms.scala).
+the corresponding SMT-LIB command. A few commands take as
+parameter a `Term`. Their ASTs are defined
+[here](/src/main/scala/smtlib/trees/Trees.scala).
 
 ### Printing
 
