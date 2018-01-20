@@ -46,15 +46,12 @@ publishTo := {
 
 pomIncludeRepository := { _ => false }
 
+sonatypeProfileName := "com.regblanc"
+
+licenses := Seq("MIT-style" -> url("https://opensource.org/licenses/MIT"))
+
 pomExtra := (
   <url>https://github.com/regb/scala-smtlib</url>
-    <licenses>
-      <license>
-        <name>MIT-style</name>
-        <url>https://opensource.org/licenses/MIT</url>
-        <distribution>repo</distribution>
-      </license>
-    </licenses>
     <scm>
       <url>git@github.com:regb/scala-smtlib.git</url>
       <connection>scm:git:git@github.com:regb/scala-smtlib.git</connection>
