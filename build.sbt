@@ -46,8 +46,6 @@ publishTo := {
 
 pomIncludeRepository := { _ => false }
 
-sonatypeProfileName := "com.regblanc"
-
 licenses := Seq("MIT-style" -> url("https://opensource.org/licenses/MIT"))
 
 pomExtra := (
