@@ -61,29 +61,12 @@ trait TestHelpers {
   }
 
   def executeZ3(file: File)(f: (String) => Unit): Unit = {
-    //Seq("z3", "-smt2", file.getPath).lineStream
     Seq("z3", "-smt2", file.getPath) ! ProcessLogger(f, s => ())
   }
 
   def executeCVC4(file: File)(f: (String) => Unit): Unit = {
-    //Seq("cvc4", "--lang", "smt", "--incremental", "--produce-models", file.getPath).lineStream
     Seq("cvc4", "--lang", "smt", "--incremental", "--produce-models", file.getPath) ! ProcessLogger(f, s => ())
   }
-
-//  def mkTest(file: File)(block: => Unit) = {
-//
-//    if(isZ3Available) {
-//      test("SMTLIB benchmark: " + file.getPath) {
-//        (new ScriptRunner).run(file)
-//      }
-//    }
-//
-//    if(isCVC4Available) {
-//
-//    }
-//
-//  }
-//
 
 }
 

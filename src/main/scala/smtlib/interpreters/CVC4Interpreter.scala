@@ -34,8 +34,6 @@ object CVC4Interpreter {
     val executable = "cvc4"
     val args = Array("-q",
                      "--produce-models",
-                     "--no-incremental",
-                     "--tear-down-incremental",
                      "--dt-rewrite-error-sel",
                      "--print-success",
                      "--lang", "smt2.5")
