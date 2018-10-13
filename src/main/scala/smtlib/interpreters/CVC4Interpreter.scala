@@ -13,28 +13,6 @@ class CVC4Interpreter(executable: String, args: Array[String], tailPrinter: Bool
   in.flush
   parser.parseGenResponse
 
-  override def parseResponseOf(cmd: SExpr): SExpr = cmd match {
-    case DefineFunsRec(funs, _) =>
-      // CVC4 translates define-funs-rec in three commands per function,
-      // and thus emits 3x success.
-      val res = for (i <- 1 to funs.size*3) yield {
-        parser.parseGenResponse
-      }
-
-      res.find(_ != Success).getOrElse(Success)
-
-    case DefineFunRec(_) =>
-      // CVC4 translates define-fun-rec in three commands,
-      // and thus emits 3x success.
-      val res = for (i <- 1 to 3) yield {
-        parser.parseGenResponse
-      }
-
-      res.find(_ != Success).getOrElse(Success)
-
-    case _ =>
-      super.parseResponseOf(cmd)
-  }
 }
 
 object CVC4Interpreter {

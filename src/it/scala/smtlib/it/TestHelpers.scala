@@ -65,7 +65,7 @@ trait TestHelpers {
   }
 
   def executeCVC4(file: File)(f: (String) => Unit): Unit = {
-    Seq("cvc4", "--lang", "smt", "--incremental", "--produce-models", file.getPath) ! ProcessLogger(f, s => ())
+    Seq("cvc4", "--lang", "smt", file.getPath) ! ProcessLogger(f, s => ())
   }
 
 }

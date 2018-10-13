@@ -3,9 +3,7 @@
 (set-info :source |
 Bit-vector benchmarks from Dawson Engler's tool contributed by Vijay Ganesh
 (vganesh@stanford.edu).  Translated into SMT-LIB format by Clark Barrett using
-CVC3.
-
-|)
+CVC3.  |)
 (set-info :smt-lib-version 2.0)
 (set-info :category "industrial")
 (set-info :status sat)
