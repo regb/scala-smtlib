@@ -42,6 +42,7 @@ object CVC4Interpreter {
   def buildDefault: CVC4Interpreter = {
     val executable = "cvc4"
     val args = Array("-q",
+                     "-i",
                      "--produce-models",
                      "--dt-rewrite-error-sel",
                      "--print-success",
