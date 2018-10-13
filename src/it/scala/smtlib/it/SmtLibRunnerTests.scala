@@ -19,7 +19,7 @@ import interpreters._
   * Compare the result of running command by command with an interpreter against
   * running the corresponding executable directly on the .smt2 files.
   *
-  * TODO: proper way to display warning when not all tests are run because of not found exectuables
+  * TODO: proper way to display warning when not all tests are run because of not found executables.
   */
 class SmtLibRunnerTests extends FunSuite with TestHelpers {
 
@@ -47,7 +47,7 @@ class SmtLibRunnerTests extends FunSuite with TestHelpers {
   if(isCVC4Available) {
     filesInResourceDir("regression/smtlib/solving/cvc4", _.endsWith(".smt2")).foreach(file => {
       test("With CVC4: SMTLIB benchmark: " + file.getPath) {
-        compareWithInterpreter(executeCVC4)(getCVC4Interpreter, file)
+        compareWithWant(getCVC4Interpreter, file, new File(file.getPath + ".want"))
       }
     })
   }
@@ -55,15 +55,33 @@ class SmtLibRunnerTests extends FunSuite with TestHelpers {
   
   def compareWithInterpreter(executable: (File) => (String => Unit) => Unit)
                             (interpreter: Interpreter, file: File) = {
-
     val lexer = new Lexer(new FileReader(file))
     val parser = new Parser(lexer)
 
     executable(file) { (expected: String) =>
-      val res: String = interpreter.eval(parser.parseCommand).toString
+      val cmd = parser.parseCommand
+      assert(cmd !== null)
+      val res: String = interpreter.eval(cmd).toString
       assert(expected.trim === res.trim)
     }
     assert(parser.parseCommand === null)
   }
 
+  def compareWithWant(interpreter: Interpreter, file: File, want: File) = {
+
+    val lexer = new Lexer(new FileReader(file))
+    val parser = new Parser(lexer)
+
+    for(expected <- scala.io.Source.fromFile(want).getLines) {
+      val cmd = parser.parseCommand
+      assert(cmd !== null)
+      val res: String = interpreter.eval(cmd).toString
+      assert(expected.trim === res.trim)
+    }
+    assert(parser.parseCommand === null)
+    intercept[smtlib.parser.Parser.UnexpectedEOFException] {
+      // There shouldn't be anything left on the interpreter parser (the solver process).
+      interpreter.parser.parseSExpr
+    }
+  }
 }
