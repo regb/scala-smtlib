@@ -103,7 +103,7 @@ class PrintingContext(writer: Writer) {
 
   protected def printString(value: String): Unit = {
     print("\"")
-    print(value.flatMap(c => if (c == '"') "\"\"" else List(c)))
+    print(value.replaceAll("\"", "\"\""))
     print("\"")
   }
 

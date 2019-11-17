@@ -341,7 +341,7 @@ class CommandsResponsesParserTests extends FunSuite {
   /*
    * TODO: the standard requires at least one value, currently we return empty list
    */
-  ignore("get-value response must contains at least one valuation pair") {
+  ignore("get-value response must contain at least one valuation pair") {
     intercept[UnexpectedTokenException] {
       Parser.fromString("()").parseGetValueResponse
     }

@@ -219,7 +219,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
       constructors.append(parseConstructor)
     }
     eat(Tokens.CParen)
-    (name, constructors)
+    (name, constructors.toSeq)
   }
 
   def parseConstructor: Constructor = {
