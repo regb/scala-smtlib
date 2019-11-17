@@ -16,7 +16,7 @@ class Binary private(val digits: List[Boolean]) {
 
   def toLongBits: Long = {
     val allReversedBits: List[Boolean] = digits.take(64).reverse.padTo(64, false)
-    allReversedBits.foldRight(0l)((bit, bits) => ((bits<<1) | (if(bit) 1 else 0)))
+    allReversedBits.foldRight(0L)((bit, bits) => ((bits<<1) | (if(bit) 1 else 0)))
   }
 
   //transform to a 32 bits integer, respecting 2 complements

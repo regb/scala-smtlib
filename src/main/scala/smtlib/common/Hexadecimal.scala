@@ -113,7 +113,7 @@ object Hexadecimal {
       while(i < 8) {
         val end = rest & 15
         rest = rest >> 4
-        repr = toDigit(end) + repr
+        repr = s"${toDigit(end)}$repr"
         i += 1
       }
 
