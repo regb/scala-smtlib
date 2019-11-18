@@ -113,7 +113,7 @@ object Terms {
   sealed trait Constant extends Term with AttributeValue
 
   /*
-   * Literal do not necessarly have an associated expected meaning (SNumeral as an
+   * Literal do not necessarily have an associated expected meaning (SNumeral as an
    * integer or SBinary as a 2-complement integer). They are just syntactic units,
    * and each local theory gives them a semantics.
    *
