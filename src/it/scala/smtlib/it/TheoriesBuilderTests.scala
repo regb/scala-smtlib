@@ -3,7 +3,7 @@ package it
 
 import scala.sys.process._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import java.io.File
 import java.io.FileReader
@@ -16,7 +16,7 @@ import trees.CommandsResponses._
 
 
 /** Checks that formula build with theories module are correctly handled by solvers */
-class TheoriesBuilderTests extends FunSuite with TestHelpers {
+class TheoriesBuilderTests extends AnyFunSuite with TestHelpers {
 
 
   def mkTest(formula: Term, expectedStatus: Status, prefix: String) = {

@@ -5,9 +5,9 @@ import trees.Terms._
 import ArraysEx._
 import Ints.{IntSort, NumeralLit}
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class ArraysExTests extends FunSuite {
+class ArraysExTests extends AnyFunSuite {
 
   override def suiteName = "ArraysEx Theory test suite"
 

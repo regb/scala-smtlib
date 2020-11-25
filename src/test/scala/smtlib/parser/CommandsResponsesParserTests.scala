@@ -7,11 +7,11 @@ import trees.Commands._
 import trees.CommandsResponses._
 import trees.Terms._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.language.implicitConversions
 
-class CommandsResponsesParserTests extends FunSuite {
+class CommandsResponsesParserTests extends AnyFunSuite {
 
   private implicit def strToSym(str: String): SSymbol = SSymbol(str)
   private implicit def strToId(str: String): Identifier = Identifier(SSymbol(str))
