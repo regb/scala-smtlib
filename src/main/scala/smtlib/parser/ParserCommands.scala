@@ -28,7 +28,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
     }
     case Tokens.CheckSat => CheckSat()
     case Tokens.CheckSatAssuming => {
-      val props = parseMany(parsePropLit _)
+      val props = parseMany(() => parsePropLit)
       CheckSatAssuming(props)
     }
 
@@ -64,8 +64,8 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
       DefineFunRec(funDef)
     }
     case Tokens.DefineFunsRec => {
-      val (funDef, funDefs) = parseOneOrMore(() => parseWithin(Tokens.OParen, Tokens.CParen)(parseFunDec _))
-      val (body, bodies) = parseOneOrMore(parseTerm _)
+      val (funDef, funDefs) = parseOneOrMore(() => parseWithin(Tokens.OParen, Tokens.CParen)(() => parseFunDec))
+      val (body, bodies) = parseOneOrMore(() => parseTerm)
       assert(funDefs.size == bodies.size)
       DefineFunsRec(funDef +: funDefs, body +: bodies)
     }
@@ -151,7 +151,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
       eat(Tokens.OParen)
       eat(Tokens.CParen)
 
-      val datatypes = parseMany(parseDatatypes _)
+      val datatypes = parseMany(() => parseDatatypes)
 
       DeclareDatatypes(datatypes)
     }
@@ -192,7 +192,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
   def parseFunDec: FunDec = {
     val name = parseSymbol
 
-    val sortedVars = parseMany(parseSortedVar _)
+    val sortedVars = parseMany(() => parseSortedVar)
 
     val sort = parseSort
 
@@ -202,7 +202,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
   def parseFunDef: FunDef = {
     val name = parseSymbol
 
-    val sortedVars = parseMany(parseSortedVar _)
+    val sortedVars = parseMany(() => parseSortedVar)
 
     val sort = parseSort
 

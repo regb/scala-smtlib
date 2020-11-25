@@ -38,13 +38,13 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
   override protected def parseTermWithoutParens(startPos: Position): Term = getPeekToken.kind match {
     case Tokens.Lambda =>
       eat(Tokens.Lambda)
-      val args = parseMany(parseSortedVar _)
+      val args = parseMany(() => parseSortedVar)
       val body = parseTerm
       Lambda(args, body)
 
     case Tokens.At =>
       eat(Tokens.At)
-      val (caller +: args) = parseUntil(LT.CParen, eatEnd = false)(parseTerm _)
+      val (caller +: args) = parseUntil(LT.CParen, eatEnd = false)(() => parseTerm)
       Application(caller, args)
 
     case Tokens.Match =>
@@ -59,7 +59,7 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
             Default
 
           case LT.OParen =>
-            val (sym, binders) = parseOneOrMore(parseSymbol _)
+            val (sym, binders) = parseOneOrMore(() => parseSymbol)
             CaseClass(sym, binders)
 
           case _ =>
@@ -82,7 +82,7 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
       getPeekToken.kind match {
         case LT.Par =>
           eat(LT.Par)
-          val tps = parseMany(parseSymbol _)
+          val tps = parseMany(() => parseSymbol)
           val res = parseTerm
           eat(LT.CParen)
           (Some(tps), res)
@@ -123,8 +123,8 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
         case LT.OParen =>
           eat(LT.OParen)
           eat(LT.Par)
-          val tps = parseMany(parseSymbol _)
-          val (sym, sort) = parseWithin(LT.OParen, LT.CParen)(parseDecl _)
+          val tps = parseMany(() => parseSymbol)
+          val (sym, sort) = parseWithin(LT.OParen, LT.CParen)(() => parseDecl)
           eat(LT.CParen)
           DeclareConstPar(tps, sym, sort)
         case _ =>
@@ -136,7 +136,7 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
       eat(LT.DeclareFun)
       def parseDecl: (SSymbol, Seq[Sort], Sort) = {
         val sym = parseSymbol
-        val sorts = parseMany(parseSort _)
+        val sorts = parseMany(() => parseSort)
         val resultSort = parseSort
         (sym, sorts, resultSort)
       }
@@ -144,8 +144,8 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
         case LT.OParen =>
           eat(LT.OParen)
           eat(LT.Par)
-          val tps = parseMany(parseSymbol _)
-          val (sym, args, resultSort) = parseWithin(LT.OParen, LT.CParen)(parseDecl _)
+          val tps = parseMany(() => parseSymbol)
+          val (sym, args, resultSort) = parseWithin(LT.OParen, LT.CParen)(() => parseDecl)
           eat(LT.CParen)
           DeclareFunPar(tps, sym, args, resultSort)
         case _ =>
@@ -159,8 +159,8 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
         case LT.OParen =>
           eat(LT.OParen)
           eat(LT.Par)
-          val tps = parseMany(parseSymbol _)
-          val funDef = parseWithin(LT.OParen, LT.CParen)(parseFunDef _)
+          val tps = parseMany(() => parseSymbol)
+          val funDef = parseWithin(LT.OParen, LT.CParen)(() => parseFunDef)
           eat(LT.CParen)
           DefineFunPar(tps, funDef)
 
@@ -175,8 +175,8 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
         case LT.OParen =>
           eat(LT.OParen)
           eat(LT.Par)
-          val tps = parseMany(parseSymbol _)
-          val funDef = parseWithin(LT.OParen, LT.CParen)(parseFunDef _)
+          val tps = parseMany(() => parseSymbol)
+          val funDef = parseWithin(LT.OParen, LT.CParen)(() => parseFunDef)
           eat(LT.CParen)
           DefineFunRecPar(tps, funDef)
 
@@ -192,8 +192,8 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
         val funDec = getPeekToken.kind match {
           case LT.Par =>
             eat(LT.Par)
-            val tps = parseMany(parseSymbol _)
-            val funDec = parseWithin(LT.OParen, LT.CParen)(parseFunDec _)
+            val tps = parseMany(() => parseSymbol)
+            val funDec = parseWithin(LT.OParen, LT.CParen)(() => parseFunDec)
             Left(FunDecPar(tps, funDec.name, funDec.params, funDec.returnSort))
           case _ =>
             Right(parseFunDec)
@@ -201,7 +201,7 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
         eat(LT.CParen)
         funDec
       })
-      val (body, bodies) = parseOneOrMore(parseTerm _)
+      val (body, bodies) = parseOneOrMore(() => parseTerm)
       assert(funDecs.size == bodies.size)
 
       if ((funDec +: funDecs).exists(_.isLeft)) {
@@ -212,8 +212,8 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
 
     case LT.DeclareDatatypes =>
       eat(LT.DeclareDatatypes)
-      val tps = parseMany(parseSymbol _)
-      val datatypes = parseMany(parseDatatypes _)
+      val tps = parseMany(() => parseSymbol)
+      val datatypes = parseMany(() => parseDatatypes)
       DeclareDatatypesPar(tps, datatypes)
 
     case _ => super.parseCommandWithoutParens
