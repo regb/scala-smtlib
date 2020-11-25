@@ -7,9 +7,10 @@ import trees.Terms._
 import Sets._
 import Ints.{IntSort, NumeralLit}
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class SetsTests extends FunSuite with Matchers {
+class SetsTests extends AnyFunSuite with Matchers {
 
   override def suiteName = "Set theory test suite"
 

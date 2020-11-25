@@ -1,13 +1,13 @@
 package smtlib
 package trees
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
 import Terms._
 import Commands._
 import TreesOps._
 
-class TreesOpsTests extends FunSuite {
+class TreesOpsTests extends AnyFunSuite {
 
   val s1 = Sort(Identifier(SSymbol("S1")))
   val s2 = Sort(Identifier(SSymbol("S2")))

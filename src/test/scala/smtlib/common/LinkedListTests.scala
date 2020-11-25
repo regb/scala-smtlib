@@ -1,8 +1,8 @@
 package smtlib.common
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class LinkedListTests extends FunSuite {
+class LinkedListTests extends AnyFunSuite {
 
 
   test("append one element on empty list pop the same element") {

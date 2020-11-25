@@ -4,9 +4,9 @@ package theories
 import FixedSizeBitVectors._
 import parser.Parser
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class FixedSizeBitVectorsTests extends FunSuite {
+class FixedSizeBitVectorsTests extends AnyFunSuite {
 
   override def suiteName = "Bit Vector theory test suite"
 
