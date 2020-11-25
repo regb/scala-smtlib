@@ -201,7 +201,7 @@ trait ParserCommon {
       } else {
         val name = parseIdentifier
 
-        val subSorts = parseUntil(Tokens.CParen, eatEnd = false)(parseSort _)
+        val subSorts = parseUntil(Tokens.CParen, eatEnd = false)(() => parseSort)
 
         Sort(name, subSorts.toList).setPos(startPos)
       }
@@ -230,7 +230,7 @@ trait ParserCommon {
     val sym = parseSymbol
 
     val head = parseSExpr
-    val indices = parseUntil(Tokens.CParen, eatEnd = false)(parseSExpr _)
+    val indices = parseUntil(Tokens.CParen, eatEnd = false)(() => parseSExpr)
 
     Identifier(sym, head +: indices)
   }
@@ -245,7 +245,7 @@ trait ParserCommon {
   def parseIdentifier: Identifier = {
     if(getPeekToken.kind == Tokens.OParen) {
       val pos = getPeekToken.getPos
-      parseWithin(Tokens.OParen, Tokens.CParen)(parseUnderscoreIdentifier _).setPos(pos)
+      parseWithin(Tokens.OParen, Tokens.CParen)(() => parseUnderscoreIdentifier).setPos(pos)
     } else {
       val sym = parseSymbol
       Identifier(sym).setPos(sym)
@@ -319,7 +319,7 @@ trait ParserCommon {
     }
   }
 
-  def parseSList: SList = SList(parseMany(parseSExpr _).toList)
+  def parseSList: SList = SList(parseMany(() => parseSExpr).toList)
 
   /**
     *
