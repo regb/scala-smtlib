@@ -1,9 +1,9 @@
 package smtlib
 package common
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class BinaryTests extends FunSuite {
+class BinaryTests extends AnyFunSuite {
 
   test("toIntBits works with one bit") {
     assert(Binary(List(true)).toIntBits === 1)

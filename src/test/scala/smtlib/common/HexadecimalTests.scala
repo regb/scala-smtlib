@@ -1,9 +1,9 @@
 package smtlib
 package common
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class HexadecimalTests extends FunSuite {
+class HexadecimalTests extends AnyFunSuite {
 
   test("Build hexadecimal with one digit string") {
     val zero = Hexadecimal.fromString("0")

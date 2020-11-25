@@ -3,9 +3,9 @@ package theories
 
 import Ints._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class IntsTests extends FunSuite {
+class IntsTests extends AnyFunSuite {
 
   override def suiteName = "Ints theory test suite"
 

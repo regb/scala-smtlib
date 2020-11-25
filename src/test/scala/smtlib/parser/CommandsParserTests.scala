@@ -11,12 +11,12 @@ import trees.TreesOps
 
 import java.io.StringReader
 
-import org.scalatest.FunSuite
 import org.scalatest.concurrent.TimeLimits
+import org.scalatest.funsuite.AnyFunSuite
 
 import scala.language.implicitConversions
 
-class CommandsParserTests extends FunSuite with TimeLimits {
+class CommandsParserTests extends AnyFunSuite with TimeLimits {
 
   override def suiteName = "SMT-LIB commands Parser suite"
 

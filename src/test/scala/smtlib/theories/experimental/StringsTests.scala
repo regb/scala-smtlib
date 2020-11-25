@@ -7,9 +7,10 @@ import trees.Terms._
 import Strings._
 import Ints.NumeralLit
 
-import org.scalatest.{FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.matchers.should.Matchers
 
-class StringsTests extends FunSuite with Matchers {
+class StringsTests extends AnyFunSuite with Matchers {
 
   override def suiteName = "Strings theory test suite"
 

@@ -8,12 +8,12 @@ import Lexer.IllegalTokenException
 
 import java.io.StringReader
 
-import org.scalatest.FunSuite
 import org.scalatest.concurrent.TimeLimits
+import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.time.SpanSugar._
 
 
-class LexerTests extends FunSuite with TimeLimits {
+class LexerTests extends AnyFunSuite with TimeLimits {
 
 
   override def suiteName = "Lexer Test Suite"

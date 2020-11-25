@@ -4,9 +4,9 @@ package theories
 import trees.Terms._
 import Core._
 
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-class CoreTests extends FunSuite {
+class CoreTests extends AnyFunSuite {
 
   override def suiteName = "Core Theory test suite"
 
