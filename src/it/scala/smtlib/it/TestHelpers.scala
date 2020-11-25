@@ -26,7 +26,7 @@ trait TestHelpers {
   private val resourceDirHard = "src/it/resources/"
 
   def filesInResourceDir(dir : String, filter : String=>Boolean = all) : Iterable[File] = {    
-    import scala.collection.JavaConversions._
+    import scala.jdk.CollectionConverters._
     val d = this.getClass.getClassLoader.getResource(dir)
 
     val asFile = if(d == null || d.getProtocol != "file") {
