@@ -48,7 +48,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val pairs = parseUntil(Tokens.CParen)(parsePair _)
+            val pairs = parseUntil(Tokens.CParen)(() => parsePair)
             GetAssignmentResponseSuccess(pairs)
           }
         }
@@ -72,7 +72,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val pairs = parseUntil(Tokens.CParen)(parsePair _)
+            val pairs = parseUntil(Tokens.CParen)(() => parsePair)
             GetValueResponseSuccess(pairs)
           }
         }
@@ -91,7 +91,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
             check(t, Tokens.OParen)
             peekToken match {
               case Tokens.SymbolLit("error") => parseErrorResponse
-              case _ => GetOptionResponseSuccess(SList(parseUntil(Tokens.CParen)(parseSExpr _).toList))
+              case _ => GetOptionResponseSuccess(SList(parseUntil(Tokens.CParen)(() => parseSExpr).toList))
             }
           }
         }
@@ -111,7 +111,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
             check(t, Tokens.OParen)
             peekToken match {
               case Tokens.SymbolLit("error") => parseErrorResponse
-              case _ => GetProofResponseSuccess(SList(parseUntil(Tokens.CParen)(parseSExpr _).toList))
+              case _ => GetProofResponseSuccess(SList(parseUntil(Tokens.CParen)(() => parseSExpr).toList))
             }
           }
         }
@@ -139,7 +139,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
                 case ex: UnknownCommandException => {
                   ex.commandName match { //recover for exceptions case in get-model
                     case Tokens.Forall =>
-                      val vars = parseMany(parseSortedVar _)
+                      val vars = parseMany(() => parseSortedVar)
                       val term = parseTerm
                       eat(Tokens.CParen)
                       exprs.append(Forall(vars.head, vars.tail, term))
@@ -201,7 +201,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val responses = parseUntil(Tokens.CParen)(parseInfoResponse _)
+            val responses = parseUntil(Tokens.CParen)(() => parseInfoResponse)
             GetInfoResponseSuccess(responses.head, responses.tail)
           }
         }
@@ -241,7 +241,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val terms = parseUntil(Tokens.CParen)(parseTerm _)
+            val terms = parseUntil(Tokens.CParen)(() => parseTerm)
             GetAssertionsResponseSuccess(terms)
           }
         }
@@ -257,7 +257,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val syms = parseUntil(Tokens.CParen)(parseSymbol _)
+            val syms = parseUntil(Tokens.CParen)(() => parseSymbol)
             GetUnsatAssumptionsResponseSuccess(syms)
           }
         }
@@ -273,7 +273,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            val syms = parseUntil(Tokens.CParen)(parseSymbol _)
+            val syms = parseUntil(Tokens.CParen)(() => parseSymbol)
             GetUnsatCoreResponseSuccess(syms)
           }
         }

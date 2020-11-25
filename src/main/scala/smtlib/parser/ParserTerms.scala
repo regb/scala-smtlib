@@ -37,19 +37,19 @@ trait ParserTerms { this: ParserCommon =>
   protected def parseTermWithoutParens(startPos: Position): Term = getPeekToken.kind match {
     case Tokens.Let =>
       eat(Tokens.Let)
-      val (head, bindings) = parseOneOrMore(parseVarBinding _)
+      val (head, bindings) = parseOneOrMore(() => parseVarBinding)
       val term = parseTerm
       Let(head, bindings, term)
 
     case Tokens.Forall =>
       eat(Tokens.Forall)
-      val (head, vars) = parseOneOrMore(parseSortedVar _)
+      val (head, vars) = parseOneOrMore(() => parseSortedVar)
       val term = parseTerm
       Forall(head, vars, term)
 
     case Tokens.Exists =>
       eat(Tokens.Exists)
-      val (head, vars) = parseOneOrMore(parseSortedVar _)
+      val (head, vars) = parseOneOrMore(() => parseSortedVar)
       val term = parseTerm
       Exists(head, vars, term)
 
@@ -57,7 +57,7 @@ trait ParserTerms { this: ParserCommon =>
       eat(Tokens.ExclamationMark)
       val term = parseTerm
       val head = parseAttribute
-      val attrs = parseUntil(Tokens.CParen, eatEnd = false)(parseAttribute _)
+      val attrs = parseUntil(Tokens.CParen, eatEnd = false)(() => parseAttribute)
       AnnotatedTerm(term, head, attrs)
 
     case Tokens.As =>
@@ -69,7 +69,7 @@ trait ParserTerms { this: ParserCommon =>
     case _ => //should be function application
       val id = parseQualifiedIdentifier 
       val head = parseTerm
-      val terms = parseUntil(Tokens.CParen, eatEnd = false)(parseTerm _)
+      val terms = parseUntil(Tokens.CParen, eatEnd = false)(() => parseTerm)
       FunctionApplication(id, head::terms.toList)
   }
 
