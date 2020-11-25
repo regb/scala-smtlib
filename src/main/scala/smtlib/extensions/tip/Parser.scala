@@ -207,7 +207,12 @@ class Parser(lexer: Lexer) extends parser.Parser(lexer) {
       if ((funDec +: funDecs).exists(_.isLeft)) {
         DefineFunsRecPar(funDec +: funDecs, body +: bodies)
       } else {
-        DefineFunsRec((funDec +: funDecs).map(_.right.get), body +: bodies)
+        def getRight(either: Either[FunDecPar, FunDec]) = either match {
+          case Left(_) => throw new NoSuchElementException("getRight() on Left")
+          case Right(a) => a
+        }
+
+        DefineFunsRec((funDec +: funDecs).map(getRight(_)), body +: bodies)
       }
 
     case LT.DeclareDatatypes =>
