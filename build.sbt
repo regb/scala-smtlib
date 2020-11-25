@@ -24,7 +24,7 @@ lazy val commonSettings = Seq(
   organization := "com.regblanc",
   name := "scala-smtlib",
   scalaVersion := "2.13.1",
-  crossScalaVersions := Seq("2.10.4", "2.11.8", "2.12.1", "2.13.1")
+  crossScalaVersions := Seq("2.10.7", "2.11.12", "2.12.12", "2.13.4")
 )
 
 lazy val root = (project in file(".")).
