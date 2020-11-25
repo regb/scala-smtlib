@@ -5,7 +5,7 @@ git.useGitDescribe := true
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
 scalacOptions ++= {
-  val Seq(_, major, minor) = (scalaVersion in ThisBuild).value.split("\\.").toSeq.map(_.toInt)
+  val Seq(_, major, minor) = scalaVersion.value.split("\\.").toSeq.map(_.toInt)
   if (major <= 10 || (major == 11 && minor < 5)) Seq.empty
   else Seq("-Ypatmat-exhaust-depth", "40")
 }
