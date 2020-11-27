@@ -39,6 +39,7 @@ class SetsTests extends FunSuite with Matchers {
       case EmptySet(Reals.RealSort()) => assert(false)
       case NumeralLit(_) => assert(false)
       case EmptySet(IntSort()) => assert(true)
+      case _ => ???
     }
   }
 

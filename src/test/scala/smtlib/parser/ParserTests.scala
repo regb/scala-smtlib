@@ -428,12 +428,14 @@ class ParserTests extends FunSuite with TimeLimits {
       case ExtendedIdentifier(a, b) => 
         assert(a === abc)
         assert(b === ext)
+      case _ => ???
     }
     extId match {
       case SimpleIdentifier(sym) => assert(false)
       case ExtendedIdentifier(a, b) => 
         assert(a === abc)
         assert(b === ext)
+      case _ => ???
     }
 
   }
