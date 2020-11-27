@@ -484,6 +484,8 @@ class PrintingContext(writer: Writer) {
 
     case AttributeOption(attribute) =>
       print(attribute)
+
+    case _ => ???
   }
 
   protected def printInfoResponse(infoResponse: InfoResponse): Unit = infoResponse match {

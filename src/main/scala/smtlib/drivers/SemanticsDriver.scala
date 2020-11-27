@@ -132,6 +132,8 @@ class SemanticsDriver(
 
     case AttributeOption(attribute) =>
       regularOutputChannel(Unsupported)
+
+    case _ => ???
   }
 
   protected def processGetInfo(infoFlag: InfoFlag): Unit = infoFlag match {
