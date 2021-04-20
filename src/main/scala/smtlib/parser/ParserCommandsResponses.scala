@@ -127,10 +127,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            nextToken match {
-              case Tokens.SymbolLit("model") => ()
-              case t => expected(t, Tokens.SymbolLitKind) //TODO: expected symbol of value "model"
-            }
+            if (peekToken == Tokens.SymbolLit("model")) nextToken
             val exprs: ListBuffer[SExpr] = new ListBuffer
             while(peekToken.kind != Tokens.CParen) {
               try {
