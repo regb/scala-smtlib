@@ -72,7 +72,7 @@ class SmtLibRunnerTests extends AnyFunSuite with TestHelpers {
     val lexer = new Lexer(new FileReader(file))
     val parser = new Parser(lexer)
 
-    for(expected <- scala.io.Source.fromFile(want).getLines) {
+    for(expected <- scala.io.Source.fromFile(want).getLines()) {
       val cmd = parser.parseCommand
       assert(cmd !== null)
       val res: String = interpreter.eval(cmd).toString

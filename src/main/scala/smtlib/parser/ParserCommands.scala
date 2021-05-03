@@ -22,7 +22,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
     Script(cmds.toList)
   }
 
-  protected def parseCommandWithoutParens: Command = nextToken.kind match {
+  protected def parseCommandWithoutParens: Command = nextToken().kind match {
     case Tokens.Assert => {
       Assert(parseTerm)
     }
@@ -162,7 +162,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
   }
 
   def parseCommand: Command = if(peekToken == null) null else {
-    val head = nextToken
+    val head = nextToken()
     check(head, Tokens.OParen)
     val cmd = parseCommandWithoutParens
     eat(Tokens.CParen)
@@ -241,7 +241,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
 
 
   def parseInfoFlag: InfoFlag = {
-    val t = nextToken
+    val t = nextToken()
     val flag = t match {
       case Tokens.Keyword("all-statistics") => AllStatisticsInfoFlag()
       case Tokens.Keyword("assertion-stack-levels") => AssertionStackLevelsInfoFlag()
@@ -261,52 +261,52 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
     val peekPosition = peekToken.getPos
     val opt = peekToken match {
       case Tokens.Keyword("diagnostic-output-channel") => 
-        nextToken
+        nextToken()
         DiagnosticOutputChannel(parseString.value)
 
       case Tokens.Keyword("global-declarations") => 
-        nextToken
+        nextToken()
         GlobalDeclarations(parseBool)
 
       case Tokens.Keyword("interactive-mode") => 
-        nextToken
+        nextToken()
         InteractiveMode(parseBool)
       case Tokens.Keyword("print-success") =>
-        nextToken
+        nextToken()
         PrintSuccess(parseBool)
 
       case Tokens.Keyword("produce-assertions") => 
-        nextToken
+        nextToken()
         ProduceAssertions(parseBool)
       case Tokens.Keyword("produce-assignments") => 
-        nextToken
+        nextToken()
         ProduceAssignments(parseBool)
       case Tokens.Keyword("produce-models") => 
-        nextToken
+        nextToken()
         ProduceModels(parseBool)
       case Tokens.Keyword("produce-proofs") => 
-        nextToken
+        nextToken()
         ProduceProofs(parseBool)
       case Tokens.Keyword("produce-unsat-assumptions") => 
-        nextToken
+        nextToken()
         ProduceUnsatAssumptions(parseBool)
       case Tokens.Keyword("produce-unsat-cores") => 
-        nextToken
+        nextToken()
         ProduceUnsatCores(parseBool)
 
       case Tokens.Keyword("random-seed") => 
-        nextToken
+        nextToken()
         RandomSeed(parseNumeral.value.toInt)
 
       case Tokens.Keyword("regular-output-channel") => 
-        nextToken
+        nextToken()
         RegularOutputChannel(parseString.value)
 
       case Tokens.Keyword("reproducible-resource-limit") => 
-        nextToken
+        nextToken()
         ReproducibleResourceLimit(parseNumeral.value.toInt)
       case Tokens.Keyword("verbosity") => 
-        nextToken
+        nextToken()
         Verbosity(parseNumeral.value.toInt)
 
       case _ => 
@@ -316,7 +316,7 @@ trait ParserCommands { this: ParserCommon with ParserTerms =>
   }
 
   def parseBool: Boolean = {
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("true") => true
       case Tokens.SymbolLit("false") => false
       case t => expected(t) //TODO: not sure how to tell we were expecting one of two specific symbols

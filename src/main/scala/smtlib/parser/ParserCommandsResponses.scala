@@ -15,7 +15,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
    * Parsing error response, assuming "(" has been parsed
    */
   private def parseErrorResponse: Error = {
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("error") =>
         val msg = parseString.value
         eat(Tokens.CParen)
@@ -24,7 +24,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
     }
   }
 
-  def parseGenResponse: GenResponse = nextToken match {
+  def parseGenResponse: GenResponse = nextToken() match {
     case Tokens.SymbolLit("success") => Success
     case Tokens.SymbolLit("unsupported") => Unsupported
     case t =>
@@ -41,7 +41,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
       (sym, bool)
     }
 
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("unsupported") => Unsupported
       case t => {
         check(t, Tokens.OParen)
@@ -65,7 +65,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
       (t1, t2)
     }
 
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("unsupported") => Unsupported
       case t => {
         check(t, Tokens.OParen)
@@ -84,7 +84,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
     tryParseConstant match {
       case Some(cst) => GetOptionResponseSuccess(cst)
       case None => {
-        nextToken match {
+        nextToken() match {
           case Tokens.SymbolLit("unsupported") => Unsupported
           case Tokens.SymbolLit(sym) => GetOptionResponseSuccess(SSymbol(sym))
           case t => {
@@ -103,7 +103,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
     tryParseConstant match {
       case Some(cst) => GetProofResponseSuccess(cst)
       case None => {
-        nextToken match {
+        nextToken() match {
           case Tokens.SymbolLit("unsupported") => Unsupported
           case Tokens.SymbolLit(sym) => GetProofResponseSuccess(SSymbol(sym))
           case Tokens.Keyword(key) => GetProofResponseSuccess(SKeyword(key))
@@ -120,14 +120,14 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
   }
 
   def parseGetModelResponse: GetModelResponse = {
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("unsupported") => Unsupported
       case t => {
         check(t, Tokens.OParen)
         peekToken match {
           case Tokens.SymbolLit("error") => parseErrorResponse
           case t => {
-            if (peekToken == Tokens.SymbolLit("model")) nextToken
+            if (peekToken == Tokens.SymbolLit("model")) nextToken()
             val exprs: ListBuffer[SExpr] = new ListBuffer
             while(peekToken.kind != Tokens.CParen) {
               try {
@@ -157,25 +157,25 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
   def parseInfoResponse: InfoResponse = {
     peekToken match {
       case Tokens.Keyword("assertion-stack-levels") =>
-        nextToken
+        nextToken()
         AssertionStackLevelsInfoResponse(parseNumeral.value.toInt)
       case Tokens.Keyword("authors") =>
-        nextToken
+        nextToken()
         AuthorsInfoResponse(parseString.value)
       case Tokens.Keyword("error-behavior") =>
-        nextToken
-        val behaviour = nextToken match {
+        nextToken()
+        val behaviour = nextToken() match {
           case Tokens.SymbolLit("immediate-exit") => ImmediateExitErrorBehavior
           case Tokens.SymbolLit("continued-execution") => ContinuedExecutionErrorBehavior
           case t => expected(t) //TODO: precise error
         }
         ErrorBehaviorInfoResponse(behaviour)
       case Tokens.Keyword("name") =>
-        nextToken
+        nextToken()
         NameInfoResponse(parseString.value)
       case Tokens.Keyword("reason-unknown") =>
-        nextToken
-        val reason = nextToken match {
+        nextToken()
+        val reason = nextToken() match {
           case Tokens.SymbolLit("timeout") => TimeoutReasonUnknown
           case Tokens.SymbolLit("memout") => MemoutReasonUnknown
           case Tokens.SymbolLit("incomplete") => IncompleteReasonUnknown
@@ -183,7 +183,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
         }
         ReasonUnknownInfoResponse(reason)
       case Tokens.Keyword("version") =>
-        nextToken
+        nextToken()
         VersionInfoResponse(parseString.value)
       case _ =>
         AttributeInfoResponse(parseAttribute)
@@ -191,7 +191,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
   }
 
   def parseGetInfoResponse: GetInfoResponse = {
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("unsupported") => Unsupported
       case t => {
         check(t, Tokens.OParen)
@@ -207,7 +207,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
   }
 
   def parseCheckSatResponse: CheckSatResponse = {
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("sat") => CheckSatStatus(SatStatus)
       case Tokens.SymbolLit("unsat") => CheckSatStatus(UnsatStatus)
       case Tokens.SymbolLit("unknown") => CheckSatStatus(UnknownStatus)
@@ -220,7 +220,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
   }
 
   def parseEchoResponse: EchoResponse = {
-    nextToken match {
+    nextToken() match {
       case Tokens.StringLit(value) => EchoResponseSuccess(value)
       case Tokens.SymbolLit("unsupported") => Unsupported
       case t => {
@@ -231,7 +231,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
   }
 
   def parseGetAssertionsResponse: GetAssertionsResponse = {
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("unsupported") => Unsupported
       case t => {
         check(t, Tokens.OParen)
@@ -247,7 +247,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
   }
 
   def parseGetUnsatAssumptionsResponse: GetUnsatAssumptionsResponse = {
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("unsupported") => Unsupported
       case t => {
         check(t, Tokens.OParen)
@@ -263,7 +263,7 @@ trait ParserCommandsResponses { this: ParserCommon with ParserTerms with ParserC
   }
 
   def parseGetUnsatCoreResponse: GetUnsatCoreResponse = {
-    nextToken match {
+    nextToken() match {
       case Tokens.SymbolLit("unsupported") => Unsupported
       case t => {
         check(t, Tokens.OParen)
