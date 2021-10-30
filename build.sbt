@@ -50,10 +50,6 @@ licenses := Seq("MIT-style" -> url("https://opensource.org/licenses/MIT"))
 
 pomExtra := (
   <url>https://github.com/regb/scala-smtlib</url>
-    <scm>
-      <url>git@github.com:regb/scala-smtlib.git</url>
-      <connection>scm:git:git@github.com:regb/scala-smtlib.git</connection>
-    </scm>
     <developers>
       <developer>
         <id>reg</id>
