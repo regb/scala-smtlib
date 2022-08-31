@@ -11,7 +11,7 @@ class Lexer(reader: java.io.Reader) {
   import Lexer._
 
   private def isNewLine(c: Char) = c == '\n' || c == '\r'
-  private def isBlank(c: Char) = c == '\n' || c == '\r' || c == ' '
+  private def isBlank(c: Char) = c == '\n' || c == '\r' || c == ' ' || c == '\t'
 
   /*
    * Note that we do not start reading the input until the next function is called.

@@ -98,6 +98,11 @@ class CommandsParserTests extends AnyFunSuite with TimeLimits {
 
 
   test("Parsing define-fun commands") {
+    assert(parseUniqueCmd("(define-fun $Perm.isValidVar ((p $Perm)) Bool\n\t(<= $Perm.No p))") ===
+      DefineFun(FunDef("$Perm.isValidVar", Seq(SortedVar("p", Sort("$Perm"))), Sort("Bool"), FunctionApplication(
+        QualifiedIdentifier("<="), Seq(QualifiedIdentifier("$Perm.No"), QualifiedIdentifier("p"))
+      )))
+    )
     assert(parseUniqueCmd("(define-fun f ((a A)) B a)") ===
            DefineFun(FunDef("f", Seq(SortedVar("a", Sort("A"))), Sort("B"), QualifiedIdentifier("a"))))
     assert(parseUniqueCmd("(define-fun f ((a A)) B (f a))") ===
