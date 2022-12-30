@@ -66,8 +66,8 @@ until the end of command:
 
     val script: List[Command] = {
       var cmds = new ListBuffer[Command]
-      var cmd = parser.parseCommand
-      while(cmd != null)
+      var cmd:Command = null
+      while({cmd = parser.parseCommand; cmd != null})
         cmds.append(cmd)
       cmds.toList
     }
