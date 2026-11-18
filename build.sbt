@@ -25,15 +25,12 @@ Test / parallelExecution := true
 val laraOrganization = "ch.epfl.lara"
 
 lazy val commonSettings = Seq(
-  organization := "com.regblanc",
+  // Published to Maven Central under the namespace of the lab (it was com.regblanc for Scala 2)
+  organization := laraOrganization,
   name := "scala-smtlib",
-  scalaVersion := "3.10.1-RC1-bin-20260903-e1f9361-NIGHTLY",
-  scalaOrganization := laraOrganization,
-  excludeDependencies ++= Seq(
-    ExclusionRule("org.scala-lang", "scala-library"),
-    ExclusionRule("org.scala-lang", "scala3-library_3"),
-    ExclusionRule("org.scala-lang", "scala3-compiler_3"),
-  ),
+  // The standard Scala 3.9 (LTS), so that the published library works with Scala 3.9 and later,
+  // including the Scala 3 compiler of the lab that Inox and Stainless use
+  scalaVersion := "3.9.0",
 )
 
 lazy val root = (project in file(".")).
@@ -41,25 +38,35 @@ lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(inConfig(ItTest)(Defaults.testSettings): _*)
 
+// Publishing to Maven Central (see .github/workflows/release.yml). The version comes from the
+// latest tag, through `git describe` (sbt-git): v0.3.0 gives 0.3.0, and -SNAPSHOT is appended when
+// the working tree has uncommitted changes. `sbt publishSigned` signs the artifacts and stages
+// them locally, `sbt sonaRelease` uploads them to the Central Portal and releases them (`sbt
+// sonaUpload` only uploads them, to inspect them in the Portal first). Both read the Portal token
+// from SONATYPE_USERNAME and SONATYPE_PASSWORD.
+description := "A Scala library to interact with SMT solvers through the SMT-LIB standard"
+
+homepage := Some(url("https://github.com/epfl-lara/scala-smtlib"))
+
+licenses := Seq("MIT" -> url("https://opensource.org/licenses/MIT"))
+
+scmInfo := Some(ScmInfo(
+  url("https://github.com/epfl-lara/scala-smtlib"),
+  "scm:git:git@github.com:epfl-lara/scala-smtlib.git",
+))
+
+developers := List(
+  Developer("reg", "Regis Blanc", "", url("http://regblanc.com")),
+  Developer("epfl-lara", "EPFL Lab for Automated Reasoning and Analysis", "lara.maven@epfl.ch", url("https://lara.epfl.ch")),
+)
+
 publishMavenStyle := true
 
 Test / publishArtifact := false
 
 pomIncludeRepository := { _ => false }
 
-licenses := Seq("MIT-style" -> url("https://opensource.org/licenses/MIT"))
+publishTo := localStaging.value
 
-pomExtra := (
-  <url>https://github.com/epfl-lara/scala-smtlib</url>
-    <scm>
-      <url>git@github.com:epfl-lara/scala-smtlib.git</url>
-      <connection>scm:git:git@github.com:epfl-lara/scala-smtlib.git</connection>
-    </scm>
-    <developers>
-      <developer>
-        <id>reg</id>
-        <name>Regis Blanc</name>
-        <url>http://regblanc.com</url>
-      </developer>
-    </developers>
-)
+// The key that signs the artifacts, when the keyring holds several
+pgpSigningKey := sys.env.get("PGP_FINGERPRINT")
